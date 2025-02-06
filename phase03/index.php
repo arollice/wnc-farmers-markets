@@ -1,7 +1,7 @@
 <?php
-include_once(__DIR__ . 'private/rollice-ashlee-db-connection.php');
+include_once(__DIR__ . '/private/rollice-ashlee-db-connection.php');
+include_once(__DIR__ . '/private/db-functions.php');
 
-include_once(__DIR__ . 'private/db-functions.php');
 ?>
 
 <!DOCTYPE html>

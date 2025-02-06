@@ -31,6 +31,7 @@ function fetchAll($table)
   return $stmt->fetchAll();
 }
 
+
 //Function to escape user input (for output safety)
 function escape($input)
 {
