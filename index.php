@@ -1,6 +1,7 @@
 <?php
-include_once(__DIR__ . '/private/initialize.php');
+include_once(__DIR__ . 'private/rollice-ashlee-db-connection.php');
 
+include_once(__DIR__ . 'private/db-functions.php');
 ?>
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@ include_once(__DIR__ . '/private/initialize.php');
 
 <body>
 
-  <h1>WNC Farmers Market - Coming Soon! 🌱</h1>
+  <h1>WNC Farmers Market - Coming Soon!</h1>
   <p>We're working hard to bring you the best farmers market experience.</p>
 
   <h2> Market Locations</h2>
