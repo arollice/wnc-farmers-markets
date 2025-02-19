@@ -5,8 +5,8 @@ include_once('../private/config.php');
 include_once HEADER_FILE;
 ?>
 
-<h1>Find a Market by Region</h1>
-<p>Select a region below to explore available markets.</p>
+<h1>Markets</h1>
+<p>This page will display a list of all farmers markets.</p>
 
 <?php
 // Include the footer
