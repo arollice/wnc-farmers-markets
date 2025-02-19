@@ -1,7 +1,7 @@
 <?php
 // Ensure config.php is included
 if (!defined('PUBLIC_PATH')) {
-  include_once __DIR__ . '/../../private/config.php';
+  include_once __DIR__ . '/../private/config.php';
 }
 ?>
 
@@ -12,7 +12,9 @@ if (!defined('PUBLIC_PATH')) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WNC Farmers Market</title>
-  <link rel="stylesheet" href="<?= PUBLIC_PATH ?>/css/styles.css">
+  <!--<link rel="stylesheet" href="<?= PUBLIC_PATH ?>/css/styles.css"> -->
+
+  <!-- Navigation styles and basic layout -->
 </head>
 
 <body>

@@ -8,6 +8,10 @@ include_once('../private/config.php');
 <?php // Include the header
 include_once HEADER_FILE;
 ?>
+<div class="homepage-buttons">
+  <a href="<?= PUBLIC_PATH ?>/regions.php" class="btn">Find a Market</a>
+  <a href="<?= PUBLIC_PATH ?>/vendor-register.php" class="btn">Become a Vendor</a>
+</div>
 
 <h2>Market Locations</h2>
 <?php displayTable('market'); ?>
