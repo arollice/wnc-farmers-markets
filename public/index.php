@@ -20,3 +20,8 @@ include_once HEADER_FILE;
 // Include the footer
 include_once FOOTER_FILE;
 ?>
+
+
+//Add vendor login link in top left
+//Add seasonal harvest highlights
+//Add basic user sign up bottom right?

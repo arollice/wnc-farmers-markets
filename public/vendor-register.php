@@ -42,32 +42,12 @@ include_once HEADER_FILE;
   <label for="vendor_logo">Upload Logo (optional):</label>
   <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
 
-  <label for="region">Select Your Region:</label>
+  <label for="region">Select Your Home Region:</label>
   <select id="region" name="region_id" required>
     <option value="">-- Select a Region --</option>
     <?php foreach ($regions as $region): ?>
       <option value="<?= htmlspecialchars($region['region_id']) ?>">
         <?= htmlspecialchars($region['region_name']) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-
-  <label>Items You Sell:</label>
-  <div class="checkbox-group">
-    <?php foreach ($items as $item): ?>
-      <label class="checkbox-label">
-        <input type="checkbox" name="items_sold[]" value="<?= htmlspecialchars($item['item_id']) ?>">
-        <?= htmlspecialchars($item['item_name']) ?>
-      </label>
-    <?php endforeach; ?>
-  </div>
-
-
-  <label for="markets_attended">Markets You Attend:</label>
-  <select id="markets_attended" name="markets_attended[]" multiple>
-    <?php foreach ($markets as $market): ?>
-      <option value="<?= htmlspecialchars($market['market_id']) ?>">
-        <?= htmlspecialchars($market['market_name']) ?>
       </option>
     <?php endforeach; ?>
   </select>
@@ -89,3 +69,6 @@ include_once HEADER_FILE;
 // Include the footer
 include_once FOOTER_FILE;
 ?>
+
+
+//Make sure logo has additional naming convention added so no logos over write each other

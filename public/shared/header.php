@@ -9,13 +9,16 @@ if (!defined('PUBLIC_PATH')) {
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
   <title>WNC Farmers Market</title>
+  <!-- JS libraries loaded without defer -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
   <!--<link rel="stylesheet" href="<?= PUBLIC_PATH ?>/css/styles.css"> -->
-
-  <!-- Navigation styles and basic layout -->
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+
 
 <body>
   <header>
