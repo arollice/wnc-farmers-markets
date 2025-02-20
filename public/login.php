@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../private/rollice-ashlee-db-connection.php';
+include_once __DIR__ . '/../private/config.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $username = $_POST['username'] ?? '';

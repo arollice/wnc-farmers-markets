@@ -1,5 +1,5 @@
 <?php
-require_once('databaseobject.class.php');
+//require_once('databaseobject.class.php');
 
 class Item extends DatabaseObject
 {

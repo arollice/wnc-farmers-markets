@@ -22,5 +22,8 @@ include_once FOOTER_FILE;
 ?>
 
 
-//Add vendor login link in bottom corner (already a member? login)
-//Add seasonal harvest highlights
+<!-- 
+ //Add seasonal harvest highlights
+ //Add vendor login link in bottom corner (already a member? login)
+ //Add supporting local, one vendor at a time and smiley
+-->

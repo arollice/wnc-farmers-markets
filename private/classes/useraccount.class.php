@@ -1,6 +1,6 @@
 <?php
-require_once('databaseobject.class.php');
-require_once('vendor.class.php');
+//require_once('databaseobject.class.php');
+//require_once('vendor.class.php');
 
 class UserAccount extends DatabaseObject
 {

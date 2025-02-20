@@ -1,6 +1,6 @@
 <?php
-require_once('databaseobject.class.php');
-require_once('region.class.php');
+//require_once('databaseobject.class.php');
+//require_once('region.class.php');
 
 class Market extends DatabaseObject
 {

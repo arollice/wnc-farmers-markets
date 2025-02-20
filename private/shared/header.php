@@ -22,6 +22,13 @@ if (!defined('PUBLIC_PATH')) {
 
 <body>
   <header>
+    <!--<h1>WNC Farmers Markets Collective</h1>-->
+    <a href="<?= PUBLIC_PATH ?>/index.php">
+      <img src="<?= PUBLIC_PATH ?>/img/wnc-logo.png" alt="WNC Farmers Markets Logo" width="200" height="auto">
+    </a>
+
+    <p>Your central resource for farmers markets in Western North Carolina</p>
+
     <nav>
       <ul>
         <li><a href="<?= PUBLIC_PATH ?>/index.php">Home</a></li>

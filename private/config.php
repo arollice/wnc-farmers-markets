@@ -31,5 +31,17 @@ try {
   die("Database connection failed: " . $e->getMessage());
 }
 
+spl_autoload_register(function ($class) {
+  // Adjust the base directory according to your file structure
+  $baseDir = __DIR__ . '/classes/';
+
+  // Convert the class name to lowercase (if your files are all lowercase)
+  $file = $baseDir . strtolower($class) . '.class.php';
+
+  if (file_exists($file)) {
+    require_once $file;
+  }
+});
+
 // Set the PDO connection for the DatabaseObject class
 DatabaseObject::set_database($pdo);

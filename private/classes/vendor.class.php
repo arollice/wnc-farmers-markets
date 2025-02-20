@@ -1,8 +1,8 @@
 <?php
-require_once('databaseobject.class.php');
-require_once('item.class.php');
-require_once('market.class.php');
-require_once('currency.class.php');
+//require_once('databaseobject.class.php');
+//require_once('item.class.php');
+//require_once('market.class.php');
+//require_once('currency.class.php');
 
 class Vendor extends DatabaseObject
 {
