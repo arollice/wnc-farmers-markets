@@ -5,8 +5,8 @@ class DatabaseObject
   static protected $database;
   static protected $table_name = "";
   static protected $db_columns = [];
+  static protected $primary_key = "id"; // Default; override in subclasses
   public $errors = [];
-  public $id;
 
   // Set the PDO database connection
   static public function set_database($database)
@@ -38,10 +38,10 @@ class DatabaseObject
     return static::find_by_sql($sql);
   }
 
-  // Retrieve a single record by ID using a prepared statement
+  // Retrieve a single record by primary key using a prepared statement
   static public function find_by_id($id)
   {
-    $sql = "SELECT * FROM " . static::$table_name . " WHERE id = :id LIMIT 1";
+    $sql = "SELECT * FROM " . static::$table_name . " WHERE " . static::$primary_key . " = :id LIMIT 1";
     $stmt = self::$database->prepare($sql);
     $stmt->bindValue(':id', $id, PDO::PARAM_INT);
     $stmt->execute();
@@ -93,7 +93,8 @@ class DatabaseObject
     }
     $result = $stmt->execute();
     if ($result) {
-      $this->id = self::$database->lastInsertId();
+      $primary_key = static::$primary_key;
+      $this->$primary_key = self::$database->lastInsertId();
     }
     return $result;
   }
@@ -113,21 +114,22 @@ class DatabaseObject
     }
 
     $sql = "UPDATE " . static::$table_name . " SET " . join(', ', $attribute_pairs);
-    $sql .= " WHERE id = :id LIMIT 1";
+    $sql .= " WHERE " . static::$primary_key . " = :id LIMIT 1";
 
     $stmt = self::$database->prepare($sql);
     foreach ($attributes as $key => $value) {
       $stmt->bindValue(':' . $key, $value);
     }
-    $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+    $stmt->bindValue(':id', $this->{static::$primary_key}, PDO::PARAM_INT);
     $result = $stmt->execute();
     return $result;
   }
 
-  // Save the object: update if ID exists, otherwise create
+  // Save the object: update if primary key exists, otherwise create
   public function save()
   {
-    if (isset($this->id)) {
+    $primary_key = static::$primary_key;
+    if (isset($this->$primary_key)) {
       return $this->update();
     } else {
       return $this->create();
@@ -144,12 +146,12 @@ class DatabaseObject
     }
   }
 
-  // Return an associative array of attributes based on db_columns (excluding the ID)
+  // Return an associative array of attributes based on db_columns (excluding the primary key)
   public function attributes()
   {
     $attributes = [];
     foreach (static::$db_columns as $column) {
-      if ($column == 'id') {
+      if ($column == static::$primary_key) {
         continue;
       }
       $attributes[$column] = $this->$column;
@@ -166,9 +168,9 @@ class DatabaseObject
   // Delete the record from the database using a prepared statement
   public function delete()
   {
-    $sql = "DELETE FROM " . static::$table_name . " WHERE id = :id LIMIT 1";
+    $sql = "DELETE FROM " . static::$table_name . " WHERE " . static::$primary_key . " = :id LIMIT 1";
     $stmt = self::$database->prepare($sql);
-    $stmt->bindValue(':id', $this->id, PDO::PARAM_INT);
+    $stmt->bindValue(':id', $this->{static::$primary_key}, PDO::PARAM_INT);
     $result = $stmt->execute();
     return $result;
   }
