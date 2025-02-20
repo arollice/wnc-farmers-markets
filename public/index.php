@@ -22,6 +22,5 @@ include_once FOOTER_FILE;
 ?>
 
 
-//Add vendor login link in top left
+//Add vendor login link in bottom corner (already a member? login)
 //Add seasonal harvest highlights
-//Add basic user sign up bottom right?
