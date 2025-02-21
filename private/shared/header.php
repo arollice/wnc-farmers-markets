@@ -11,9 +11,22 @@ if (!defined('PUBLIC_PATH')) {
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market</title>
-  <!-- JS libraries loaded without defer -->
+
+  <!-- JS libraries loaded without defer, TRY WITH DEFER-->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+
+  <?php if (isset($currentPage) && $currentPage === 'regions'): ?>
+    <!-- Leaflet CSS from CDN -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <!-- Leaflet JS from CDN -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
+    <!-- Custom JS for your regions map -->
+    <script src="<?= PUBLIC_PATH ?>/js/leaflet-map.js" defer></script>
+  <?php endif; ?>
+
+
   <!--<link rel="stylesheet" href="<?= PUBLIC_PATH ?>/css/styles.css"> -->
   <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
