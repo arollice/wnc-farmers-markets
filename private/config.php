@@ -6,16 +6,12 @@ define('PROJECT_ROOT', dirname(PRIVATE_PATH));
 // Set a web-friendly public path (relative to localhost)
 define('PUBLIC_PATH', '/web289/public');
 
-// Update the shared folder path to point to the new location inside private
 define('SHARED_PATH', PRIVATE_PATH . '/shared');
 
-// Define header & footer paths using the new shared folder location
 define('HEADER_FILE', SHARED_PATH . '/header.php');
 define('FOOTER_FILE', SHARED_PATH . '/footer.php');
 
-// Include database credentials and functions
 require_once PRIVATE_PATH . '/db-credentials.php';
-require_once PRIVATE_PATH . '/db-functions.php';
 
 // Include the new DatabaseObject class file (located in the classes folder)
 require_once PRIVATE_PATH . '/classes/databaseobject.class.php';
@@ -32,10 +28,10 @@ try {
 }
 
 spl_autoload_register(function ($class) {
-  // Adjust the base directory according to your file structure
+
   $baseDir = __DIR__ . '/classes/';
 
-  // Convert the class name to lowercase (if your files are all lowercase)
+  // Convert the class name to lowercase
   $file = $baseDir . strtolower($class) . '.class.php';
 
   if (file_exists($file)) {

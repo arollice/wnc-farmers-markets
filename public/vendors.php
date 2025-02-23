@@ -6,7 +6,7 @@ include_once HEADER_FILE;
 ?>
 
 <h1>Vendors</h1>
-<?php displayTable('vendor');
+<?php DatabaseObject::displayTable('vendor');
 ?>
 <p>This page will display a list of all vendors.</p>
 

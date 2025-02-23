@@ -10,7 +10,9 @@ $sql = "SELECT r.region_id, r.region_name, r.latitude, r.longitude,
         LEFT JOIN market m ON r.region_id = m.region_id
         GROUP BY r.region_id, m.market_id";
 
-$stmt = $pdo->prepare($sql);
+
+$db = DatabaseObject::get_database();
+$stmt = $db->prepare($sql);
 $stmt->execute();
 $regions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 

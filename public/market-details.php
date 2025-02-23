@@ -1,14 +1,16 @@
 <?php
 require_once('../private/config.php');
-require_once('../private/db-functions.php');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 if (!isset($_GET['id'])) {
   die("Market ID not provided.");
 }
 
 $market_id = intval($_GET['id']);
-$market = fetchMarketDetails($market_id);  // Fetch market details
-$policies = fetchMarketPolicies();         // Fetch only the selected policies
+$market = Market::fetchMarketDetails($market_id);  // Fetch market details
+$policies = Market::fetchMarketPolicies();         // Fetch selected policies
 
 if (!$market) {
   die("Market not found.");
@@ -30,6 +32,10 @@ if (!$market) {
 
   <p><strong>Location:</strong> <?= htmlspecialchars($market['city']) ?>, <?= htmlspecialchars($market['state_name']) ?> <?= htmlspecialchars($market['zip_code']) ?></p>
   <p><strong>Parking Info:</strong> <?= htmlspecialchars($market['parking_info']) ?></p>
+
+  <?php if (!empty($market['market_open']) && !empty($market['market_close'])) : ?>
+    <p><strong>Market Hours:</strong> <?= date("g:i A", strtotime($market['market_open'])) ?> - <?= date("g:i A", strtotime($market['market_close'])) ?></p>
+  <?php endif; ?>
 
   <?php if (!empty($market['market_days'])) : ?>
     <p><strong>Market Days:</strong> <?= htmlspecialchars($market['market_days']) ?></p>

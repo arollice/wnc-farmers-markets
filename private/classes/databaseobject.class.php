@@ -8,6 +8,22 @@ class DatabaseObject
   static protected $primary_key = "id"; // Default; override in subclasses
   public $errors = [];
 
+  // Allowed table names for generic fetches (prevents SQL injection)
+  static protected $allowed_tables = [
+    'vendor',
+    'vendor_item',
+    'market',
+    'vendor_market',
+    'region',
+    'item',
+    'season',
+    'policy_info',
+    'users',
+    'currency',
+    'vendor_currency',
+    'state'
+  ];
+
   // Set the PDO database connection
   static public function set_database($database)
   {
@@ -31,8 +47,8 @@ class DatabaseObject
     return $object_array;
   }
 
-  // Retrieve all records from the table
-  static public function find_all()
+  // Retrieve all records from the table as objects
+  static public function find_all_as_objects()
   {
     $sql = "SELECT * FROM " . static::$table_name;
     return static::find_by_sql($sql);
@@ -173,5 +189,52 @@ class DatabaseObject
     $stmt->bindValue(':id', $this->{static::$primary_key}, PDO::PARAM_INT);
     $result = $stmt->execute();
     return $result;
+  }
+
+  /********************
+   * Utility Functions
+   ********************/
+
+  // Fetch all records from a validated table (prevents SQL injection by whitelisting allowed table names)
+  static public function fetch_all_from_table($table)
+  {
+    if (!in_array($table, self::$allowed_tables)) {
+      die("Invalid table name: " . htmlspecialchars($table));
+    }
+
+    $stmt = self::$database->query("SELECT * FROM " . $table);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // Escape user input for output safety
+  static public function escape($input)
+  {
+    return htmlspecialchars($input, ENT_QUOTES, 'UTF-8');
+  }
+
+  // Display a table (for debugging or admin views)
+  static public function displayTable($table)
+  {
+    $rows = self::fetch_all_from_table($table);
+    if (!$rows) {
+      echo "<p>No records found.</p>";
+      return;
+    }
+
+    echo "<table border='1'>";
+    echo "<tr>";
+    foreach (array_keys($rows[0]) as $column) {
+      echo "<th>" . self::escape($column) . "</th>";
+    }
+    echo "</tr>";
+
+    foreach ($rows as $row) {
+      echo "<tr>";
+      foreach ($row as $cell) {
+        echo "<td>" . self::escape($cell) . "</td>";
+      }
+      echo "</tr>";
+    }
+    echo "</table>";
   }
 }

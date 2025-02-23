@@ -80,3 +80,12 @@ UPDATE market_schedule
 SET last_day_of_season = '2024-04-30'
 WHERE market_id = 7;
 
+--Adding Market times columns
+ALTER TABLE market
+ADD COLUMN market_open TIME NOT NULL DEFAULT '08:00:00',
+ADD COLUMN market_close TIME NOT NULL DEFAULT '14:00:00';
+
+UPDATE market SET market_open = '09:30:00', market_close = '15:30:00' WHERE market_id = 2;
+UPDATE market SET market_open = '10:00:00', market_close = '16:00:00' WHERE market_id = 4;
+UPDATE market SET market_open = '11:00:00', market_close = '15:00:00' WHERE market_id = 6;
+UPDATE market SET market_open = '12:00:00', market_close = '15:45:00' WHERE market_id = 8;

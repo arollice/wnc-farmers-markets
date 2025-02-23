@@ -1,27 +1,30 @@
 <?php
 include_once('../private/config.php');
 
+// Get the PDO connection from DatabaseObject
+$db = DatabaseObject::get_database();
+
 // Fetch available regions
 $regionQuery = "SELECT region_id, region_name FROM region ORDER BY region_name ASC";
-$regionStmt = $pdo->prepare($regionQuery);
+$regionStmt = $db->prepare($regionQuery);
 $regionStmt->execute();
 $regions = $regionStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch available items
 $itemQuery = "SELECT item_id, item_name FROM item ORDER BY item_name ASC";
-$itemStmt = $pdo->prepare($itemQuery);
+$itemStmt = $db->prepare($itemQuery);
 $itemStmt->execute();
 $items = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch available markets
 $marketQuery = "SELECT market_id, market_name FROM market ORDER BY market_name ASC";
-$marketStmt = $pdo->prepare($marketQuery);
+$marketStmt = $db->prepare($marketQuery);
 $marketStmt->execute();
 $markets = $marketStmt->fetchAll(PDO::FETCH_ASSOC);
 
 // Fetch available payment methods
 $currencyQuery = "SELECT currency_id, currency_name FROM currency ORDER BY currency_name ASC";
-$currencyStmt = $pdo->prepare($currencyQuery);
+$currencyStmt = $db->prepare($currencyQuery);
 $currencyStmt->execute();
 $currencies = $currencyStmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -39,6 +42,11 @@ include_once HEADER_FILE;
   <label for="vendor_website">Business Website (optional):</label>
   <input type="url" id="vendor_website" name="vendor_website">
 
+  <!--
+    When processing the vendor logo upload in process_vendor_registration.php,
+    make sure to append a unique identifier (such as a timestamp or a random hash)
+    to the filename so that no logos overwrite each other.
+  -->
   <label for="vendor_logo">Upload Logo (optional):</label>
   <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
 
@@ -69,6 +77,3 @@ include_once HEADER_FILE;
 // Include the footer
 include_once FOOTER_FILE;
 ?>
-
-
-//Make sure logo has additional naming convention added so no logos over write each other
