@@ -1,14 +1,37 @@
 <?php
-include_once('../private/config.php');
+require_once('../private/config.php');
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
-// Include the header
 include_once HEADER_FILE;
-?>
 
-<h1>Markets</h1>
-<p>This page will display a list of all farmers markets.</p>
+// Retrieve all markets using the new function
+$markets = Market::fetchAllMarkets();
+if (!$markets) {
+  die("No markets found.");
+}
 
-<?php
-// Include the footer
-include_once FOOTER_FILE;
+// Fetch policies once (assuming these apply to all markets)
+$policies = Market::fetchMarketPolicies();
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All Markets</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <h1>All Markets</h1>
+
+  <?php foreach ($markets as $market): ?>
+    <?= Market::renderMarketCard($market, $policies) ?>
+  <?php endforeach; ?>
+
+</body>
+
+</html>

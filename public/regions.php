@@ -8,7 +8,7 @@ include_once HEADER_FILE;
 ?>
 
 <h1>Find a Market by Region</h1>
-<p>Select a region below to explore available markets.</p>
+<p>Select a region below to explore related markets.</p>
 
 <div id="map" style="height: 600px;"></div>
 
@@ -17,5 +17,3 @@ include_once HEADER_FILE;
 // Include the footer
 include_once FOOTER_FILE;
 ?>
-
-<!--Add a you are here pin?? -->
