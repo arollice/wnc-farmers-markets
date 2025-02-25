@@ -1,16 +1,37 @@
 <?php
 include_once('../private/config.php');
-
-// Include the header
 include_once HEADER_FILE;
-?>
 
-<h1>Vendors</h1>
-<?php DatabaseObject::displayTable('vendor');
+// Fetch all vendors using the findAll method from Vendor class
+$vendors = Vendor::findAll();
+
 ?>
-<p>This page will display a list of all vendors.</p>
+<section>
+  <a href="<?= PUBLIC_PATH ?>/vendor-register.php" class="btn">Become a Vendor</a>
+  <p>Already a vendor? <a href="login.php">Login here</a>.</p>
+</section>
+
+<main>
+  <h1>Vendor Directory</h1>
+  <section class="vendor-directory">
+    <?php if (empty($vendors)) : ?>
+      <p>No vendors found.</p>
+    <?php else : ?>
+      <ul class="vendor-list">
+        <?php foreach ($vendors as $vendor) : ?>
+          <li class="vendor-item">
+            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+              <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo">
+              <h3><?= htmlspecialchars($vendor['vendor_name']) ?></h3>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    <?php endif; ?>
+  </section>
+
+</main>
 
 <?php
-// Include the footer
 include_once FOOTER_FILE;
 ?>

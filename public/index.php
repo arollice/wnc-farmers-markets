@@ -8,10 +8,9 @@ include_once('../private/config.php');
 <?php // Include the header
 include_once HEADER_FILE;
 ?>
-<div class="homepage-buttons">
+<!--<div class="homepage-buttons">
   <a href="<?= PUBLIC_PATH ?>/regions.php" class="btn">Find a Market</a>
-  <a href="<?= PUBLIC_PATH ?>/vendor-register.php" class="btn">Become a Vendor</a>
-</div>
+</div>-->
 
 <h2>Seasonal Harvest Highlights</h2>
 <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
@@ -24,8 +23,13 @@ include_once HEADER_FILE;
 <img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
 <p>Seasonal Plants & Greenery</p>
 
-<section id="vendor-login">
-  <p>Already a vendor? <a href="login.php">Login here</a>.</p>
+<section>
+  <h2>Looking for something specific? See who sells what you're looking for!</h2>
+  <p>(Insert item search here)</p>
+  <!--<form class="search-form" action="search.php" method="GET">
+    <input type="text" name="query" placeholder="Type an item you need (e.g., organic honey, artisan bread)..." required>
+    <button type="submit">Search</button>
+  </form>-->
 </section>
 
 <aside>
@@ -35,6 +39,5 @@ include_once HEADER_FILE;
 
 
 <?php
-// Include the footer
 include_once FOOTER_FILE;
 ?>

@@ -89,3 +89,65 @@ UPDATE market SET market_open = '09:30:00', market_close = '15:30:00' WHERE mark
 UPDATE market SET market_open = '10:00:00', market_close = '16:00:00' WHERE market_id = 4;
 UPDATE market SET market_open = '11:00:00', market_close = '15:00:00' WHERE market_id = 6;
 UPDATE market SET market_open = '12:00:00', market_close = '15:45:00' WHERE market_id = 8;
+
+
+---- New vendors --
+
+INSERT INTO vendor (vendor_id, vendor_name, vendor_website) VALUES
+(9, 'Green Thumb Gardens', 'https://greenthumbgardens.com'),
+(10, 'Highland Cattle Ranch', 'https://highlandcattleranch.com'),
+(11, 'Riverwood Bakery', 'https://riverwoodbakery.com'),
+(12, 'Appalachian Mushrooms', 'https://appalachianmushrooms.com'),
+(13, 'Sunny Fields Flowers', 'https://sunnyfieldsflowers.com');
+INSERT INTO vendor (vendor_id, vendor_name, vendor_website) VALUES
+(14, 'Oak Ridge Maple Syrup', 'https://oakridgemaple.com'),
+(15, 'Smoky Mountain Goat Cheese', 'https://smokymountaingoatcheese.com'),
+(16, 'Rolling Hills Coffee Roasters', 'https://rollinghillscoffee.com');
+
+
+
+---New vendor market assignments--
+
+INSERT INTO vendor_market (market_id, vendor_id) VALUES
+(1, 9), (1, 10),
+(2, 6), (2, 11),
+(3, 4), (3, 9),
+(4, 3), (4, 12),
+(5, 2), (5, 11),
+(6, 1), (6, 13),
+(7, 2), (7, 10), (7, 13),
+(8, 9), (8, 12);
+
+INSERT INTO vendor_market (market_id, vendor_id) VALUES
+(1, 11), (1, 14), -- Asheville City Market (now has 5)
+(2, 5), (2, 15), -- Black Mountain Tailgate Market (now has 5)
+(3, 1), (3, 10), -- Candler Farmers Market (now has 5)
+(4, 9), (4, 16), -- Hendersonville Farmers Market (now has 5)
+(5, 7), (5, 14), -- Waynesville Farmers Market (now has 5)
+(6, 4), (6, 15), -- Brevard Farmers Market (now has 5)
+(7, 6); -- Marshall Farmers Market (now has 5)
+
+---Add column to vendor table
+ALTER TABLE vendor
+ADD COLUMN vendor_description VARCHAR(255) NULL;
+
+---add Desc to vendor table 
+
+UPDATE vendor SET vendor_description = CASE vendor_id
+    WHEN 1 THEN 'Providing fresh produce and seasonal vegetables grown sustainably.'
+    WHEN 2 THEN 'Local organic farm offering fruits, vegetables, and herbs.'
+    WHEN 3 THEN 'Family-run farm specializing in heirloom tomatoes and peppers.'
+    WHEN 4 THEN 'High-quality, locally-sourced meats and poultry.'
+    WHEN 5 THEN 'Pure honey harvested from local Hendersonville apiaries.'
+    WHEN 6 THEN 'Fresh wildflowers and seasonal bouquets from Waynesville.'
+    WHEN 7 THEN 'Local dairy farm offering artisanal cheeses and fresh milk products.'
+    WHEN 9 THEN 'Sustainable farm providing organically grown vegetables and herbs.'
+    WHEN 10 THEN 'Ranch offering premium grass-fed beef from the Highlands.'
+    WHEN 11 THEN 'Freshly baked artisan breads, pastries, and desserts.'
+    WHEN 12 THEN 'Cultivating gourmet mushrooms for culinary enthusiasts.'
+    WHEN 13 THEN 'Specializing in vibrant floral arrangements from Sunny Fields.'
+    WHEN 14 THEN 'Craft maple syrup produced locally in Oak Ridge.'
+    WHEN 15 THEN 'Artisan goat cheeses made in the Smoky Mountains.'
+    WHEN 16 THEN 'Local coffee roasters offering freshly roasted specialty coffees.'
+    ELSE 'Local vendor offering quality products from Western North Carolina.'
+END;

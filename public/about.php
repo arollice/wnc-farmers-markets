@@ -13,7 +13,7 @@ include_once HEADER_FILE;
     with the people who grow, craft, and create.
   </p>
   <p>
-    We believe that farmers markets are more than just a place to shop—they’re a vital part of a thriving local economy,
+    We believe that farmers markets are more than just a place to shop—they're a vital part of a thriving local economy,
     a gathering space for communities, and a way to support sustainable agriculture. Our platform exists to make it easier
     for you to find markets near you, discover fresh seasonal produce, and support small businesses that make
     Western North Carolina unique.
@@ -25,7 +25,7 @@ include_once HEADER_FILE;
 </section>
 
 <section id="wnc-farming-traditions">
-  <h2>WNC’s Farming Traditions</h2>
+  <h2>WNC's Farming Traditions</h2>
   <p>
     Western North Carolina has a rich agricultural heritage that dates back generations. Known for its fertile valleys,
     sustainable farming practices, and vibrant local food culture, the region continues to support small farmers and
@@ -56,7 +56,7 @@ include_once HEADER_FILE;
   </p>
   <p>
     <strong>Reference:</strong>
-    <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) – "How Local Food Systems Can Strengthen Rural Economies"</a>
+    <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) - "How Local Food Systems Can Strengthen Rural Economies"</a>
     (This source discusses the economic benefits of local food systems and includes multipliers related to farmers market spending.)
   </p>
 
@@ -67,7 +67,7 @@ include_once HEADER_FILE;
   </p>
   <p>
     <strong>Reference:</strong>
-    <a href="https://www.ers.usda.gov/topics/food-markets-prices/local-foods" target="_blank">USDA Economic Research Service (ERS) – Local Food Systems</a>
+    <a href="https://www.ers.usda.gov/topics/food-markets-prices/local-foods" target="_blank">USDA Economic Research Service (ERS) - Local Food Systems</a>
     (While the USDA ERS reports offer comprehensive data on market dynamics, check the latest reports for the most current figures.)
   </p>
 
@@ -81,7 +81,7 @@ include_once HEADER_FILE;
   </p>
   <p>
     <strong>Reference:</strong>
-    <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) – "How Local Food Systems Can Strengthen Rural Economies"</a>
+    <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) - "How Local Food Systems Can Strengthen Rural Economies"</a>
     (See the section discussing the benefits for small producers.)
   </p>
 
@@ -93,16 +93,15 @@ include_once HEADER_FILE;
   </p>
   <p>
     <strong>Reference:</strong>
-    <a href="https://www.localharvest.org/" target="_blank">National Farmers Market Directory – Vendor Surveys & Market Impact Reports</a>
+    <a href="https://www.localharvest.org/" target="_blank">National Farmers Market Directory - Vendor Surveys & Market Impact Reports</a>
     (For more detailed statistics, you might also consult research summaries available on local food organization websites.)
   </p>
 
-  <h3>Final Note</h3>
   <p>
-    While these sources provide a solid foundation, the exact figures can vary depending on the <strong>region</strong> and
-    <strong>specific study</strong>. These statistics are representative based on findings from reputable organizations such
-    as the <strong>American Farmland Trust</strong> and the <strong>USDA Economic Research Service (ERS)</strong>. For the most
-    current data, we encourage checking the latest reports and local economic studies.
+    <small>While these sources provide a solid foundation, the exact figures can vary depending on the <strong>region</strong> and
+      <strong>specific study</strong>. These statistics are representative based on findings from reputable organizations such
+      as the <strong>American Farmland Trust</strong> and the <strong>USDA Economic Research Service (ERS)</strong>. For the most
+      current data, we encourage checking the latest reports and local economic studies.</small>
   </p>
 
 </section>

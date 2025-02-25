@@ -143,4 +143,17 @@ class Market extends DatabaseObject
 <?php
     return ob_get_clean();
   }
+
+  //New
+  public static function getVendorIdsForMarket($market_id)
+  {
+    if (!isset(self::$database)) {
+      die("Database connection is not established.");
+    }
+
+    $sql = "SELECT vendor_id FROM vendor_market WHERE market_id = ?";
+    $stmt = self::$database->prepare($sql);
+    $stmt->execute([$market_id]);
+    return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
 }

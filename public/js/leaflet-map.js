@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener("DOMContentLoaded", function () {
-  var map = L.map("map").setView([35.5951, -82.5515], 10);
+  var map = L.map("map").setView([35.5951, -82.5515], 10); // Keep initial view on all markets
 
   // Add OpenStreetMap tiles
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -29,36 +29,43 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((error) => console.error("Error loading regions:", error));
 
-  // Check if geolocation is available
+  // Handle Geolocation (ask once per session)
   if ("geolocation" in navigator) {
-      // Show a prompt explaining why we want to use geolocation
-      if (window.confirm("We'd like to show your location relative to the markets. Allow geolocation?")) {
-          navigator.geolocation.getCurrentPosition(
-              function (position) {
-                  var userLatLng = [position.coords.latitude, position.coords.longitude];
-                  var userMarker = L.marker(userLatLng, {
-                      icon: L.icon({
-                          iconUrl: 'path/to/your-user-icon.png', // Replace with your custom icon path
-                          iconSize: [25, 41],
-                          iconAnchor: [12, 41],
-                          popupAnchor: [0, -41]
-                      })
-                  }).addTo(map);
-                  userMarker.bindPopup("You are here").openPopup();
-                  // Optionally recenter the map on the user's location:
-                  map.setView(userLatLng, 13);
-              },
-              function (error) {
-                  console.warn("Geolocation error: " + error.message);
-                  // If geolocation fails, do nothing and the map remains at the default center.
-              }
-          );
-      } else {
-          console.log("User opted out of geolocation; map remains at the default center.");
+      let geoPermission = sessionStorage.getItem("geoPermission");
+
+      if (geoPermission === null) {  // Only ask if not set
+          if (window.confirm("We'd like to show your location relative to the markets. Allow geolocation?")) {
+              sessionStorage.setItem("geoPermission", "granted");
+              showUserLocation();
+          } else {
+              sessionStorage.setItem("geoPermission", "denied");
+              console.log("User opted out of geolocation.");
+          }
+      } else if (geoPermission === "granted") {
+          showUserLocation();
       }
   } else {
       console.log("Geolocation is not available in your browser.");
   }
-});
 
-//Add personalize icon for "you are here"
+  function showUserLocation() {
+      navigator.geolocation.getCurrentPosition(
+          function (position) {
+              var userLatLng = [position.coords.latitude, position.coords.longitude];
+              var userMarker = L.marker(userLatLng, {
+                  icon: L.icon({
+                    iconUrl: 'img/icon.png', 
+                    iconSize: [42, 38], 
+                    iconAnchor: [21, 38], 
+                    popupAnchor: [0, -38] 
+                  })
+              }).addTo(map);
+              userMarker.bindPopup("You are here").openPopup();
+              console.log("User location added to the map.");
+          },
+          function (error) {
+              console.warn("Geolocation error: " + error.message);
+          }
+      );
+  }
+});
