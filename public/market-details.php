@@ -29,7 +29,7 @@ if (!$market) {
 
   <h1><?= htmlspecialchars($market['market_name']) ?> - Market Details</h1>
 
-  <?= Market::renderMarketCard($market, $policies) ?>
+  <?= Market::renderMarketCard($market) ?>
 
   <!-- Vendors Attending This Market -->
   <h2>Attending Vendors</h2>
@@ -48,6 +48,18 @@ if (!$market) {
     </ul>
   <?php else : ?>
     <p>No vendors are currently listed for this market.</p>
+  <?php endif; ?>
+
+  <!-- Display Market Policies at the Bottom -->
+  <?php if (!empty($policies)) : ?>
+    <section class="market-policies">
+      <h2>Market Policies</h2>
+      <ul>
+        <?php foreach ($policies as $policy) : ?>
+          <li><?= htmlspecialchars($policy['policy_description']) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    </section>
   <?php endif; ?>
 
   <a href="regions.php">Back to Map</a>

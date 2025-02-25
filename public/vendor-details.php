@@ -11,6 +11,7 @@ $market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null; // C
 
 $vendor = Vendor::findVendorById($vendor_id); // Fetch vendor details
 $items = Item::findItemsByVendor($vendor_id); // Fetch items sold by vendor
+$payment_methods = Currency::findPaymentMethodsByVendor($vendor_id); // Fetch accepted payment methods
 
 if (!$vendor) {
   die("Vendor not found.");
@@ -30,7 +31,6 @@ if (!$vendor) {
 
   <h1><?= htmlspecialchars($vendor['vendor_name']) ?></h1>
 
-  <!-- Display Vendor Logo -->
   <?php if (!empty($vendor['vendor_logo'])) : ?>
     <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
   <?php else : ?>
@@ -61,9 +61,21 @@ if (!$vendor) {
     <p>No items listed for this vendor.</p>
   <?php endif; ?>
 
+  <!-- Display Accepted Payment Methods -->
+  <h2>Accepted Payment Methods</h2>
+  <?php if (!empty($payment_methods)) : ?>
+    <ul>
+      <?php foreach ($payment_methods as $method) : ?>
+        <li><?= htmlspecialchars($method) ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else : ?>
+    <p>No payment methods listed for this vendor.</p>
+  <?php endif; ?>
+
   <!-- Back to Market Details Button -->
   <?php if ($market_id) : ?>
-    <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">⬅ Back to Market Details</a></p>
+    <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">Back to Market Details</a></p>
   <?php endif; ?>
 
 </body>

@@ -12,7 +12,7 @@ if (!$markets) {
   die("No markets found.");
 }
 
-// Fetch policies once (assuming these apply to all markets)
+// Fetch policies once
 $policies = Market::fetchMarketPolicies();
 ?>
 <!DOCTYPE html>
@@ -29,8 +29,19 @@ $policies = Market::fetchMarketPolicies();
   <h1>All Markets</h1>
 
   <?php foreach ($markets as $market): ?>
-    <?= Market::renderMarketCard($market, $policies) ?>
+    <?= Market::renderMarketCard($market) ?>
   <?php endforeach; ?>
+
+  <?php if ($policies): ?>
+    <section class="market-policies">
+      <h2>Market Policies</h2>
+      <ul>
+        <?php foreach ($policies as $policy): ?>
+          <li><?= htmlspecialchars($policy['policy_description']) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    </section>
+  <?php endif; ?>
 
 </body>
 

@@ -9,4 +9,19 @@ class Currency extends DatabaseObject
 
   public $currency_id;
   public $currency_name;
+
+  public static function findPaymentMethodsByVendor($vendor_id)
+  {
+    $pdo = self::$database; // Use the inherited database connection
+
+    $query = "SELECT c.currency_name 
+              FROM vendor_currency vc
+              JOIN currency c ON vc.currency_id = c.currency_id
+              WHERE vc.vendor_id = ?";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$vendor_id]);
+
+    return $stmt->fetchAll(PDO::FETCH_COLUMN); // Fetch as an array of currency names
+  }
 }

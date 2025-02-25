@@ -13,6 +13,7 @@ $vendors = Vendor::findAll();
 
 <main>
   <h1>Vendor Directory</h1>
+  <p>“Meet the growers, artisans, and food crafters bringing fresh, local goods to your table!”</p>
   <section class="vendor-directory">
     <?php if (empty($vendors)) : ?>
       <p>No vendors found.</p>
