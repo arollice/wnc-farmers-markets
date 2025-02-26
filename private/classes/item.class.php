@@ -1,5 +1,5 @@
 <?php
-//require_once('databaseobject.class.php');
+include_once('../private/config_api.php'); // Ensure this contains SAPLING_API_KEY
 
 class Item extends DatabaseObject
 {
@@ -29,69 +29,11 @@ class Item extends DatabaseObject
 
   public static function searchItemsAndVendors($search_term)
   {
-    $pdo = self::$database; // Use the inherited database connection
+    $pdo = self::$database;
 
-    // Fetch all item names from the database
-    $item_query = "SELECT item_name FROM item";
-    $stmt = $pdo->prepare($item_query);
-    $stmt->execute();
-    $all_items = $stmt->fetchAll(PDO::FETCH_COLUMN);
-
-    // Common misspellings (Failsafe for words that don't match well)
-    $manual_corrections = [
-      'rbead' => 'bread',
-      'met' => 'meat',
-      'appel' => 'apple',
-      'lettcue' => 'lettuce',
-      'strwabery' => 'strawberry',
-      'bluberry' => 'blueberry',
-      'honeyy' => 'honey',
-      'poutlry' => 'poultry',
-      'pultry' => 'poultry',
-      'poltry' => 'poultry',
-      'diary' => 'dairy',
-      'dairey' => 'dairy',
-      'darry' => 'dairy'
-    ];
-
-    // Check if the term has a manual correction
-    if (array_key_exists(strtolower($search_term), $manual_corrections)) {
-      $closest_match = $manual_corrections[strtolower($search_term)];
-    } else {
-      // Otherwise, find the best match dynamically
-      $closest_match = null;
-      $best_jaro_score = 0;
-      $shortest_distance = PHP_INT_MAX;
-
-      foreach ($all_items as $item) {
-        $damerau_distance = self::damerauLevenshtein(strtolower($search_term), strtolower($item));
-        $jaro_score = self::jaroWinkler(strtolower($search_term), strtolower($item));
-        $metaphone_match = (metaphone($search_term) == metaphone($item));
-
-        // Set adaptive threshold: Allow bigger distance for longer words
-        $threshold = (strlen($search_term) <= 5) ? 3 : 4;
-
-        // Damerau-Levenshtein distance-based correction
-        if ($damerau_distance < $shortest_distance && $damerau_distance <= $threshold) {
-          $closest_match = $item;
-          $shortest_distance = $damerau_distance;
-        }
-
-        // Jaro-Winkler: If score > 0.85, prioritize
-        if ($jaro_score > 0.85 && $jaro_score > $best_jaro_score) {
-          $closest_match = $item;
-          $best_jaro_score = $jaro_score;
-        }
-
-        // Metaphone phonetic matching
-        if ($metaphone_match && $closest_match === null) {
-          $closest_match = $item;
-        }
-      }
-    }
-
-    // Final search term (corrected or original)
-    $final_search_term = ($closest_match !== null) ? $closest_match : $search_term;
+    // Call Sapling Spell Check API to correct search term
+    $corrected_term = self::getSpellCheckedTerm($search_term);
+    $final_search_term = $corrected_term ?: $search_term; // Use corrected term if available
 
     // Search vendors based on the corrected or original search term
     $query = "SELECT i.item_id, i.item_name, v.vendor_id, v.vendor_name
@@ -107,109 +49,93 @@ class Item extends DatabaseObject
 
     return [
       'results' => $results,
-      'suggested_term' => ($final_search_term !== $search_term) ? $final_search_term : null
+      'suggested_term' => ($corrected_term !== null && $corrected_term !== $search_term) ? $corrected_term : null
     ];
   }
 
-
-
-
-  /**
-   * Damerau-Levenshtein Distance Algorithm
-   * Handles:
-   *  - Insertions
-   *  - Deletions
-   *  - Substitutions
-   *  - Transpositions (swapped adjacent letters)
-   */
-  private static function damerauLevenshtein($str1, $str2)
+  private static function getSpellCheckedTerm($text)
   {
-    $lenStr1 = strlen($str1);
-    $lenStr2 = strlen($str2);
+    // Custom Dictionary of Common Misspellings
+    $manual_corrections = [
+      'meet' => 'meat',
+      'met' => 'meat',
+      'appel' => 'apple',
+      'lettcue' => 'lettuce',
+      'strwabery' => 'strawberry',
+      'bluberry' => 'blueberry',
+      'honeyy' => 'honey',
+      'poutlry' => 'poultry',
+      'pultry' => 'poultry',
+      'poltry' => 'poultry',
+      'diary' => 'dairy',
+      'dairey' => 'dairy',
+      'darry' => 'dairy',
+      'sirup' => 'syrup'
+    ];
 
-    if ($lenStr1 == 0) return $lenStr2;
-    if ($lenStr2 == 0) return $lenStr1;
-
-    // Create distance matrix
-    $dist = array_fill(0, $lenStr1 + 1, array_fill(0, $lenStr2 + 1, 0));
-
-    for ($i = 0; $i <= $lenStr1; $i++) {
-      $dist[$i][0] = $i;
+    $lower_text = strtolower($text);
+    if (array_key_exists($lower_text, $manual_corrections)) {
+      return $manual_corrections[$lower_text];
     }
-    for ($j = 0; $j <= $lenStr2; $j++) {
-      $dist[0][$j] = $j;
+
+    $api_key = SAPLING_API_KEY;
+    if (!$api_key) {
+      error_log("Sapling API key is missing.");
+      return null;
     }
 
-    // Calculate distances
-    for ($i = 1; $i <= $lenStr1; $i++) {
-      for ($j = 1; $j <= $lenStr2; $j++) {
-        $cost = ($str1[$i - 1] == $str2[$j - 1]) ? 0 : 1;
+    $endpoint = 'https://api.sapling.ai/api/v1/edits';
 
-        $dist[$i][$j] = min(
-          $dist[$i - 1][$j] + 1,      // Deletion
-          $dist[$i][$j - 1] + 1,      // Insertion
-          $dist[$i - 1][$j - 1] + $cost // Substitution
-        );
+    $data = [
+      'key' => $api_key,
+      'text' => $text,
+      'session_id' => uniqid()
+    ];
 
-        // Handle transpositions (swapped adjacent letters)
-        if (
-          $i > 1 && $j > 1 &&
-          $str1[$i - 1] == $str2[$j - 2] &&
-          $str1[$i - 2] == $str2[$j - 1]
-        ) {
-          $dist[$i][$j] = min($dist[$i][$j], $dist[$i - 2][$j - 2] + $cost);
-        }
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, $endpoint);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+
+    $response = curl_exec($ch);
+    $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_code === 200) {
+      $data = json_decode($response, true);
+      if (!empty($data['edits'])) {
+        return $data['edits'][0]['replacement'] ?? null;
       }
     }
 
-    return $dist[$lenStr1][$lenStr2];
+    return self::basicSpellCheck($text);
   }
 
-  private static function jaroWinkler($str1, $str2)
+
+  private static function basicSpellCheck($text)
   {
-    $s1_len = strlen($str1);
-    $s2_len = strlen($str2);
+    $pdo = self::$database;
 
-    if ($s1_len === 0 || $s2_len === 0) return 0.0;
+    // Fetch all item names from the database
+    $query = "SELECT item_name FROM item";
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $all_items = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-    $match_distance = (int) floor(max($s1_len, $s2_len) / 2) - 1;
-    $matches = 0;
-    $hash_s1 = array_fill(0, $s1_len, 0);
-    $hash_s2 = array_fill(0, $s2_len, 0);
+    $best_match = null;
+    $highest_similarity = 0;
 
-    for ($i = 0; $i < $s1_len; $i++) {
-      $start = max(0, $i - $match_distance);
-      $end = min($i + $match_distance + 1, $s2_len);
-
-      for ($j = $start; $j < $end; $j++) {
-        if ($hash_s2[$j] === 1 || $str1[$i] !== $str2[$j]) continue;
-        $hash_s1[$i] = 1;
-        $hash_s2[$j] = 1;
-        $matches++;
-        break;
+    foreach ($all_items as $item) {
+      similar_text(strtolower($text), strtolower($item), $percent);
+      if ($percent > $highest_similarity) {
+        $highest_similarity = $percent;
+        $best_match = $item;
       }
     }
 
-    if ($matches === 0) return 0.0;
-
-    $transpositions = 0;
-    $k = 0;
-    for ($i = 0; $i < $s1_len; $i++) {
-      if ($hash_s1[$i] === 0) continue;
-      while ($hash_s2[$k] === 0) $k++;
-      if ($str1[$i] !== $str2[$k]) $transpositions++;
-      $k++;
-    }
-
-    $transpositions /= 2;
-    $match_score = (($matches / $s1_len) + ($matches / $s2_len) + (($matches - $transpositions) / $matches)) / 3;
-    $prefix_len = 0;
-
-    for ($i = 0; $i < min(4, $s1_len, $s2_len); $i++) {
-      if ($str1[$i] !== $str2[$i]) break;
-      $prefix_len++;
-    }
-
-    return $match_score + (0.1 * $prefix_len * (1 - $match_score));
+    // Set a confidence threshold (e.g., 75% similarity)
+    return ($highest_similarity > 75) ? $best_match : null;
   }
 }

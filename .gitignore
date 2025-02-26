@@ -1,4 +1,6 @@
 db-credentials.php
+config_api.php
+
 
 # Ignore macOS system files
 .DS_Store

@@ -25,9 +25,10 @@ include_once('../private/config.php');
   <!-- Search Form -->
   <form method="GET" action="index.php">
     <input type="text" name="search_term" placeholder="Search for items..."
-      value="<?= isset($_GET['search_term']) ? htmlspecialchars($_GET['search_term']) : ''; ?>" spellcheck="true" />
+      value="<?= isset($_GET['search_term']) ? htmlspecialchars($_GET['search_term']) : ''; ?>" />
     <button type="submit">Search</button>
   </form>
+
 
   <?php
   $search_term = isset($_GET['search_term']) ? trim($_GET['search_term']) : '';
