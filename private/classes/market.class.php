@@ -144,7 +144,6 @@ class Market extends DatabaseObject
     return ob_get_clean();
   }
 
-  //New
   public static function getVendorIdsForMarket($market_id)
   {
     if (!isset(self::$database)) {

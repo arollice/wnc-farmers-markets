@@ -12,6 +12,14 @@ class Region extends DatabaseObject
   public $longitude;
   public $description;
 
+  public static function fetchAllRegions()
+  {
+    $sql = "SELECT region_id, region_name FROM region ORDER BY region_name ASC";
+    $stmt = self::$database->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
   public static function fetchRegionsWithMarkets()
   {
     $sql = "SELECT r.region_id, r.region_name, r.latitude, r.longitude, 
