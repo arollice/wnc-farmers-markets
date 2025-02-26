@@ -124,6 +124,10 @@ class Market extends DatabaseObject
         <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_season']) ?></p>
       <?php endif; ?>
 
+      <?php if (!empty($market['market_day'])) : ?>
+        <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_day']) ?></p>
+      <?php endif; ?>
+
       <?php if (!empty($market['last_market_date'])) : ?>
         <p><strong>Last Market Date:</strong> <?= date('F j, Y', strtotime($market['last_market_date'])) ?></p>
       <?php endif; ?>
