@@ -1,32 +1,11 @@
 <?php
 include_once('../private/config.php');
 
-// Get the PDO connection from DatabaseObject
-$db = DatabaseObject::get_database();
+// Fetch available regions using the Region class method
+$regions = Region::fetchAllRegions();
 
-// Fetch available regions
-$regionQuery = "SELECT region_id, region_name FROM region ORDER BY region_name ASC";
-$regionStmt = $db->prepare($regionQuery);
-$regionStmt->execute();
-$regions = $regionStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch available items
-$itemQuery = "SELECT item_id, item_name FROM item ORDER BY item_name ASC";
-$itemStmt = $db->prepare($itemQuery);
-$itemStmt->execute();
-$items = $itemStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch available markets
-$marketQuery = "SELECT market_id, market_name FROM market ORDER BY market_name ASC";
-$marketStmt = $db->prepare($marketQuery);
-$marketStmt->execute();
-$markets = $marketStmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Fetch available payment methods
-$currencyQuery = "SELECT currency_id, currency_name FROM currency ORDER BY currency_name ASC";
-$currencyStmt = $db->prepare($currencyQuery);
-$currencyStmt->execute();
-$currencies = $currencyStmt->fetchAll(PDO::FETCH_ASSOC);
+// Fetch available payment methods (currencies) using a dedicated Currency method
+$currencies = Currency::fetchAllCurrencies();
 
 // Include the header
 include_once HEADER_FILE;
@@ -35,20 +14,30 @@ include_once HEADER_FILE;
 <h1>Vendor Registration</h1>
 <p>Register your business to be listed in the WNC Farmers Market.</p>
 
-<form action="<?= PUBLIC_PATH ?>/process_vendor_registration.php" method="POST" enctype="multipart/form-data">
+<form action="<?= PUBLIC_PATH ?>/process_vendor_registration.php" method="POST">
+
   <label for="vendor_name">Business Name:</label>
   <input type="text" id="vendor_name" name="vendor_name" required>
+
+  <!-- Username Field -->
+  <label for="vendor_username">Username:</label>
+  <input type="text" id="vendor_username" name="vendor_username" required>
 
   <label for="vendor_website">Business Website (optional):</label>
   <input type="url" id="vendor_website" name="vendor_website">
 
-  <!--
-    When processing the vendor logo upload in process_vendor_registration.php,
-    make sure to append a unique identifier (such as a timestamp or a random hash)
-    to the filename so that no logos overwrite each other.
-  -->
-  <label for="vendor_logo">Upload Logo (optional):</label>
-  <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
+  <!-- Business Description -->
+  <label for="vendor_description">Business Description (max 255 characters):</label>
+  <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50" placeholder="Enter a brief description of your business..."></textarea>
+
+  <!-- Password Fields -->
+  <label for="vendor_password">Password:</label>
+  <input type="password" id="vendor_password" name="vendor_password" required
+    minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+    placeholder="At least 8 characters, including uppercase, lowercase & numbers">
+
+  <label for="vendor_password_confirm">Confirm Password:</label>
+  <input type="password" id="vendor_password_confirm" name="vendor_password_confirm" required minlength="8">
 
   <label for="region">Select Your Home Region:</label>
   <select id="region" name="region_id" required>

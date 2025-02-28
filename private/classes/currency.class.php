@@ -24,4 +24,12 @@ class Currency extends DatabaseObject
 
     return $stmt->fetchAll(PDO::FETCH_COLUMN); // Fetch as an array of currency names
   }
+
+  public static function fetchAllCurrencies()
+  {
+    $sql = "SELECT currency_id, currency_name FROM currency ORDER BY currency_name ASC";
+    $stmt = self::$database->prepare($sql);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
 }
