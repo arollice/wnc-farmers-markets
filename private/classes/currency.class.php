@@ -32,4 +32,20 @@ class Currency extends DatabaseObject
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  public static function associateVendorPayments($vendor_id, $accepted_payments)
+  {
+    // Use the shared PDO connection set in DatabaseObject
+    $db = self::$database;
+    $sql = "INSERT INTO vendor_currency (vendor_id, currency_id) VALUES (:vendor_id, :currency_id)";
+    $stmt = $db->prepare($sql);
+
+    foreach ($accepted_payments as $currency_id) {
+      $stmt->bindValue(':vendor_id', $vendor_id, PDO::PARAM_INT);
+      $stmt->bindValue(':currency_id', $currency_id, PDO::PARAM_INT);
+      $stmt->execute();
+    }
+
+    return true;
+  }
 }

@@ -1,20 +1,15 @@
 <?php
 include_once('../private/config.php');
 
-// Fetch available regions using the Region class method
-$regions = Region::fetchAllRegions();
-
-// Fetch available payment methods (currencies) using a dedicated Currency method
 $currencies = Currency::fetchAllCurrencies();
 
-// Include the header
 include_once HEADER_FILE;
 ?>
 
 <h1>Vendor Registration</h1>
 <p>Register your business to be listed in the WNC Farmers Market.</p>
 
-<form action="<?= PUBLIC_PATH ?>/process_vendor_registration.php" method="POST">
+<form action="<?= PUBLIC_PATH ?>/process-vendor-registration.php" method="POST">
 
   <label for="vendor_name">Business Name:</label>
   <input type="text" id="vendor_name" name="vendor_name" required>
@@ -39,16 +34,7 @@ include_once HEADER_FILE;
   <label for="vendor_password_confirm">Confirm Password:</label>
   <input type="password" id="vendor_password_confirm" name="vendor_password_confirm" required minlength="8">
 
-  <label for="region">Select Your Home Region:</label>
-  <select id="region" name="region_id" required>
-    <option value="">-- Select a Region --</option>
-    <?php foreach ($regions as $region): ?>
-      <option value="<?= htmlspecialchars($region['region_id']) ?>">
-        <?= htmlspecialchars($region['region_name']) ?>
-      </option>
-    <?php endforeach; ?>
-  </select>
-
+  <!-- Accepted Payments -->
   <label>Accepted Payments:</label>
   <div class="checkbox-group">
     <?php foreach ($currencies as $currency): ?>
@@ -63,6 +49,5 @@ include_once HEADER_FILE;
 </form>
 
 <?php
-// Include the footer
 include_once FOOTER_FILE;
 ?>

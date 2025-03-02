@@ -2,19 +2,33 @@
 
 class Vendor extends DatabaseObject
 {
+  // Updated to include vendor_username, vendor_password, and status.
   static protected $table_name = "vendor";
-  static protected $db_columns = ['vendor_id', 'vendor_name', 'vendor_website', 'vendor_logo', 'vendor_description'];
+  static protected $db_columns = [
+    'vendor_id',
+    'vendor_name',
+    'vendor_username',
+    'vendor_password',
+    'vendor_website',
+    'vendor_logo',
+    'vendor_description',
+    'status'
+  ];
   static protected $primary_key = 'vendor_id';
 
   public $vendor_id;
   public $vendor_name;
+  public $vendor_username;
+  public $vendor_password;
   public $vendor_website;
   public $vendor_logo;
   public $vendor_description;
+  public $status;
 
+  // Fetch all vendors
   public static function findAll()
   {
-    return self::fetch_all_from_table('vendor');  // Fetch all vendors
+    return self::fetch_all_from_table('vendor');
   }
 
   // Retrieve items associated with this vendor (via vendor_item junction table)
@@ -53,22 +67,16 @@ class Vendor extends DatabaseObject
     if (!isset(self::$database)) {
       die("Database connection is not established.");
     }
-
     if (empty($vendor_ids)) {
       return [];
     }
-
     // Generate placeholders for the query
     $placeholders = implode(',', array_fill(0, count($vendor_ids), '?'));
-
-    // Corrected query to fetch vendor details including logo & description
     $sql = "SELECT vendor_id, vendor_name, vendor_website, vendor_logo, vendor_description 
             FROM vendor 
             WHERE vendor_id IN ($placeholders)";
-
     $stmt = self::$database->prepare($sql);
     $stmt->execute($vendor_ids);
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
@@ -78,31 +86,61 @@ class Vendor extends DatabaseObject
     if (!isset(self::$database)) {
       die("Database connection is not established.");
     }
-
     $sql = "SELECT vendor_id, vendor_name, vendor_website, vendor_logo, vendor_description 
             FROM vendor 
             WHERE vendor_id = ?";
-
     $stmt = self::$database->prepare($sql);
     $stmt->execute([$vendor_id]);
-
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
+  // Retrieve vendors by market ID
   public static function findVendorsByMarket($market_id)
   {
     if (!isset(self::$database)) {
       die("Database connection is not established.");
     }
-
     $sql = "SELECT v.vendor_id, v.vendor_name, v.vendor_website 
             FROM vendor v
             JOIN vendor_market vm ON v.vendor_id = vm.vendor_id
             WHERE vm.market_id = ?";
-
     $stmt = self::$database->prepare($sql);
     $stmt->execute([$market_id]);
-
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  // Encapsulated method to register a new vendor.
+  // Expects an associative array with keys: vendor_name, vendor_username, vendor_password, vendor_website, vendor_description.
+  public static function register($data)
+  {
+    $vendor = new self();
+    $vendor->vendor_name = trim($data['vendor_name']);
+    $vendor->vendor_username = trim($data['vendor_username']);
+    // Hash the password before storing it.
+    $vendor->vendor_password = password_hash($data['vendor_password'], PASSWORD_DEFAULT);
+    $vendor->vendor_website = trim($data['vendor_website'] ?? '');
+    $vendor->vendor_description = trim($data['vendor_description'] ?? '');
+    $vendor->status = 'pending';  // New vendors start as pending
+
+    if ($vendor->save()) {
+      return $vendor;
+    } else {
+      return false;
+    }
+  }
+
+  // Encapsulated method to associate accepted payment methods with this vendor.
+  // Calls the Currency class method to insert into vendor_currency.
+  public function associatePayments($accepted_payments)
+  {
+    if (!empty($accepted_payments)) {
+      return Currency::associateVendorPayments($this->{self::$primary_key}, $accepted_payments);
+    }
+    return true;
+  }
+
+  public function verifyPassword($password)
+  {
+    return password_verify($password, $this->vendor_password);
   }
 }
