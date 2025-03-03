@@ -11,6 +11,8 @@ define('SHARED_PATH', PRIVATE_PATH . '/shared');
 define('HEADER_FILE', SHARED_PATH . '/header.php');
 define('FOOTER_FILE', SHARED_PATH . '/footer.php');
 
+define('UPLOADS_PATH', PUBLIC_PATH . '/uploads/');
+
 require_once PRIVATE_PATH . '/db-credentials.php';
 
 // Include the new DatabaseObject class file (located in the classes folder)

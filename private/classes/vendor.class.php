@@ -2,13 +2,10 @@
 
 class Vendor extends DatabaseObject
 {
-  // Updated to include vendor_username, vendor_password, and status.
   static protected $table_name = "vendor";
   static protected $db_columns = [
     'vendor_id',
     'vendor_name',
-    'vendor_username',
-    'vendor_password',
     'vendor_website',
     'vendor_logo',
     'vendor_description',
@@ -18,8 +15,6 @@ class Vendor extends DatabaseObject
 
   public $vendor_id;
   public $vendor_name;
-  public $vendor_username;
-  public $vendor_password;
   public $vendor_website;
   public $vendor_logo;
   public $vendor_description;
@@ -86,7 +81,7 @@ class Vendor extends DatabaseObject
     if (!isset(self::$database)) {
       die("Database connection is not established.");
     }
-    $sql = "SELECT vendor_id, vendor_name, vendor_website, vendor_logo, vendor_description 
+    $sql = "SELECT vendor_id, vendor_name, vendor_website, vendor_logo, vendor_description, status 
             FROM vendor 
             WHERE vendor_id = ?";
     $stmt = self::$database->prepare($sql);
@@ -109,15 +104,10 @@ class Vendor extends DatabaseObject
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  // Encapsulated method to register a new vendor.
-  // Expects an associative array with keys: vendor_name, vendor_username, vendor_password, vendor_website, vendor_description.
   public static function register($data)
   {
     $vendor = new self();
     $vendor->vendor_name = trim($data['vendor_name']);
-    $vendor->vendor_username = trim($data['vendor_username']);
-    // Hash the password before storing it.
-    $vendor->vendor_password = password_hash($data['vendor_password'], PASSWORD_DEFAULT);
     $vendor->vendor_website = trim($data['vendor_website'] ?? '');
     $vendor->vendor_description = trim($data['vendor_description'] ?? '');
     $vendor->status = 'pending';  // New vendors start as pending
@@ -129,18 +119,11 @@ class Vendor extends DatabaseObject
     }
   }
 
-  // Encapsulated method to associate accepted payment methods with this vendor.
-  // Calls the Currency class method to insert into vendor_currency.
   public function associatePayments($accepted_payments)
   {
     if (!empty($accepted_payments)) {
       return Currency::associateVendorPayments($this->{self::$primary_key}, $accepted_payments);
     }
     return true;
-  }
-
-  public function verifyPassword($password)
-  {
-    return password_verify($password, $this->vendor_password);
   }
 }

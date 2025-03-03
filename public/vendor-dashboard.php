@@ -1,19 +1,34 @@
 <?php
 include_once('../private/config.php');
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 
-//Comment out ot view page without logging in
+// Redirect if not logged in as vendor.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'vendor') {
   header('Location: login.php');
   exit;
 }
 
-$vendor_id = $_SESSION['user_id'];
+// Retrieve the user account record using the user_id stored in session.
+// This assumes that your DatabaseObject class provides a findById() method.
+$userAccount = UserAccount::find_by_id($_SESSION['user_id']);
+if (!$userAccount || empty($userAccount->vendor_id)) {
+  // If there is an issue retrieving the vendor id, log out or redirect.
+  header('Location: logout.php');
+  exit;
+}
 
+$vendor_id = $userAccount->vendor_id;
+
+// Retrieve vendor information using the actual vendor id.
 $vendor = Vendor::findVendorById($vendor_id);
 $status = isset($vendor['status']) ? $vendor['status'] : 'Unknown';
 
+// Create a Vendor object to use its methods.
 $vendorObj = new Vendor();
 $vendorObj->vendor_id = $vendor_id;
 $items = $vendorObj->get_items();
@@ -29,7 +44,7 @@ $accepted = [];
 $acceptedCurrencies = $vendorObj->get_accepted_currencies();
 if ($acceptedCurrencies) {
   foreach ($acceptedCurrencies as $currency) {
-    $accepted[] = $currency['currency_id'];
+    $accepted[] = $currency->currency_id;
   }
 }
 ?>

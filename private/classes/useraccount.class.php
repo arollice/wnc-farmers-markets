@@ -36,4 +36,31 @@ class UserAccount extends DatabaseObject
     $result = Vendor::find_by_sql($sql, $params);
     return !empty($result) ? array_shift($result) : false;
   }
+
+  // Static register method to create a new user account.
+  public static function register($data)
+  {
+    $user = new self();
+    $user->username = $data['username'];
+    // Expect a key 'password' and hash it here
+    $user->password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
+    $user->email = $data['email'];
+    $user->role = $data['role'];
+    $user->vendor_id = $data['vendor_id'];
+    $user->created_at = date("Y-m-d H:i:s");
+    // last_login is not set at registration
+    $user->is_active = 1;
+
+    if ($user->save()) {
+      return $user;
+    } else {
+      return false;
+    }
+  }
+
+  public function updateLastLogin()
+  {
+    $this->last_login = date("Y-m-d H:i:s");
+    return $this->save();
+  }
 }

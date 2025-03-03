@@ -10,12 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $stmt->execute([$username]);
   $user = $stmt->fetch();
 
-  if ($user && hash('sha256', $password) === $user['password_hash']) {
+  // Use password_verify() to compare the raw password with the hashed version.
+  if ($user && password_verify($password, $user['password_hash'])) {
     $_SESSION['user_id'] = $user['user_id'];
     $_SESSION['username'] = $user['username'];
     $_SESSION['role'] = $user['role'];
 
-    // Redirect based on role
+    // Redirect based on role.
     if ($user['role'] === 'admin') {
       header('Location: admin.php');
     } elseif ($user['role'] === 'vendor') {
@@ -40,7 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
   <h2>Login</h2>
-  <?php if (!empty($error)) echo "<p style='color:red;'>$error</p>"; ?>
+  <?php
+  if (!empty($error)) {
+    echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
+  }
+  // Display the flash message if it exists.
+  if (isset($_SESSION['success_message'])) {
+    echo "<p style='color:green;'>" . htmlspecialchars($_SESSION['success_message']) . "</p>";
+    unset($_SESSION['success_message']);
+  }
+  ?>
   <form method="POST">
     <label>Username: <input type="text" name="username" required></label><br>
     <label>Password: <input type="password" name="password" required></label><br>

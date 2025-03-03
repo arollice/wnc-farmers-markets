@@ -14,16 +14,12 @@ include_once HEADER_FILE;
   <label for="vendor_name">Business Name:</label>
   <input type="text" id="vendor_name" name="vendor_name" required>
 
-  <!-- Username Field -->
+  <!-- Login-Specific Fields -->
   <label for="vendor_username">Username:</label>
   <input type="text" id="vendor_username" name="vendor_username" required>
 
-  <label for="vendor_website">Business Website (optional):</label>
-  <input type="url" id="vendor_website" name="vendor_website">
-
-  <!-- Business Description -->
-  <label for="vendor_description">Business Description (max 255 characters):</label>
-  <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50" placeholder="Enter a brief description of your business..."></textarea>
+  <label for="vendor_email">Email:</label>
+  <input type="email" id="vendor_email" name="vendor_email" required>
 
   <!-- Password Fields -->
   <label for="vendor_password">Password:</label>
@@ -33,6 +29,13 @@ include_once HEADER_FILE;
 
   <label for="vendor_password_confirm">Confirm Password:</label>
   <input type="password" id="vendor_password_confirm" name="vendor_password_confirm" required minlength="8">
+
+  <!-- Vendor-Specific Fields -->
+  <label for="vendor_website">Business Website (optional):</label>
+  <input type="url" id="vendor_website" name="vendor_website">
+
+  <label for="vendor_description">Business Description (max 255 characters):</label>
+  <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50" placeholder="Enter a brief description of your business..."></textarea>
 
   <!-- Accepted Payments -->
   <label>Accepted Payments:</label>
