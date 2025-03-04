@@ -126,4 +126,20 @@ class Vendor extends DatabaseObject
     }
     return true;
   }
+
+  public static function findMarketsByVendor($vendor_id)
+  {
+    global $pdo; // Use the PDO connection from config.php
+
+    $sql = "SELECT m.* 
+            FROM market AS m
+            INNER JOIN vendor_market AS vm ON m.market_id = vm.market_id
+            WHERE vm.vendor_id = :vendor_id";
+
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':vendor_id' => $vendor_id]);
+    $markets = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    return $markets;
+  }
 }

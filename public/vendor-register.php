@@ -4,6 +4,17 @@ include_once('../private/config.php');
 $currencies = Currency::fetchAllCurrencies();
 
 include_once HEADER_FILE;
+
+
+session_start();
+if (isset($_SESSION['error_message'])) {
+  echo '<div class="error">' . $_SESSION['error_message'] . '</div>';
+  unset($_SESSION['error_message']);
+}
+if (isset($_SESSION['success_message'])) {
+  echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
+  unset($_SESSION['success_message']);
+}
 ?>
 
 <h1>Vendor Registration</h1>
@@ -36,6 +47,24 @@ include_once HEADER_FILE;
 
   <label for="vendor_description">Business Description (max 255 characters):</label>
   <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50" placeholder="Enter a brief description of your business..."></textarea>
+
+  <!-- Multi-select for Initial Markets Selection -->
+  <section id="select-markets">
+    <h3>Select Markets to Attend</h3>
+    <label for="markets">Select Markets:</label>
+    <select id="markets" name="market_ids[]" multiple="multiple" style="width:300px;">
+      <?php
+      // Assuming $all_markets is fetched similarly as in the dashboard:
+      $all_markets = Market::fetchAllMarkets();
+      foreach ($all_markets as $market):
+      ?>
+        <option value="<?= htmlspecialchars($market['market_id']); ?>">
+          <?= htmlspecialchars($market['market_name']); ?>
+        </option>
+      <?php endforeach; ?>
+    </select>
+  </section>
+  <p><small>Hold control or command key to select multiple markets</small></p>
 
   <!-- Accepted Payments -->
   <label>Accepted Payments:</label>

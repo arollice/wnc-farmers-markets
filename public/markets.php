@@ -30,6 +30,7 @@ $policies = Market::fetchMarketPolicies();
 
   <?php foreach ($markets as $market): ?>
     <?= Market::renderMarketCard($market) ?>
+    <hr>
   <?php endforeach; ?>
 
   <?php if ($policies): ?>

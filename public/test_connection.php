@@ -5,14 +5,13 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Load configuration and base class
 require_once '../private/config.php';
 require_once '../private/classes/databaseobject.class.php';
 
-// Set the PDO connection for our DatabaseObject classes.
+
 DatabaseObject::set_database($pdo);
 
-// Test the connection with a simple query.
+// Test connection
 try {
   $stmt = DatabaseObject::get_database()->query("SELECT 1");
   if ($stmt->fetch()) {

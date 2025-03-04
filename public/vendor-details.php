@@ -1,21 +1,32 @@
 <?php
 require_once('../private/config.php'); // Ensure database connection
 
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
+
 // Check if vendor ID is provided
 if (!isset($_GET['id'])) {
   die("Vendor ID not provided.");
 }
 
 $vendor_id = intval($_GET['id']);
-$market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null; // Capture market_id if provided
+$market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null;
 
-$vendor = Vendor::findVendorById($vendor_id); // Fetch vendor details
-$items = Item::findItemsByVendor($vendor_id); // Fetch items sold by vendor
-$payment_methods = Currency::findPaymentMethodsByVendor($vendor_id); // Fetch accepted payment methods
-
+$vendor = Vendor::findVendorById($vendor_id);
+$items = Item::findItemsByVendor($vendor_id);
+$payment_methods = Currency::findPaymentMethodsByVendor($vendor_id);
 if (!$vendor) {
   die("Vendor not found.");
 }
+
+// Fetch the markets this vendor attends.
+// If your vendor object is an object with a get_markets() method, use that.
+// Otherwise, use a static method (for example, Vendor::findMarketsByVendor($vendor_id)).
+$vendorMarkets = method_exists($vendor, 'get_markets')
+  ? $vendor->get_markets()
+  : Vendor::findMarketsByVendor($vendor_id);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -72,10 +83,31 @@ if (!$vendor) {
     <p>No payment methods listed for this vendor.</p>
   <?php endif; ?>
 
-  <!-- Back to Market Details Button -->
-  <?php if ($market_id) : ?>
-    <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">Back to Market Details</a></p>
+  <!-- Display Markets Attended by the Vendor -->
+  <h2>Markets Attending</h2>
+  <?php if (!empty($vendorMarkets)) : ?>
+    <ul>
+      <?php foreach ($vendorMarkets as $market) : ?>
+        <li>
+          <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
+            <?= htmlspecialchars($market['market_name']) ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else : ?>
+    <p>This vendor is not attending any markets.</p>
   <?php endif; ?>
+
+  <!-- Back Button -->
+  <!-- Back Button -->
+  <?php if (!empty($market_id)) : ?>
+    <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">Back to Market Details</a></p>
+  <?php elseif (!empty($vendor_id)) : ?>
+    <p><a href="vendors.php">Back to Vendors</a></p>
+  <?php endif; ?>
+
+
 
 </body>
 

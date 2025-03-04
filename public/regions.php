@@ -7,9 +7,6 @@ $regions = Region::fetchAllRegions();
 
 include_once HEADER_FILE;
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 ?>
 
 <h1>Find a Market by Region</h1>
@@ -21,8 +18,6 @@ ini_set('display_errors', 1);
     #map-container {
       display: none;
     }
-
-    /* Prevent empty space if JS is disabled */
   </style>
 </noscript>
 
@@ -48,6 +43,5 @@ ini_set('display_errors', 1);
 
 
 <?php
-// Include the footer
 include_once FOOTER_FILE;
 ?>

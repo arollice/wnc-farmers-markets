@@ -45,14 +45,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors[] = "Passwords do not match.";
   }
 
-  if (!empty($errors)) {
-    foreach ($errors as $error) {
-      echo "<p>" . htmlspecialchars($error) . "</p>";
+  // Duplicate Check: Verify that the username and email are not already in use.
+  // Only run this check if username and email passed basic validation.
+  $pdo = DatabaseObject::get_database();
+  if (!empty($username) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    $stmt = $pdo->prepare("SELECT username, email FROM user_account WHERE username = ? OR email = ?");
+    $stmt->execute([$username, $email]);
+    while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      if ($row['username'] === $username) {
+        $errors[] = "The username '$username' is already taken.";
+      }
+      if ($row['email'] === $email) {
+        $errors[] = "The email '$email' is already in use.";
+      }
     }
+  }
+
+  // If any errors exist, set them in session and redirect back.
+  if (!empty($errors)) {
+    $_SESSION['error_message'] = '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>';
+    header("Location: vendor-register.php");
     exit;
   }
 
-  // Step 1: Create the vendor record (only vendor-specific fields)
+  // Create the vendor record (only vendor-specific fields)
   $vendorData = [
     'vendor_name'        => $vendor_name,
     'vendor_website'     => $vendor_website,
@@ -62,7 +78,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $vendor = Vendor::register($vendorData);
   if (!$vendor) {
-    echo "<p>Vendor registration failed. Please try again.</p>";
+    $_SESSION['error_message'] = "Vendor registration failed. Please try again.";
+    header("Location: vendor-register.php");
     exit;
   }
 
@@ -77,12 +94,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $userAccount = UserAccount::register($userAccountData);
   if (!$userAccount) {
-    echo "<p>User account creation failed. Please try again.</p>";
+    $_SESSION['error_message'] = "User account creation failed. Please try again.";
+    header("Location: vendor-register.php");
     exit;
   }
 
   // Optionally, associate accepted payments with the vendor.
   $vendor->associatePayments($accepted_payments);
+
+  // Insert the market associations if any were selected.
+  if (isset($_POST['market_ids']) && is_array($_POST['market_ids'])) {
+    $stmt = $pdo->prepare("INSERT INTO vendor_market (vendor_id, market_id) VALUES (?, ?)");
+    foreach ($_POST['market_ids'] as $market_id) {
+      $stmt->execute([$vendor->vendor_id, $market_id]);
+    }
+  }
 
   // Set a flash message to indicate success.
   $_SESSION['user_id']   = $userAccount->user_id;
