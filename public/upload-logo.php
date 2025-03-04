@@ -2,7 +2,6 @@
 session_start();
 include_once('../private/config.php');
 
-
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -40,7 +39,10 @@ if ($_FILES['vendor_logo']['size'] > $maxSize) {
 }
 
 // Define the destination directory and ensure it exists.
-$target_dir = UPLOADS_PATH;
+$target_dir = UPLOADS_PATH;  // UPLOADS_PATH should point to your uploads folder.
+if (substr($target_dir, -1) !== '/') {
+  $target_dir .= '/';
+}
 if (!is_dir($target_dir)) {
   if (!mkdir($target_dir, 0755, true)) {
     error_log("Failed to create directory: " . $target_dir);
@@ -73,27 +75,19 @@ if (!move_uploaded_file($_FILES["vendor_logo"]["tmp_name"], $target_file)) {
   exit;
 }
 
-// Retrieve the existing vendor record.
-$existing_vendor = Vendor::findVendorById($vendor_id);
-if (!$existing_vendor) {
+// Retrieve the existing vendor record directly.
+$vendorObj = Vendor::findVendorById($vendor_id);
+if (!$vendorObj) {
   error_log("Could not find vendor record for vendor_id: " . $vendor_id);
   $_SESSION['error_message'] = "Server error, please contact support.";
   header("Location: vendor-dashboard.php");
   exit;
 }
 
-// Populate a Vendor object with the existing data.
-$vendorObj = new Vendor();
-$vendorObj->vendor_id = $vendor_id;
-$vendorObj->vendor_name = $existing_vendor['vendor_name'];
-$vendorObj->vendor_website = $existing_vendor['vendor_website'];
-$vendorObj->vendor_description = $existing_vendor['vendor_description'];
-$vendorObj->status = $existing_vendor['status'];
+// Update just the vendor_logo field.
+$vendorObj->vendor_logo = 'uploads/' . $unique_name;
 
-// Set the new logo filename.
-$vendorObj->vendor_logo = $unique_name;
-
-// Update the vendor record.
+// Save the updated vendor record.
 if (!$vendorObj->save()) {
   error_log("Failed to update vendor record with logo: " . $unique_name);
   $_SESSION['error_message'] = "Logo uploaded, but there was an error updating your profile. Please contact support.";
