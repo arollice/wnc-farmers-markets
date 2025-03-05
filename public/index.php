@@ -1,5 +1,12 @@
 <?php
+session_start();
 include_once('../private/config.php');
+
+if (isset($_SESSION['success_message'])) {
+  echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
+  unset($_SESSION['success_message']);
+}
+
 ?>
 
 <h1>WNC Farmers Market - Coming Soon!</h1>
@@ -24,7 +31,8 @@ include_once('../private/config.php');
 
   <!-- Search Form -->
   <form method="GET" action="index.php">
-    <input type="text" name="search_term" placeholder="Search for items..."
+    <label for="search_term">Search for items:</label>
+    <input type="text" name="search_term" id="search_term" placeholder="Search for items..."
       value="<?= isset($_GET['search_term']) ? htmlspecialchars($_GET['search_term']) : ''; ?>" />
     <button type="submit">Search</button>
   </form>

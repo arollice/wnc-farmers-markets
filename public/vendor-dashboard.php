@@ -20,13 +20,21 @@ if (!$userAccount || empty($userAccount->vendor_id)) {
   exit;
 }
 $vendor_id = $userAccount->vendor_id;
-$vendor = Vendor::findVendorById($vendor_id);
-if (!$vendor) {
+
+// Get vendor data as an array.
+$vendorData = Vendor::findVendorById($vendor_id);
+if (!$vendorData) {
   $_SESSION['error_message'] = "Vendor record not found.";
   header("Location: vendor-dashboard.php");
   exit;
 }
-$status = isset($vendor['status']) ? $vendor['status'] : 'Unknown';
+// Convert the array to a Vendor object.
+$vendor = new Vendor();
+foreach ($vendorData as $key => $value) {
+  $vendor->$key = $value;
+}
+
+$status = isset($vendor->status) ? $vendor->status : 'Unknown';
 
 $all_markets = Market::fetchAllMarkets();
 $currencies = Currency::fetchAllCurrencies();
@@ -36,111 +44,76 @@ $pdo = DatabaseObject::get_database();
 // --- Process Form Submissions --- //
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  // Process adding a single market.
-  if (isset($_POST['add_market'])) {
-    $market_to_add = intval($_POST['add_market']);
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM vendor_market WHERE vendor_id = ? AND market_id = ?");
-    $stmt->execute([$vendor_id, $market_to_add]);
-    if ($stmt->fetchColumn() == 0) {
-      $stmt = $pdo->prepare("INSERT INTO vendor_market (vendor_id, market_id) VALUES (?, ?)");
-      $stmt->execute([$vendor_id, $market_to_add]);
+  // Process adding a market using the Vendor class method.
+  if (isset($_POST['add_market_btn'])) {
+    $market_to_add = intval($_POST['add_market'] ?? 0);
+    if ($vendor->addMarket($market_to_add)) {
       $_SESSION['success_message'] = "Market added successfully.";
     } else {
-      $_SESSION['error_message'] = "You are already attending that market.";
+      $_SESSION['error_message'] = "You are already attending that market or an error occurred.";
     }
     header("Location: vendor-dashboard.php");
     exit;
   }
-  // Process removing a single market.
-  elseif (isset($_POST['remove_market'])) {
-    $market_to_remove = intval($_POST['remove_market']);
-    $stmt = $pdo->prepare("DELETE FROM vendor_market WHERE vendor_id = ? AND market_id = ?");
-    $stmt->execute([$vendor_id, $market_to_remove]);
-    $_SESSION['success_message'] = "Market removed successfully.";
+
+  // Process removing a market using the Vendor class method.
+  elseif (isset($_POST['remove_market_btn'])) {
+    $market_to_remove = intval($_POST['remove_market'] ?? 0);
+    if ($vendor->removeMarket($market_to_remove)) {
+      $_SESSION['success_message'] = "Market removed successfully.";
+    } else {
+      $_SESSION['error_message'] = "An error occurred while removing the market.";
+    }
     header("Location: vendor-dashboard.php");
     exit;
   }
-  // Process main vendor update.
+  // Process main vendor update and optional password change.
   elseif (isset($_POST['update_vendor'])) {
+    $errors = [];
 
-    $vendor_website = isset($_POST['vendor_website']) ? trim($_POST['vendor_website']) : null;
-    if ($vendor_website === '') {
-      $vendor_website = null;
-    }
-    $vendor_description = !empty($_POST['vendor_description']) ? trim($_POST['vendor_description']) : $vendor['vendor_description'];
+    // Update vendor details using the Vendor class method.
+    $result = $vendor->updateDetails($_POST, $_FILES);
 
-    // Process accepted payments from checkboxes.
-    $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
-    $stmt->execute([$vendor_id]);
-    if (isset($_POST['accepted_payments']) && is_array($_POST['accepted_payments'])) {
-      $accepted_payments = $_POST['accepted_payments'];
-      Currency::associateVendorPayments($vendor_id, $accepted_payments);
-    }
+    // Process password change if any of the password fields are provided.
+    if (!empty($_POST['current_password']) || !empty($_POST['new_password']) || !empty($_POST['confirm_password'])) {
+      // Ensure all password fields are provided.
+      if (empty($_POST['current_password']) || empty($_POST['new_password']) || empty($_POST['confirm_password'])) {
+        $errors[] = "Please fill in all password fields.";
+      }
 
-    // Process logo deletion and file upload.
-    $vendor_logo = $vendor['vendor_logo'];
-    if (isset($_POST['delete_logo']) && $_POST['delete_logo'] == '1') {
-      if (!empty($vendor_logo)) {
-        $filePath = PROJECT_ROOT . '/public/' . $vendor_logo;
-        if (file_exists($filePath)) {
-          unlink($filePath);
+      if ($_POST['new_password'] !== $_POST['confirm_password']) {
+        $errors[] = "New password and confirmation do not match.";
+      }
+
+      if (strlen($_POST['new_password']) < 8) {
+        $errors[] = "New password must be at least 8 characters long.";
+      }
+
+      if (!password_verify($_POST['current_password'], $userAccount->password_hash)) {
+        $errors[] = "Current password is incorrect.";
+      }
+      // If no password errors, update the password.
+      if (empty($errors)) {
+        $newPasswordHash = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+        $stmt = $pdo->prepare("UPDATE user_account SET password_hash = ? WHERE user_id = ?");
+        if (!$stmt->execute([$newPasswordHash, $_SESSION['user_id']])) {
+          $errors[] = "There was an error updating your password.";
         }
       }
-      $vendor_logo = '';
-    } elseif (isset($_FILES['vendor_logo']) && $_FILES['vendor_logo']['error'] !== UPLOAD_ERR_NO_FILE) {
-      if ($_FILES['vendor_logo']['error'] !== UPLOAD_ERR_OK) {
-        echo "Upload error code: " . $_FILES['vendor_logo']['error'] . "<br>";
-        echo "<pre>" . print_r($_FILES['vendor_logo'], true) . "</pre>";
-        $_SESSION['error_message'] = "There was an error uploading your file. Error code: " . $_FILES['vendor_logo']['error'];
-        header("Location: vendor-dashboard.php");
-        exit;
-      }
-      $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
-      $finfo = finfo_open(FILEINFO_MIME_TYPE);
-      $mime_type = finfo_file($finfo, $_FILES['vendor_logo']['tmp_name']);
-      finfo_close($finfo);
-      if (!in_array($mime_type, $allowed_types)) {
-        $_SESSION['error_message'] = "Only JPG, PNG, and GIF files are allowed. Detected type: $mime_type";
-        header("Location: vendor-dashboard.php");
-        exit;
-      }
-      $maxSize = 2 * 1024 * 1024; // 2MB limit
-      if ($_FILES['vendor_logo']['size'] > $maxSize) {
-        $_SESSION['error_message'] = "The file is too large. Maximum allowed size is 2MB.";
-        header("Location: vendor-dashboard.php");
-        exit;
-      }
-      $target_dir = UPLOADS_PATH;
-      if (!is_dir($target_dir)) {
-        $_SESSION['error_message'] = "Upload directory does not exist: $target_dir";
-        header("Location: vendor-dashboard.php");
-        exit;
-      }
-      $extension = strtolower(pathinfo($_FILES["vendor_logo"]["name"], PATHINFO_EXTENSION));
-      $unique_name = "vendor_" . $vendor_id . "_" . time() . "_" . uniqid() . "." . $extension;
-      $target_file = $target_dir . '/' . $unique_name;
-      if (!move_uploaded_file($_FILES["vendor_logo"]["tmp_name"], $target_file)) {
-        $_SESSION['error_message'] = "There was an error uploading your file. Please try again.";
-        header("Location: vendor-dashboard.php");
-        exit;
-      }
-      $vendor_logo = 'uploads/' . $unique_name;
     }
 
-    // Update the vendor record.
-    $vendorObj = new Vendor();
-    $vendorObj->vendor_id = $vendor_id;
-    $vendorObj->vendor_name = $vendor['vendor_name'];
-    $vendorObj->vendor_website = $vendor_website;
-    $vendorObj->vendor_description = $vendor_description;
-    $vendorObj->vendor_logo = $vendor_logo;
-    $vendorObj->status = $vendor['status'];
+    // Combine errors from updateDetails() with password errors.
+    if (!$result['success']) {
+      $errors = array_merge($errors, $result['errors']);
+    }
 
-    if ($vendorObj->save()) {
-      $_SESSION['success_message'] = "Profile updated successfully.";
+    if (empty($errors)) {
+      $_SESSION['success_message'] = "Profile updated successfully." .
+        (!empty($_POST['new_password']) ? " Your password has also been updated." : "");
     } else {
-      $_SESSION['error_message'] = "There was an error updating your profile.";
+      $_SESSION['error_message'] = implode("<br>", $errors);
     }
+
     header("Location: vendor-dashboard.php");
     exit;
   }
@@ -152,7 +125,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="UTF-8">
   <title>Vendor Dashboard</title>
-  <!-- Optionally include Select2 CSS for enhanced multi-select -->
 </head>
 
 <body>
@@ -163,80 +135,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <!-- Session Messages -->
   <?php
   if (isset($_SESSION['success_message'])) {
-    echo "<div style='padding: 10px; background: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 10px;'>";
+    echo "<div style='padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; margin-bottom:10px;'>";
     echo htmlspecialchars($_SESSION['success_message']);
     echo "</div>";
     unset($_SESSION['success_message']);
   }
   if (isset($_SESSION['error_message'])) {
-    echo "<div style='padding: 10px; background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; margin-bottom: 10px;'>";
+    echo "<div style='padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; margin-bottom:10px;'>";
     echo htmlspecialchars($_SESSION['error_message']);
     echo "</div>";
     unset($_SESSION['error_message']);
   }
   ?>
-
-  <!-- Main Form to Update Vendor Details -->
-  <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
-    <!-- Hidden field to identify main form submission -->
-    <input type="hidden" name="update_vendor" value="1">
-
-    <!-- Upload Vendor Logo -->
-    <section id="upload-logo">
-      <h3>Upload Vendor Logo</h3>
-      <?php if (!empty($vendor['vendor_logo'])): ?>
-        <p>Current Logo:</p>
-        <img src="<?= htmlspecialchars($vendor['vendor_logo']); ?>" alt="Vendor Logo" width="150">
-        <!-- Delete Logo Checkbox -->
-        <br>
-        <label for="delete_logo">
-          <input type="checkbox" name="delete_logo" id="delete_logo" value="1">
-          Delete current logo
-        </label>
-      <?php endif; ?>
-      <br>
-      <label for="vendor_logo">Select New Logo (optional):</label>
-      <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
-    </section>
-    <hr>
-
-    <!-- Update Vendor Website -->
-    <section id="update-website">
-      <h3>Update Vendor Website</h3>
-      <label for="vendor_website">Website URL:</label>
-      <input type="url" id="vendor_website" name="vendor_website" value="<?= htmlspecialchars($vendor['vendor_website']); ?>">
-    </section>
-    <hr>
-
-    <!-- Update Business Description -->
-    <section id="update-description">
-      <h3>Update Business Description</h3>
-      <textarea name="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor['vendor_description']); ?></textarea>
-    </section>
-    <hr>
-
-    <!-- Update Accepted Payment Methods -->
-    <section id="update-payments">
-      <h3>Update Accepted Payment Methods</h3>
-      <div class="checkbox-group">
-        <?php
-        $currentPayments = Currency::findPaymentMethodsByVendor($vendor_id);
-        foreach ($currencies as $currency):
-          $isChecked = in_array($currency['currency_name'], $currentPayments) ? 'checked' : '';
-        ?>
-          <label>
-            <input type="checkbox" name="accepted_payments[]" value="<?= htmlspecialchars($currency['currency_id']); ?>" <?= $isChecked; ?>>
-            <?= htmlspecialchars($currency['currency_name']); ?>
-          </label>
-          <br>
-        <?php endforeach; ?>
-      </div>
-    </section>
-    <hr>
-
-    <button type="submit">Save Changes</button>
-  </form>
-  <hr>
 
   <!-- Display Current Markets -->
   <section id="current-markets">
@@ -254,7 +164,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
   </section>
-  <hr>
 
   <!-- Incremental Market Update Forms -->
   <h3>Modify Markets You Are Attending</h3>
@@ -263,8 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <label for="add_market">Add a Market:</label>
     <select name="add_market" id="add_market">
       <?php
-      // List markets not currently attended.
-      $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+      $all_markets = Market::fetchAllMarkets();
       $currentMarketIds = [];
       if (!empty($vendorMarkets)) {
         foreach ($vendorMarkets as $market) {
@@ -278,7 +186,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       ?>
     </select>
-    <button type="submit">Add Market</button>
+    <button type="submit" name="add_market_btn">Add Market</button>
   </form>
   <br>
   <!-- Form to Remove a Market -->
@@ -293,10 +201,61 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
       ?>
     </select>
-    <button type="submit">Remove Market</button>
+    <button type="submit" name="remove_market_btn">Remove Market</button>
   </form>
 
-  <!-- Optionally include Select2 JS for enhanced multi-select -->
+  <!-- Main Form to Update Vendor Details & Change Password -->
+  <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
+    <input type="hidden" name="update_vendor" value="1">
+    <hr>
+    <!-- Update Vendor Details Section -->
+    <section id="update-details">
+      <h3>Update Vendor Details</h3>
+      <label for="vendor_name">Vendor Name:</label>
+      <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
+
+      <label for="vendor_website">Website URL:</label>
+      <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
+
+      <label for="vendor_description">Business Description (max 255 characters):</label>
+      <textarea name="vendor_description" id="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
+    </section>
+
+    <hr>
+    <!-- Optional: Logo Update Section -->
+    <section id="upload-logo">
+      <h3>Upload Vendor Logo</h3>
+      <?php if (!empty($vendor->vendor_logo)): ?>
+        <p>Current Logo:</p>
+        <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
+        <label for="delete_logo">
+          <input type="checkbox" name="delete_logo" id="delete_logo" value="1">
+          Delete current logo
+        </label>
+      <?php endif; ?>
+      <br>
+      <label for="vendor_logo">Select New Logo (optional):</label>
+      <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
+    </section>
+
+    <hr>
+    <!-- Password Change Section -->
+    <section id="change-password">
+      <h3>Change Password</h3>
+      <p>If you wish to change your password, please fill in all fields below.</p>
+      <label for="current_password">Current Password:</label>
+      <input type="password" name="current_password" id="current_password"><br>
+
+      <label for="new_password">New Password:</label>
+      <input type="password" name="new_password" id="new_password"><br>
+
+      <label for="confirm_password">Confirm New Password:</label>
+      <input type="password" name="confirm_password" id="confirm_password"><br>
+    </section>
+
+    <hr>
+    <button type="submit" name="update_vendor">Save Changes</button>
+  </form>
 </body>
 
 </html>

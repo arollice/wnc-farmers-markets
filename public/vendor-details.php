@@ -1,5 +1,5 @@
 <?php
-require_once('../private/config.php'); // Ensure database connection
+require_once('../private/config.php');
 
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
@@ -21,9 +21,6 @@ if (!$vendor) {
   die("Vendor not found.");
 }
 
-// Fetch the markets this vendor attends.
-// If your vendor object is an object with a get_markets() method, use that.
-// Otherwise, use a static method (for example, Vendor::findMarketsByVendor($vendor_id)).
 $vendorMarkets = method_exists($vendor, 'get_markets')
   ? $vendor->get_markets()
   : Vendor::findMarketsByVendor($vendor_id);
@@ -99,7 +96,6 @@ $vendorMarkets = method_exists($vendor, 'get_markets')
     <p>This vendor is not attending any markets.</p>
   <?php endif; ?>
 
-  <!-- Back Button -->
   <!-- Back Button -->
   <?php if (!empty($market_id)) : ?>
     <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">Back to Market Details</a></p>

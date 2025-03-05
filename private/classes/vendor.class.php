@@ -142,4 +142,111 @@ class Vendor extends DatabaseObject
 
     return $markets;
   }
+
+  /**
+   * Updates the vendor's details based on provided form data and file uploads.
+   *
+   * This method updates fields such as the website, description, accepted payment methods,
+   * and vendor logo. It handles file validation and deletion for the logo and updates
+   * related records in the vendor_currency table.
+   *
+   * @param array $post The $_POST data containing vendor details.
+   * @param array $files The $_FILES data for file uploads.
+   *
+   * @return array An associative array with two keys:
+   *               - 'success' (bool): True if the update was successful, false otherwise.
+   *               - 'errors' (array): An array of error messages if the update failed.
+   */
+  public function updateDetails($post, $files)
+  {
+    $errors = [];
+    $vendor_id = $this->vendor_id;
+    $pdo = DatabaseObject::get_database();
+
+    // Update website and description.
+    $this->vendor_website = isset($post['vendor_website']) ? trim($post['vendor_website']) : null;
+    if ($this->vendor_website === '') {
+      $this->vendor_website = null;
+    }
+    $this->vendor_description = !empty($post['vendor_description']) ? trim($post['vendor_description']) : $this->vendor_description;
+
+    // Process accepted payments.
+    $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
+    $stmt->execute([$vendor_id]);
+    if (isset($post['accepted_payments']) && is_array($post['accepted_payments'])) {
+      $accepted_payments = $post['accepted_payments'];
+      Currency::associateVendorPayments($vendor_id, $accepted_payments);
+    }
+
+    // Process logo deletion and file upload.
+    if (isset($post['delete_logo']) && $post['delete_logo'] == '1') {
+      if (!empty($this->vendor_logo)) {
+        $filePath = PROJECT_ROOT . '/public/' . $this->vendor_logo;
+        if (file_exists($filePath)) {
+          unlink($filePath);
+        }
+      }
+      $this->vendor_logo = '';
+    } elseif (isset($files['vendor_logo']) && $files['vendor_logo']['error'] !== UPLOAD_ERR_NO_FILE) {
+      if ($files['vendor_logo']['error'] !== UPLOAD_ERR_OK) {
+        $errors[] = "There was an error uploading your file. Error code: " . $files['vendor_logo']['error'];
+        return ['success' => false, 'errors' => $errors];
+      }
+      $allowed_types = ['image/jpeg', 'image/png', 'image/gif'];
+      $finfo = finfo_open(FILEINFO_MIME_TYPE);
+      $mime_type = finfo_file($finfo, $files['vendor_logo']['tmp_name']);
+      finfo_close($finfo);
+      if (!in_array($mime_type, $allowed_types)) {
+        $errors[] = "Only JPG, PNG, and GIF files are allowed. Detected type: $mime_type";
+        return ['success' => false, 'errors' => $errors];
+      }
+      $maxSize = 2 * 1024 * 1024; // 2MB limit
+      if ($files['vendor_logo']['size'] > $maxSize) {
+        $errors[] = "The file is too large. Maximum allowed size is 2MB.";
+        return ['success' => false, 'errors' => $errors];
+      }
+      $target_dir = UPLOADS_PATH;
+      if (!is_dir($target_dir)) {
+        $errors[] = "Upload directory does not exist: $target_dir";
+        return ['success' => false, 'errors' => $errors];
+      }
+      $extension = strtolower(pathinfo($files["vendor_logo"]["name"], PATHINFO_EXTENSION));
+      $unique_name = "vendor_" . $vendor_id . "_" . time() . "_" . uniqid() . "." . $extension;
+      $target_file = $target_dir . '/' . $unique_name;
+      if (!move_uploaded_file($files["vendor_logo"]["tmp_name"], $target_file)) {
+        $errors[] = "There was an error uploading your file. Please try again.";
+        return ['success' => false, 'errors' => $errors];
+      }
+      $this->vendor_logo = 'uploads/' . $unique_name;
+    }
+
+    $this->vendor_name = isset($post['vendor_name']) ? trim($post['vendor_name']) : $this->vendor_name;
+
+    // Save updated data to the database.
+    if ($this->save()) {
+      return ['success' => true, 'errors' => []];
+    } else {
+      $errors[] = "There was an error updating the vendor.";
+      return ['success' => false, 'errors' => $errors];
+    }
+  }
+
+  public function addMarket($market_id)
+  {
+    $pdo = DatabaseObject::get_database();
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM vendor_market WHERE vendor_id = ? AND market_id = ?");
+    $stmt->execute([$this->vendor_id, $market_id]);
+    if ($stmt->fetchColumn() == 0) {
+      $stmt = $pdo->prepare("INSERT INTO vendor_market (vendor_id, market_id) VALUES (?, ?)");
+      return $stmt->execute([$this->vendor_id, $market_id]);
+    }
+    return false;
+  }
+
+  public function removeMarket($market_id)
+  {
+    $pdo = DatabaseObject::get_database();
+    $stmt = $pdo->prepare("DELETE FROM vendor_market WHERE vendor_id = ? AND market_id = ?");
+    return $stmt->execute([$this->vendor_id, $market_id]);
+  }
 }

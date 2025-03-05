@@ -1,6 +1,7 @@
 <?php
 session_start();
 include_once __DIR__ . '/../private/config.php';
+include HEADER_FILE;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $username = $_POST['username'] ?? '';
@@ -59,3 +60,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+<?php include FOOTER_FILE;
+?>

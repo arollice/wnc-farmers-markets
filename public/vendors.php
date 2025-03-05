@@ -2,7 +2,6 @@
 include_once('../private/config.php');
 include_once HEADER_FILE;
 
-// Fetch all vendors using the findAll method from Vendor class
 $vendors = Vendor::findAll();
 
 ?>

@@ -7,6 +7,10 @@ include_once HEADER_FILE;
 
 
 session_start();
+
+$sticky = $_SESSION['sticky'] ?? [];
+
+
 if (isset($_SESSION['error_message'])) {
   echo '<div class="error">' . $_SESSION['error_message'] . '</div>';
   unset($_SESSION['error_message']);
@@ -21,16 +25,21 @@ if (isset($_SESSION['success_message'])) {
 <p>Register your business to be listed in the WNC Farmers Market.</p>
 
 <form action="<?= PUBLIC_PATH ?>/process-vendor-registration.php" method="POST">
-
   <label for="vendor_name">Business Name:</label>
-  <input type="text" id="vendor_name" name="vendor_name" required>
+  <input type="text" id="vendor_name" name="vendor_name" required
+    value="<?= htmlspecialchars($sticky['vendor_name'] ?? '') ?>">
+
 
   <!-- Login-Specific Fields -->
   <label for="vendor_username">Username:</label>
-  <input type="text" id="vendor_username" name="vendor_username" required>
+  <input type="text" id="vendor_username" name="vendor_username" required
+    value="<?= htmlspecialchars($sticky['vendor_username'] ?? '') ?>">
+
 
   <label for="vendor_email">Email:</label>
-  <input type="email" id="vendor_email" name="vendor_email" required>
+  <input type="email" id="vendor_email" name="vendor_email" required
+    value="<?= htmlspecialchars($sticky['vendor_email'] ?? '') ?>">
+
 
   <!-- Password Fields -->
   <label for="vendor_password">Password:</label>
@@ -43,10 +52,14 @@ if (isset($_SESSION['success_message'])) {
 
   <!-- Vendor-Specific Fields -->
   <label for="vendor_website">Business Website (optional):</label>
-  <input type="url" id="vendor_website" name="vendor_website">
+  <input type="url" id="vendor_website" name="vendor_website"
+    value="<?= htmlspecialchars($sticky['vendor_website'] ?? '') ?>">
+
 
   <label for="vendor_description">Business Description (max 255 characters):</label>
-  <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50" placeholder="Enter a brief description of your business..."></textarea>
+  <textarea id="vendor_description" name="vendor_description" maxlength="255" rows="4" cols="50"
+    placeholder="Enter a brief description of your business..."><?= htmlspecialchars($sticky['vendor_description'] ?? '') ?></textarea>
+
 
   <!-- Multi-select for Initial Markets Selection -->
   <section id="select-markets">
@@ -54,32 +67,39 @@ if (isset($_SESSION['success_message'])) {
     <label for="markets">Select Markets:</label>
     <select id="markets" name="market_ids[]" multiple="multiple" style="width:300px;">
       <?php
-      // Assuming $all_markets is fetched similarly as in the dashboard:
       $all_markets = Market::fetchAllMarkets();
+      $selectedMarkets = $sticky['market_ids'] ?? [];
       foreach ($all_markets as $market):
       ?>
-        <option value="<?= htmlspecialchars($market['market_id']); ?>">
+        <option value="<?= htmlspecialchars($market['market_id']); ?>"
+          <?= in_array($market['market_id'], $selectedMarkets) ? 'selected' : '' ?>>
           <?= htmlspecialchars($market['market_name']); ?>
         </option>
       <?php endforeach; ?>
     </select>
+
   </section>
   <p><small>Hold control or command key to select multiple markets</small></p>
 
   <!-- Accepted Payments -->
   <label>Accepted Payments:</label>
   <div class="checkbox-group">
-    <?php foreach ($currencies as $currency): ?>
+    <?php
+    $selectedPayments = $sticky['accepted_payments'] ?? [];
+    foreach ($currencies as $currency): ?>
       <label>
-        <input type="checkbox" name="accepted_payments[]" value="<?= htmlspecialchars($currency['currency_id']) ?>">
+        <input type="checkbox" name="accepted_payments[]" value="<?= htmlspecialchars($currency['currency_id']) ?>"
+          <?= in_array($currency['currency_id'], $selectedPayments) ? 'checked' : '' ?>>
         <?= htmlspecialchars($currency['currency_name']) ?>
       </label>
     <?php endforeach; ?>
   </div>
 
+
   <button type="submit">Register</button>
 </form>
 
 <?php
+unset($_SESSION['sticky']);
 include_once FOOTER_FILE;
 ?>

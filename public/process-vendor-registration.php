@@ -2,26 +2,20 @@
 include_once('../private/config.php');
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   $errors = [];
 
-  // Vendor-specific fields
   $vendor_name        = trim($_POST['vendor_name'] ?? '');
   $vendor_website     = trim($_POST['vendor_website'] ?? '');
   $vendor_description = trim($_POST['vendor_description'] ?? '');
 
-  // Login-specific fields (for the user_account table)
   $username           = trim($_POST['vendor_username'] ?? '');
   $email              = trim($_POST['vendor_email'] ?? '');
   $password           = $_POST['vendor_password'] ?? '';
   $password_confirm   = $_POST['vendor_password_confirm'] ?? '';
 
-  // Optional: Accepted payments
+
   $accepted_payments  = $_POST['accepted_payments'] ?? [];
 
   // Validate vendor fields
@@ -46,7 +40,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   // Duplicate Check: Verify that the username and email are not already in use.
-  // Only run this check if username and email passed basic validation.
   $pdo = DatabaseObject::get_database();
   if (!empty($username) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
     $stmt = $pdo->prepare("SELECT username, email FROM user_account WHERE username = ? OR email = ?");
@@ -63,12 +56,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // If any errors exist, set them in session and redirect back.
   if (!empty($errors)) {
+    // Save submitted data (except passwords) for sticky form fields.
+    $_SESSION['sticky'] = [
+      'vendor_name'        => $vendor_name,
+      'vendor_username'    => $username,
+      'vendor_email'       => $email,
+      'vendor_website'     => $vendor_website,
+      'vendor_description' => $vendor_description,
+      'market_ids'         => $_POST['market_ids'] ?? [],
+      'accepted_payments'  => $accepted_payments,
+    ];
     $_SESSION['error_message'] = '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>';
     header("Location: vendor-register.php");
     exit;
   }
 
-  // Create the vendor record (only vendor-specific fields)
   $vendorData = [
     'vendor_name'        => $vendor_name,
     'vendor_website'     => $vendor_website,
@@ -83,7 +85,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  // Step 2: Create the user account record and link it to the vendor.
   $userAccountData = [
     'username'  => $username,
     'password'  => $password, // raw password; will be hashed in UserAccount::register()
