@@ -1,10 +1,6 @@
 <?php
-// vendor-dashboard.php
 include_once('../private/config.php');
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
+include_once('../private/validation.php');
 session_start();
 
 // Redirect if not logged in as vendor.
@@ -37,7 +33,7 @@ foreach ($vendorData as $key => $value) {
 $status = isset($vendor->status) ? $vendor->status : 'Unknown';
 
 $all_markets = Market::fetchAllMarkets();
-$currencies = Currency::fetchAllCurrencies();
+$currencies   = Currency::fetchAllCurrencies();
 
 $pdo = DatabaseObject::get_database();
 
@@ -47,10 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Process adding a market using the Vendor class method.
   if (isset($_POST['add_market_btn'])) {
     $market_to_add = intval($_POST['add_market'] ?? 0);
-    if ($vendor->addMarket($market_to_add)) {
+    if (validateMarketId($market_to_add) && $vendor->addMarket($market_to_add)) {
       $_SESSION['success_message'] = "Market added successfully.";
     } else {
-      $_SESSION['error_message'] = "You are already attending that market or an error occurred.";
+      $_SESSION['error_message'] = "Invalid market ID or you are already attending that market.";
     }
     header("Location: vendor-dashboard.php");
     exit;
@@ -59,10 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Process removing a market using the Vendor class method.
   elseif (isset($_POST['remove_market_btn'])) {
     $market_to_remove = intval($_POST['remove_market'] ?? 0);
-    if ($vendor->removeMarket($market_to_remove)) {
+    if (validateMarketId($market_to_remove) && $vendor->removeMarket($market_to_remove)) {
       $_SESSION['success_message'] = "Market removed successfully.";
     } else {
-      $_SESSION['error_message'] = "An error occurred while removing the market.";
+      $_SESSION['error_message'] = "Invalid market ID or an error occurred while removing the market.";
     }
     header("Location: vendor-dashboard.php");
     exit;
@@ -80,15 +76,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (empty($_POST['current_password']) || empty($_POST['new_password']) || empty($_POST['confirm_password'])) {
         $errors[] = "Please fill in all password fields.";
       }
-
       if ($_POST['new_password'] !== $_POST['confirm_password']) {
         $errors[] = "New password and confirmation do not match.";
       }
-
       if (strlen($_POST['new_password']) < 8) {
         $errors[] = "New password must be at least 8 characters long.";
       }
-
       if (!password_verify($_POST['current_password'], $userAccount->password_hash)) {
         $errors[] = "Current password is incorrect.";
       }

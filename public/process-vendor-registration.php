@@ -1,10 +1,9 @@
 <?php
 include_once('../private/config.php');
+include_once('../private/validation.php');
 session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-  $errors = [];
 
   $vendor_name        = trim($_POST['vendor_name'] ?? '');
   $vendor_website     = trim($_POST['vendor_website'] ?? '');
@@ -15,33 +14,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password           = $_POST['vendor_password'] ?? '';
   $password_confirm   = $_POST['vendor_password_confirm'] ?? '';
 
-
   $accepted_payments  = $_POST['accepted_payments'] ?? [];
 
-  // Validate vendor fields
-  if (empty($vendor_name)) {
-    $errors[] = "Business Name is required.";
-  }
-  if (!empty($vendor_website) && !filter_var($vendor_website, FILTER_VALIDATE_URL)) {
-    $errors[] = "Please provide a valid URL for the business website.";
-  }
-
-  // Validate login fields
-  if (empty($username)) {
-    $errors[] = "Username is required.";
-  }
-  if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    $errors[] = "A valid email is required.";
-  }
-  if (empty($password) || empty($password_confirm)) {
-    $errors[] = "Both password fields are required.";
-  } elseif ($password !== $password_confirm) {
-    $errors[] = "Passwords do not match.";
-  }
+  // Validate vendor registration fields using the validation function.
+  $errors = validateVendorRegistrationFields($vendor_name, $vendor_website, $username, $email, $password, $password_confirm);
 
   // Duplicate Check: Verify that the username and email are not already in use.
   $pdo = DatabaseObject::get_database();
-  if (!empty($username) && !empty($email) && filter_var($email, FILTER_VALIDATE_EMAIL)) {
+  if (empty($errors)) {
     $stmt = $pdo->prepare("SELECT username, email FROM user_account WHERE username = ? OR email = ?");
     $stmt->execute([$username, $email]);
     while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {

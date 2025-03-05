@@ -1,6 +1,7 @@
 <?php
 // admin-edit-vendor.php
 include_once('../private/config.php');
+include_once('../private/validation.php');
 session_start();
 
 // Optionally, check that the user is an admin.
@@ -16,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Process vendor detail update.
   if (isset($_POST['update_vendor'])) {
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
-    if ($vendor_id <= 0) {
+    if (!validateVendorId($vendor_id)) {
       $_SESSION['error_message'] = "Invalid vendor ID.";
       header("Location: admin.php");
       exit;
@@ -45,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   elseif (isset($_POST['add_market_btn'])) {
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
     $market_to_add = intval($_POST['add_market'] ?? 0);
-    if ($vendor_id > 0 && $market_to_add > 0) {
+    if (validateVendorId($vendor_id) && validateMarketId($market_to_add)) {
       $vendorData = Vendor::findVendorById($vendor_id);
       if ($vendorData) {
         $vendor = new Vendor();
@@ -66,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   elseif (isset($_POST['remove_market_btn'])) {
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
     $market_to_remove = intval($_POST['remove_market'] ?? 0);
-    if ($vendor_id > 0 && $market_to_remove > 0) {
+    if (validateVendorId($vendor_id) && validateMarketId($market_to_remove)) {
       $vendorData = Vendor::findVendorById($vendor_id);
       if ($vendorData) {
         $vendor = new Vendor();
@@ -87,7 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 // For GET requests, retrieve vendor data.
 $vendor_id = intval($_GET['vendor_id'] ?? 0);
-if ($vendor_id <= 0) {
+if (!validateVendorId($vendor_id)) {
   $_SESSION['error_message'] = "Invalid vendor ID.";
   header("Location: admin.php");
   exit;

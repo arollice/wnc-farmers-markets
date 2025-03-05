@@ -1,35 +1,54 @@
 <?php
 session_start();
 include_once __DIR__ . '/../private/config.php';
+include_once __DIR__ . '/../private/validation.php';
 include HEADER_FILE;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $username = $_POST['username'] ?? '';
-  $password = $_POST['password'] ?? '';
+  $username = trim($_POST['username'] ?? '');
+  $password = trim($_POST['password'] ?? '');
 
-  $stmt = $pdo->prepare("SELECT user_id, username, password_hash, role FROM user_account WHERE username = ? LIMIT 1");
-  $stmt->execute([$username]);
-  $user = $stmt->fetch();
 
-  // Use password_verify() to compare the raw password with the hashed version.
-  if ($user && password_verify($password, $user['password_hash'])) {
-    $_SESSION['user_id'] = $user['user_id'];
-    $_SESSION['username'] = $user['username'];
-    $_SESSION['role'] = $user['role'];
-
-    // Redirect based on role.
-    if ($user['role'] === 'admin') {
-      header('Location: admin.php');
-    } elseif ($user['role'] === 'vendor') {
-      header('Location: vendor-dashboard.php');
-    } else {
-      header('Location: index.php');
-    }
-    exit;
+  // Validate login fields.
+  $errors = validateLoginFields($username, $password);
+  if (!empty($errors)) {
+    $error = implode("<br>", $errors);
   } else {
-    $error = "Invalid username or password";
+    // Query the database for the user.
+    $stmt = $pdo->prepare("SELECT user_id, username, password_hash, role FROM user_account WHERE username = ? LIMIT 1");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
+
+    // Debug logging (development only)
+    if (!$user) {
+      error_log("User not found for username: " . $username);
+    } else {
+      error_log("User found: " . print_r($user, true));
+    }
+    error_log("Login attempt: Username = [" . $username . "], Password Length = " . strlen($password));
+
+
+    // Verify the password.
+    if ($user && password_verify($password, $user['password_hash'])) {
+      $_SESSION['user_id'] = $user['user_id'];
+      $_SESSION['username'] = $user['username'];
+      $_SESSION['role'] = $user['role'];
+
+      // Redirect based on role.
+      if ($user['role'] === 'admin') {
+        header('Location: admin.php');
+      } elseif ($user['role'] === 'vendor') {
+        header('Location: vendor-dashboard.php');
+      } else {
+        header('Location: index.php');
+      }
+      exit;
+    } else {
+      $error = "Invalid username or password";
+    }
   }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -60,5 +79,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
-<?php include FOOTER_FILE;
-?>
+<?php include FOOTER_FILE; ?>
