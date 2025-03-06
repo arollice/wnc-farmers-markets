@@ -1,9 +1,6 @@
 <?php
 require_once('../private/config.php');
-
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+include_once HEADER_FILE;
 
 
 // Check if vendor ID is provided
@@ -108,3 +105,4 @@ $vendorMarkets = method_exists($vendor, 'get_markets')
 </body>
 
 </html>
+<?php include_once FOOTER_FILE; ?>

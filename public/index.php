@@ -1,30 +1,46 @@
 <?php
 session_start();
 include_once('../private/config.php');
+include_once HEADER_FILE;
 
 if (isset($_SESSION['success_message'])) {
   echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
   unset($_SESSION['success_message']);
 }
-
 ?>
 
-<h1>WNC Farmers Market - Coming Soon!</h1>
-<p>We're working hard to bring you the best farmers market experience.</p>
+<!--remove post production-->
+<div id="coming-soon">
+  <h1>WNC Farmers Market - Coming Soon!</h1>
+  <p>We're working hard to bring you the best farmers market experience.</p>
+</div>
 
-<?php include_once HEADER_FILE; ?>
+<main>
+  <h2>Seasonal Harvest Highlights</h2>
+  <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
+</main>
+<aside>
+  <div>
+    <img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
+    <p>Fruits</p>
+  </div>
 
-<h2>Seasonal Harvest Highlights</h2>
-<p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
+  <div>
+    <img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
+    <p>Vegetables</p>
+  </div>
 
-<img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
-<p>Fruits</p>
-<img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
-<p>Vegetables</p>
-<img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
-<p>Meats & Poultry</p>
-<img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
-<p>Seasonal Plants & Greenery</p>
+  <div>
+    <img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
+    <p>Meats & Poultry</p>
+  </div>
+
+  <div>
+    <img src="img/placeholder-img.png" width="150" height="auto" alt="Placeholder image.">
+    <p>Seasonal Plants & Greenery</p>
+  </div>
+</aside>
+
 
 <section>
   <h2>Looking for something specific? See who sells what you're looking for!</h2>
@@ -86,11 +102,11 @@ if (isset($_SESSION['success_message'])) {
     <?php endif; ?>
   <?php endif; ?>
 
-</section>
+  <aside>
+    <p>Supporting Local, one market at a time.</p>
+    <img src="img/smiley.svg" width="50" height="auto" alt="A retro smiley face.">
+  </aside>
 
-<aside>
-  <p>Supporting Local, one market at a time.</p>
-  <img src="img/smiley.svg" width="50" height="auto" alt="A retro smiley face.">
-</aside>
+</section>
 
 <?php include_once FOOTER_FILE; ?>

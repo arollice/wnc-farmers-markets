@@ -1,6 +1,7 @@
 <?php
 include_once('../private/config.php');
 include_once('../private/validation.php');
+include_once HEADER_FILE;
 session_start();
 
 // Redirect if not logged in as vendor.
@@ -379,3 +380,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
+<?php include_once FOOTER_FILE; ?>

@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+  background-color: #faf8ef;
+  font-family: 'Inter', sans-serif;
+  color: #333;
+  font-size: 16px;
+  margin: 0 auto;
+}
+
+h1,
+button {
+  color: #333;
+  font-family: 'Bagel Fat One', system-ui;
+  letter-spacing: 0.05em;
+}
+
+header {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+nav ul {
+  display: flex;
+  flex-direction: row;
+  margin: 5px auto;
+}
+
+nav ul li {
+  list-style: none;
+  margin: 0 15px;
+  padding: 5px;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 1rem;
+}
+
+aside {
+  display: flex;
+  justify-content: space-around;
+  padding: 1rem;
+}
+
+aside div {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+#coming-soon {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0.5rem 1rem;
+}
+
+main p,
+#coming-soon p {
+  margin: 0;
+}

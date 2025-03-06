@@ -1,7 +1,7 @@
 <?php
-// admin.php
 include_once('../private/config.php');
 session_start();
+include_once HEADER_FILE;
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   header('Location: login.php');
@@ -141,3 +141,4 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 </body>
 
 </html>
+<?php include_once FOOTER_FILE; ?>
