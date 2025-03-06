@@ -1,7 +1,10 @@
 <?php
+include_once('../private/filterable.php'); // Include the Filterable trait
 
 class Vendor extends DatabaseObject
 {
+  use Filterable;
+
   static protected $table_name = "vendor";
   static protected $db_columns = [
     'vendor_id',
@@ -20,10 +23,20 @@ class Vendor extends DatabaseObject
   public $vendor_description;
   public $status;
 
-  // Fetch all vendors
+  // Fetch all vendors (legacy method)
   public static function findAll()
   {
     return self::fetch_all_from_table('vendor');
+  }
+
+  // New: Retrieve all vendors with optional filters.
+  public static function findAllWithFilters($filters = [])
+  {
+    list($filterSql, $params) = self::buildFilterConditions($filters);
+    $sql = "SELECT * FROM vendor" . $filterSql;
+    $stmt = self::$database->prepare($sql);
+    $stmt->execute($params);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
   // Retrieve items associated with this vendor (via vendor_item junction table)
@@ -56,8 +69,8 @@ class Vendor extends DatabaseObject
     return Currency::find_by_sql($sql, $params);
   }
 
-  // Retrieve vendors by an array of IDs
-  public static function findVendorsByIds($vendor_ids)
+  // Retrieve vendors by an array of IDs with optional filters.
+  public static function findVendorsByIds($vendor_ids, $filters = [])
   {
     if (!isset(self::$database)) {
       die("Database connection is not established.");
@@ -65,17 +78,20 @@ class Vendor extends DatabaseObject
     if (empty($vendor_ids)) {
       return [];
     }
-    // Generate placeholders for the query
+    // Generate placeholders for the query.
     $placeholders = implode(',', array_fill(0, count($vendor_ids), '?'));
     $sql = "SELECT vendor_id, vendor_name, vendor_website, vendor_logo, vendor_description 
             FROM vendor 
             WHERE vendor_id IN ($placeholders)";
+    if (!empty($filters['approved'])) {
+      $sql .= " AND status = 'approved'";
+    }
     $stmt = self::$database->prepare($sql);
     $stmt->execute($vendor_ids);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-  // Retrieve a single vendor by ID
+  // Retrieve a single vendor by ID.
   public static function findVendorById($vendor_id)
   {
     if (!isset(self::$database)) {
@@ -89,8 +105,8 @@ class Vendor extends DatabaseObject
     return $stmt->fetch(PDO::FETCH_ASSOC);
   }
 
-  // Retrieve vendors by market ID
-  public static function findVendorsByMarket($market_id)
+  // Retrieve vendors by market ID with optional filters.
+  public static function findVendorsByMarket($market_id, $filters = [])
   {
     if (!isset(self::$database)) {
       die("Database connection is not established.");
@@ -99,8 +115,12 @@ class Vendor extends DatabaseObject
             FROM vendor v
             JOIN vendor_market vm ON v.vendor_id = vm.vendor_id
             WHERE vm.market_id = ?";
+    $params = [$market_id];
+    if (!empty($filters['approved'])) {
+      $sql .= " AND v.status = 'approved'";
+    }
     $stmt = self::$database->prepare($sql);
-    $stmt->execute([$market_id]);
+    $stmt->execute($params);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
@@ -145,10 +165,6 @@ class Vendor extends DatabaseObject
 
   /**
    * Updates the vendor's details based on provided form data and file uploads.
-   *
-   * This method updates fields such as the website, description, accepted payment methods,
-   * and vendor logo. It handles file validation and deletion for the logo and updates
-   * related records in the vendor_currency table.
    *
    * @param array $post The $_POST data containing vendor details.
    * @param array $files The $_FILES data for file uploads.

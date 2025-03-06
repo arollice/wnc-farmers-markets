@@ -1,8 +1,11 @@
 <?php
-include_once('../private/config_api.php'); // Ensure this contains SAPLING_API_KEY
+include_once('../private/config_api.php');
+include_once('../private/filterable.php'); // Include the Filterable trait
 
 class Item extends DatabaseObject
 {
+  use Filterable;
+
   static protected $table_name = "item";
   static protected $db_columns = ['item_id', 'item_name'];
   static protected $primary_key = 'item_id';
@@ -41,6 +44,7 @@ class Item extends DatabaseObject
               JOIN vendor_item vi ON i.item_id = vi.item_id
               JOIN vendor v ON vi.vendor_id = v.vendor_id
               WHERE i.item_name LIKE :search_term
+                AND v.status = 'approved'
               ORDER BY i.item_name ASC";
 
     $stmt = $pdo->prepare($query);
@@ -60,6 +64,10 @@ class Item extends DatabaseObject
       'meet' => 'meat',
       'met' => 'meat',
       'appel' => 'apple',
+      'beens' => 'beans',
+      'banans' => 'bananas',
+      'bannas' => 'bananas',
+      'bannanas' => 'bananas',
       'lettcue' => 'lettuce',
       'strwabery' => 'strawberry',
       'bluberry' => 'blueberry',
@@ -113,6 +121,10 @@ class Item extends DatabaseObject
     return self::basicSpellCheck($text);
   }
 
+  public static function spellCheck($text)
+  {
+    return self::getSpellCheckedTerm($text);
+  }
 
   private static function basicSpellCheck($text)
   {

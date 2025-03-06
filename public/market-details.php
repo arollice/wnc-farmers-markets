@@ -9,7 +9,8 @@ if (!isset($_GET['id'])) {
 $market_id = intval($_GET['id']);
 $market = Market::fetchMarketDetails($market_id); // Fetch market details
 $policies = Market::fetchMarketPolicies(); // Fetch selected policies
-$vendors = Vendor::findVendorsByMarket($market_id); // Fetch vendors attending this market
+$vendors = Vendor::findVendorsByMarket($market_id, ['approved' => true]);
+
 
 if (!$market) {
   die("Market not found.");

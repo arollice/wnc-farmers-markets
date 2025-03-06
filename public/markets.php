@@ -6,8 +6,9 @@ error_reporting(E_ALL);
 
 include_once HEADER_FILE;
 
-// Retrieve all markets using the new function
 $markets = Market::fetchAllMarkets();
+
+
 if (!$markets) {
   die("No markets found.");
 }

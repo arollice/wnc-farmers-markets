@@ -40,8 +40,8 @@ $pdo = DatabaseObject::get_database();
 // --- Process Form Submissions --- //
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-  // Process adding a market using the Vendor class method.
   if (isset($_POST['add_market_btn'])) {
+    // Process adding a market using the Vendor class method.
     $market_to_add = intval($_POST['add_market'] ?? 0);
     if (validateMarketId($market_to_add) && $vendor->addMarket($market_to_add)) {
       $_SESSION['success_message'] = "Market added successfully.";
@@ -50,10 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     header("Location: vendor-dashboard.php");
     exit;
-  }
-
-  // Process removing a market using the Vendor class method.
-  elseif (isset($_POST['remove_market_btn'])) {
+  } elseif (isset($_POST['remove_market_btn'])) {
+    // Process removing a market using the Vendor class method.
     $market_to_remove = intval($_POST['remove_market'] ?? 0);
     if (validateMarketId($market_to_remove) && $vendor->removeMarket($market_to_remove)) {
       $_SESSION['success_message'] = "Market removed successfully.";
@@ -62,9 +60,90 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     header("Location: vendor-dashboard.php");
     exit;
-  }
-  // Process main vendor update and optional password change.
-  elseif (isset($_POST['update_vendor'])) {
+  } elseif (isset($_POST['add_item_btn'])) {
+    // Process Adding an Item
+    $item_name = trim($_POST['item_name']);
+    if (empty($item_name)) {
+      $_SESSION['error_message'] = "Please enter an item name.";
+      header("Location: vendor-dashboard.php");
+      exit;
+    }
+
+    // Use the public spellCheck method.
+    $corrected_item_name = Item::spellCheck($item_name);
+    // If a correction is available and the vendor hasn't confirmed a choice:
+    if ($corrected_item_name && strtolower($corrected_item_name) !== strtolower($item_name) && !isset($_POST['confirm_spell'])) {
+      // Store suggestion info in session and redirect.
+      $_SESSION['spell_suggestion'] = [
+        'original'   => $item_name,
+        'suggestion' => $corrected_item_name
+      ];
+      header("Location: vendor-dashboard.php");
+      exit;
+    }
+
+    // If the vendor has confirmed the suggestion choice, use it accordingly.
+    if (isset($_POST['confirm_spell'])) {
+      if ($_POST['confirm_spell'] === 'accept') {
+        $item_name = $_SESSION['spell_suggestion']['suggestion'];
+      } else { // 'decline'
+        $item_name = $_SESSION['spell_suggestion']['original'];
+      }
+      unset($_SESSION['spell_suggestion']);
+    }
+
+    // Check if the item already exists (ignoring case)
+    $stmt = $pdo->prepare("SELECT item_id FROM item WHERE LOWER(item_name) = LOWER(?)");
+    $stmt->execute([$item_name]);
+    $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($existing_item) {
+      $item_id = $existing_item['item_id'];
+    } else {
+      // Insert new item into the item table.
+      $stmt = $pdo->prepare("INSERT INTO item (item_name) VALUES (?)");
+      if ($stmt->execute([$item_name])) {
+        $item_id = $pdo->lastInsertId();
+      } else {
+        $_SESSION['error_message'] = "Error adding new item.";
+        header("Location: vendor-dashboard.php");
+        exit;
+      }
+    }
+
+    // Link the item to the vendor (assuming a vendor_item table with vendor_id and item_id columns)
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
+    $stmt->execute([$vendor_id, $item_id]);
+    if ($stmt->fetchColumn() == 0) {
+      $stmt = $pdo->prepare("INSERT INTO vendor_item (vendor_id, item_id) VALUES (?, ?)");
+      if ($stmt->execute([$vendor_id, $item_id])) {
+        $_SESSION['success_message'] = "Item added successfully.";
+      } else {
+        $_SESSION['error_message'] = "Error linking item to your profile.";
+      }
+    } else {
+      $_SESSION['error_message'] = "Item already exists in your profile.";
+    }
+    header("Location: vendor-dashboard.php");
+    exit;
+  } elseif (isset($_POST['remove_item_btn'])) {
+    // Process removing an item from the vendor's list.
+    $item_id = intval($_POST['item_id'] ?? 0);
+    if ($item_id <= 0) {
+      $_SESSION['error_message'] = "Invalid item ID.";
+      header("Location: vendor-dashboard.php");
+      exit;
+    }
+    $stmt = $pdo->prepare("DELETE FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
+    if ($stmt->execute([$vendor_id, $item_id])) {
+      $_SESSION['success_message'] = "Item removed successfully.";
+    } else {
+      $_SESSION['error_message'] = "Error removing the item.";
+    }
+    header("Location: vendor-dashboard.php");
+    exit;
+  } elseif (isset($_POST['update_vendor'])) {
+    // Process main vendor update and optional password change.
     $errors = [];
 
     // Update vendor details using the Vendor class method.
@@ -72,7 +151,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Process password change if any of the password fields are provided.
     if (!empty($_POST['current_password']) || !empty($_POST['new_password']) || !empty($_POST['confirm_password'])) {
-      // Ensure all password fields are provided.
       if (empty($_POST['current_password']) || empty($_POST['new_password']) || empty($_POST['confirm_password'])) {
         $errors[] = "Please fill in all password fields.";
       }
@@ -85,7 +163,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if (!password_verify($_POST['current_password'], $userAccount->password_hash)) {
         $errors[] = "Current password is incorrect.";
       }
-      // If no password errors, update the password.
       if (empty($errors)) {
         $newPasswordHash = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
         $stmt = $pdo->prepare("UPDATE user_account SET password_hash = ? WHERE user_id = ?");
@@ -95,7 +172,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
 
-    // Combine errors from updateDetails() with password errors.
     if (!$result['success']) {
       $errors = array_merge($errors, $result['errors']);
     }
@@ -138,6 +214,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo htmlspecialchars($_SESSION['error_message']);
     echo "</div>";
     unset($_SESSION['error_message']);
+  }
+  ?>
+
+  <!-- Spell Check Suggestion Block -->
+  <?php
+  if (isset($_SESSION['spell_suggestion'])) {
+    $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
+    $suggestion = htmlspecialchars($_SESSION['spell_suggestion']['suggestion']);
+    echo "<div style='padding:10px; background:#fff3cd; color:#856404; border:1px solid #ffeeba; margin-bottom:10px;'>";
+    echo "Did you mean <strong>$suggestion</strong> instead of <strong>$original</strong>? ";
+    echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>
+            <input type='hidden' name='item_name' value='$original'>
+            <input type='hidden' name='confirm_spell' value='decline'>
+            <button type='submit' name='add_item_btn'>Ignore Suggestion</button>
+          </form>";
+    echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>
+            <input type='hidden' name='item_name' value='$original'>
+            <input type='hidden' name='confirm_spell' value='accept'>
+            <button type='submit' name='add_item_btn'>Accept Suggestion</button>
+          </form>";
+    echo "</div>";
   }
   ?>
 
@@ -196,6 +293,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </select>
     <button type="submit" name="remove_market_btn">Remove Market</button>
   </form>
+
+  <!-- List of Items Vendor Sells in a Select List -->
+  <section id="vendor-items-list">
+    <h3>Your Items for Sale</h3>
+    <?php
+    $vendorItems = Item::findItemsByVendor($vendor_id);
+    if (!empty($vendorItems)) {
+      echo '<form action="vendor-dashboard.php" method="POST">';
+      echo '<select name="item_id">';
+      foreach ($vendorItems as $item) {
+        echo '<option value="' . htmlspecialchars($item['item_id']) . '">' . htmlspecialchars($item['item_name']) . '</option>';
+      }
+      echo '</select>';
+      echo '<button type="submit" name="remove_item_btn">Remove Selected Item</button>';
+      echo '</form>';
+    } else {
+      echo "<p>You haven't added any items yet.</p>";
+    }
+    ?>
+  </section>
+
+  <!-- Items Form: Add Items for Sale -->
+  <section id="vendor-items">
+    <h3>Add Items for Sale</h3>
+    <form action="vendor-dashboard.php" method="POST">
+      <label for="item_name">Item Name:</label>
+      <input type="text" name="item_name" id="item_name" required>
+      <button type="submit" name="add_item_btn">Add Item</button>
+    </form>
+  </section>
 
   <!-- Main Form to Update Vendor Details & Change Password -->
   <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">

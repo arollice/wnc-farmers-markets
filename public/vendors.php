@@ -2,7 +2,8 @@
 include_once('../private/config.php');
 include_once HEADER_FILE;
 
-$vendors = Vendor::findAll();
+$vendors = Vendor::findAllWithFilters(['approved' => true]);
+
 
 ?>
 <section>

@@ -138,11 +138,6 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <?php else: ?>
     <p>No approved vendors at this time.</p>
   <?php endif; ?>
-
-  <hr>
-  <!-- Optional: Debug Table Using displayTable() -->
-  <h3>Debug: All Vendors Table</h3>
-  <?php DatabaseObject::displayTable('vendor'); ?>
 </body>
 
 </html>

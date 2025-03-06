@@ -1,7 +1,10 @@
 <?php
+include_once('../private/filterable.php');
 
 class Market extends DatabaseObject
 {
+  use Filterable;
+
   static protected $table_name = "market";
   static protected $db_columns = [
     'market_id',
@@ -25,7 +28,6 @@ class Market extends DatabaseObject
   public $parking_info;
   public $market_open;
   public $market_close;
-
 
   public static function fetchAllMarkets()
   {
@@ -52,7 +54,6 @@ class Market extends DatabaseObject
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
-
   // Fetch market details
   public static function fetchMarketDetails($market_id)
   {
@@ -74,7 +75,6 @@ class Market extends DatabaseObject
         WHERE m.market_id = :market_id
         GROUP BY m.market_id";
 
-
     $stmt = self::$database->prepare($sql);
     $stmt->bindParam(':market_id', $market_id, PDO::PARAM_INT);
     $stmt->execute();
@@ -87,8 +87,7 @@ class Market extends DatabaseObject
     try {
       $sql = "SELECT policy_name, policy_description 
                     FROM policy_info
-                    WHERE policy_name IN ('Pet-Friendly Market', 'SNAP/EBT Accepted')"; // Only include these two policies
-
+                    WHERE policy_name IN ('Pet-Friendly Market', 'SNAP/EBT Accepted')";
       $stmt = self::$database->query($sql);
       return $stmt->fetchAll(PDO::FETCH_ASSOC);
     } catch (Exception $e) {
@@ -111,27 +110,18 @@ class Market extends DatabaseObject
       <h2><?= htmlspecialchars($market['market_name']) ?></h2>
       <p><strong>Location:</strong> <?= htmlspecialchars($market['city']) ?>, <?= htmlspecialchars($market['state_name']) ?> <?= htmlspecialchars($market['zip_code']) ?></p>
       <p><strong>Parking Info:</strong> <?= htmlspecialchars($market['parking_info']) ?></p>
-
       <?php if (!empty($market['market_open']) && !empty($market['market_close'])) : ?>
         <p><strong>Market Hours:</strong> <?= date("g:i A", strtotime($market['market_open'])) ?> - <?= date("g:i A", strtotime($market['market_close'])) ?></p>
       <?php endif; ?>
-
       <?php if (!empty($market['market_days'])) : ?>
         <p><strong>Market Days:</strong> <?= htmlspecialchars($market['market_days']) ?></p>
       <?php endif; ?>
-
       <?php if (!empty($market['market_season'])) : ?>
         <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_season']) ?></p>
       <?php endif; ?>
-
-      <?php if (!empty($market['market_day'])) : ?>
-        <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_day']) ?></p>
-      <?php endif; ?>
-
       <?php if (!empty($market['last_market_date'])) : ?>
         <p><strong>Last Market Date:</strong> <?= date('F j, Y', strtotime($market['last_market_date'])) ?></p>
       <?php endif; ?>
-
       <?php if (!empty($policies)) : ?>
         <h3>Market Policies</h3>
         <ul>
