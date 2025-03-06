@@ -12,10 +12,6 @@ if (!defined('PUBLIC_PATH')) {
   <meta charset="utf-8">
   <title>WNC Farmers Market</title>
 
-  <!-- JS libraries loaded without defer, TRY WITH DEFER-->
-  <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script> -->
-
   <?php if (isset($currentPage) && $currentPage === 'regions'): ?>
     <!-- Leaflet CSS from CDN -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
@@ -50,5 +46,4 @@ if (!defined('PUBLIC_PATH')) {
         <li><a href="<?= PUBLIC_PATH ?>/about.php">About</a></li>
       </ul>
     </nav>
-    <hr>
   </header>

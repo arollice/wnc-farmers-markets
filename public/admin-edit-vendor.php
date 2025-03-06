@@ -1,14 +1,9 @@
 <?php
-// admin-edit-vendor.php
+session_start();
 include_once('../private/config.php');
 include_once('../private/validation.php');
-session_start();
+include HEADER_FILE;
 
-// Optionally, check that the user is an admin.
-// if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-//     header('Location: login.php');
-//     exit;
-// }
 
 $pdo = DatabaseObject::get_database();
 
@@ -109,115 +104,131 @@ foreach ($vendorData as $key => $value) {
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
   <title>Edit Vendor</title>
 </head>
 
 <body>
-  <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
+  <main>
+    <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
 
-  <!-- Display session messages -->
-  <?php
-  if (isset($_SESSION['success_message'])) {
-    echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
-    unset($_SESSION['success_message']);
-  }
-  if (isset($_SESSION['error_message'])) {
-    echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
-    unset($_SESSION['error_message']);
-  }
-  ?>
-
-  <!-- Main Vendor Update Form -->
-  <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
-
-    <h3>Modify Vendor Details</h3>
-    <label for="vendor_name">Vendor Name:</label>
-    <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
-
-    <label for="vendor_website">Website:</label>
-    <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
-
-    <label for="vendor_description">Description:</label>
-    <textarea name="vendor_description" id="vendor_description" rows="4" cols="50"><?= htmlspecialchars($vendor->vendor_description); ?></textarea><br>
-
-    <!-- Optional: Logo Update -->
-    <?php if (!empty($vendor->vendor_logo)): ?>
-      <p>Current Logo:</p>
-      <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
-      <label for="delete_logo">
-        <input type="checkbox" name="delete_logo" id="delete_logo" value="1"> Delete current logo
-      </label><br>
-    <?php endif; ?>
-    <label for="vendor_logo">Select New Logo (optional):</label>
-    <input type="file" name="vendor_logo" id="vendor_logo" accept="image/*"><br>
-
-    <button type="submit" name="update_vendor">Save Changes</button>
-  </form>
-
-  <hr>
-
-  <!-- Markets Section -->
-  <?php
-  // Fetch vendor markets once.
-  $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
-  ?>
-  <h3>Markets Vendor is Attending</h3>
-  <?php
-  if (!empty($vendorMarkets)) {
-    echo "<ul>";
-    foreach ($vendorMarkets as $market) {
-      echo "<li>" . htmlspecialchars($market['market_name']) . "</li>";
+    <!-- Display session messages -->
+    <?php
+    if (isset($_SESSION['success_message'])) {
+      echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
+      unset($_SESSION['success_message']);
     }
-    echo "</ul>";
-  } else {
-    echo "<p>Vendor is not attending any markets.</p>";
-  }
-  ?>
+    if (isset($_SESSION['error_message'])) {
+      echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
+      unset($_SESSION['error_message']);
+    }
+    ?>
 
-  <!-- Form to Add a Market -->
-  <form action="admin-edit-vendor.php" method="POST">
-    <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
-    <label for="add_market">Add a Market:</label>
-    <select name="add_market" id="add_market">
-      <?php
-      $all_markets = Market::fetchAllMarkets();
-      $currentMarketIds = [];
-      if (!empty($vendorMarkets)) {
-        foreach ($vendorMarkets as $market) {
-          $currentMarketIds[] = $market['market_id'];
-        }
+    <!-- Main Vendor Update Form -->
+    <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
+
+      <h3>Modify Vendor Details</h3>
+      <label for="vendor_name">Vendor Name:</label>
+      <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
+
+      <label for="vendor_website">Website:</label>
+      <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
+
+      <label for="vendor_description">Description:</label>
+      <textarea name="vendor_description" id="vendor_description" rows="4" cols="50"><?= htmlspecialchars($vendor->vendor_description); ?></textarea><br>
+
+      <!-- Optional: Logo Update -->
+      <?php if (!empty($vendor->vendor_logo)): ?>
+        <p>Current Logo:</p>
+        <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
+        <label for="delete_logo">
+          <input type="checkbox" name="delete_logo" id="delete_logo" value="1"> Delete current logo
+        </label><br>
+      <?php endif; ?>
+      <label for="vendor_logo">Select New Logo (optional):</label>
+      <input type="file" name="vendor_logo" id="vendor_logo" accept="image/*"><br>
+
+      <button type="submit" name="update_vendor">Save Changes</button>
+    </form>
+
+    <hr>
+
+    <!-- Markets Section -->
+    <?php
+    // Fetch vendor markets once.
+    $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+    ?>
+    <h3>Markets Vendor is Attending</h3>
+    <?php
+    if (!empty($vendorMarkets)) {
+      echo "<ul>";
+      foreach ($vendorMarkets as $market) {
+        echo "<li>" . htmlspecialchars($market['market_name']) . "</li>";
       }
-      foreach ($all_markets as $market) {
-        if (!in_array($market['market_id'], $currentMarketIds)) {
-          echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-        }
+      echo "</ul>";
+    } else {
+      echo "<p>Vendor is not attending any markets.</p>";
+    }
+    ?>
+
+    <!-- Form to Add a Market -->
+    <?php
+    $all_markets = Market::fetchAllMarkets();
+    $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+    $currentMarketIds = [];
+    if (!empty($vendorMarkets)) {
+      foreach ($vendorMarkets as $market) {
+        $currentMarketIds[] = $market['market_id'];
       }
-      ?>
-    </select>
-    <button type="submit" name="add_market_btn">Add Market</button>
-  </form>
+    }
 
-  <br>
-
-  <!-- Form to Remove a Market -->
-  <form action="admin-edit-vendor.php" method="POST">
-    <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
-    <label for="remove_market">Remove a Market:</label>
-    <select name="remove_market" id="remove_market">
-      <?php
-      if (!empty($vendorMarkets)) {
-        foreach ($vendorMarkets as $market) {
-          echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-        }
+    // Build array of available markets (those not already added)
+    $available_markets = [];
+    foreach ($all_markets as $market) {
+      if (!in_array($market['market_id'], $currentMarketIds)) {
+        $available_markets[] = $market;
       }
-      ?>
-    </select>
-    <button type="submit" name="remove_market_btn">Remove Market</button>
-  </form>
+    }
+    ?>
+    <form action="vendor-dashboard.php" method="POST">
+      <label for="add_market">Add a Market:</label>
+      <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
+        <?php
+        if (empty($available_markets)) {
+          echo '<option value="">All markets added</option>';
+        } else {
+          foreach ($available_markets as $market) {
+            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+          }
+        }
+        ?>
+      </select>
+      <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
+    </form>
 
-  <p><a href="admin.php">Back to Admin Dashboard</a></p>
+
+    <br>
+
+    <!-- Form to Remove a Market -->
+    <form action="admin-edit-vendor.php" method="POST">
+      <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
+      <label for="remove_market">Remove a Market:</label>
+      <select name="remove_market" id="remove_market">
+        <?php
+        if (!empty($vendorMarkets)) {
+          foreach ($vendorMarkets as $market) {
+            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+          }
+        }
+        ?>
+      </select>
+      <button type="submit" name="remove_market_btn">Remove Market</button>
+    </form>
+
+    <p><a href="admin.php">Back to Admin Dashboard</a></p>
+  </main>
 </body>
 
 </html>
+
+<?php include FOOTER_FILE; ?>

@@ -193,191 +193,206 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
   <title>Vendor Dashboard</title>
 </head>
 
 <body>
-  <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
-  <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
-  <a href="logout.php">Logout</a>
+  <main>
+    <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
+    <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
+    <a href="logout.php">Logout</a>
 
-  <!-- Session Messages -->
-  <?php
-  if (isset($_SESSION['success_message'])) {
-    echo "<div style='padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; margin-bottom:10px;'>";
-    echo htmlspecialchars($_SESSION['success_message']);
-    echo "</div>";
-    unset($_SESSION['success_message']);
-  }
-  if (isset($_SESSION['error_message'])) {
-    echo "<div style='padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; margin-bottom:10px;'>";
-    echo htmlspecialchars($_SESSION['error_message']);
-    echo "</div>";
-    unset($_SESSION['error_message']);
-  }
-  ?>
-
-  <!-- Spell Check Suggestion Block -->
-  <?php
-  if (isset($_SESSION['spell_suggestion'])) {
-    $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
-    $suggestion = htmlspecialchars($_SESSION['spell_suggestion']['suggestion']);
-    echo "<div style='padding:10px; background:#fff3cd; color:#856404; border:1px solid #ffeeba; margin-bottom:10px;'>";
-    echo "Did you mean <strong>$suggestion</strong> instead of <strong>$original</strong>? ";
-    echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>
-            <input type='hidden' name='item_name' value='$original'>
-            <input type='hidden' name='confirm_spell' value='decline'>
-            <button type='submit' name='add_item_btn'>Ignore Suggestion</button>
-          </form>";
-    echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>
-            <input type='hidden' name='item_name' value='$original'>
-            <input type='hidden' name='confirm_spell' value='accept'>
-            <button type='submit' name='add_item_btn'>Accept Suggestion</button>
-          </form>";
-    echo "</div>";
-  }
-  ?>
-
-  <!-- Display Current Markets -->
-  <section id="current-markets">
-    <h3>Markets You Are Attending</h3>
+    <!-- Session Messages -->
     <?php
+    if (isset($_SESSION['success_message'])) {
+      echo "<div style='padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; margin-bottom:10px;'>";
+      echo htmlspecialchars($_SESSION['success_message']);
+      echo "</div>";
+      unset($_SESSION['success_message']);
+    }
+    if (isset($_SESSION['error_message'])) {
+      echo "<div style='padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; margin-bottom:10px;'>";
+      echo htmlspecialchars($_SESSION['error_message']);
+      echo "</div>";
+      unset($_SESSION['error_message']);
+    }
+    ?>
+
+    <!-- Spell Check Suggestion Block -->
+    <?php
+    if (isset($_SESSION['spell_suggestion'])) {
+      $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
+      $suggestion = htmlspecialchars($_SESSION['spell_suggestion']['suggestion']);
+      echo "<div style='padding:10px; background:#fff3cd; color:#856404; border:1px solid #ffeeba; margin-bottom:10px;'>";
+      echo "Did you mean <strong>$suggestion</strong> instead of <strong>$original</strong>? ";
+      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>
+              <input type='hidden' name='item_name' value='$original'>
+              <input type='hidden' name='confirm_spell' value='decline'>
+              <button type='submit' name='add_item_btn'>Ignore Suggestion</button>
+            </form>";
+      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>
+              <input type='hidden' name='item_name' value='$original'>
+              <input type='hidden' name='confirm_spell' value='accept'>
+              <button type='submit' name='add_item_btn'>Accept Suggestion</button>
+            </form>";
+      echo "</div>";
+    }
+    ?>
+
+    <!-- Display Current Markets -->
+    <section id="current-markets">
+      <h3>Markets You Are Attending</h3>
+      <?php
+      $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+      if (!empty($vendorMarkets)) {
+        echo "<ul>";
+        foreach ($vendorMarkets as $market) {
+          echo "<li>" . htmlspecialchars($market['market_name']) . "</li>";
+        }
+        echo "</ul>";
+      } else {
+        echo "<p>You are not attending any markets.</p>";
+      }
+      ?>
+    </section>
+
+    <!-- Incremental Market Update Forms -->
+    <h3>Modify Markets You Are Attending</h3>
+    <!-- Form to Add a Market -->
+    <?php
+    $all_markets = Market::fetchAllMarkets();
     $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+    $currentMarketIds = [];
     if (!empty($vendorMarkets)) {
-      echo "<ul>";
       foreach ($vendorMarkets as $market) {
-        echo "<li>" . htmlspecialchars($market['market_name']) . "</li>";
+        $currentMarketIds[] = $market['market_id'];
       }
-      echo "</ul>";
-    } else {
-      echo "<p>You are not attending any markets.</p>";
+    }
+
+    // Build array of available markets (those not already added)
+    $available_markets = [];
+    foreach ($all_markets as $market) {
+      if (!in_array($market['market_id'], $currentMarketIds)) {
+        $available_markets[] = $market;
+      }
     }
     ?>
-  </section>
-
-  <!-- Incremental Market Update Forms -->
-  <h3>Modify Markets You Are Attending</h3>
-  <!-- Form to Add a Market -->
-  <form action="vendor-dashboard.php" method="POST">
-    <label for="add_market">Add a Market:</label>
-    <select name="add_market" id="add_market">
-      <?php
-      $all_markets = Market::fetchAllMarkets();
-      $currentMarketIds = [];
-      if (!empty($vendorMarkets)) {
-        foreach ($vendorMarkets as $market) {
-          $currentMarketIds[] = $market['market_id'];
-        }
-      }
-      foreach ($all_markets as $market) {
-        if (!in_array($market['market_id'], $currentMarketIds)) {
-          echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-        }
-      }
-      ?>
-    </select>
-    <button type="submit" name="add_market_btn">Add Market</button>
-  </form>
-  <br>
-  <!-- Form to Remove a Market -->
-  <form action="vendor-dashboard.php" method="POST">
-    <label for="remove_market">Remove a Market:</label>
-    <select name="remove_market" id="remove_market">
-      <?php
-      if (!empty($vendorMarkets)) {
-        foreach ($vendorMarkets as $market) {
-          echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-        }
-      }
-      ?>
-    </select>
-    <button type="submit" name="remove_market_btn">Remove Market</button>
-  </form>
-
-  <!-- List of Items Vendor Sells in a Select List -->
-  <section id="vendor-items-list">
-    <h3>Your Items for Sale</h3>
-    <?php
-    $vendorItems = Item::findItemsByVendor($vendor_id);
-    if (!empty($vendorItems)) {
-      echo '<form action="vendor-dashboard.php" method="POST">';
-      echo '<select name="item_id">';
-      foreach ($vendorItems as $item) {
-        echo '<option value="' . htmlspecialchars($item['item_id']) . '">' . htmlspecialchars($item['item_name']) . '</option>';
-      }
-      echo '</select>';
-      echo '<button type="submit" name="remove_item_btn">Remove Selected Item</button>';
-      echo '</form>';
-    } else {
-      echo "<p>You haven't added any items yet.</p>";
-    }
-    ?>
-  </section>
-
-  <!-- Items Form: Add Items for Sale -->
-  <section id="vendor-items">
-    <h3>Add Items for Sale</h3>
     <form action="vendor-dashboard.php" method="POST">
-      <label for="item_name">Item Name:</label>
-      <input type="text" name="item_name" id="item_name" required>
-      <button type="submit" name="add_item_btn">Add Item</button>
+      <label for="add_market">Add a Market:</label>
+      <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
+        <?php
+        if (empty($available_markets)) {
+          echo '<option value="">All markets added</option>';
+        } else {
+          foreach ($available_markets as $market) {
+            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+          }
+        }
+        ?>
+      </select>
+      <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
     </form>
-  </section>
 
-  <!-- Main Form to Update Vendor Details & Change Password -->
-  <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
-    <input type="hidden" name="update_vendor" value="1">
-    <hr>
-    <!-- Update Vendor Details Section -->
-    <section id="update-details">
-      <h3>Update Vendor Details</h3>
-      <label for="vendor_name">Vendor Name:</label>
-      <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
+    <br>
+    <!-- Form to Remove a Market -->
+    <form action="vendor-dashboard.php" method="POST">
+      <label for="remove_market">Remove a Market:</label>
+      <select name="remove_market" id="remove_market">
+        <?php
+        if (!empty($vendorMarkets)) {
+          foreach ($vendorMarkets as $market) {
+            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+          }
+        }
+        ?>
+      </select>
+      <button type="submit" name="remove_market_btn">Remove Market</button>
+    </form>
 
-      <label for="vendor_website">Website URL:</label>
-      <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
-
-      <label for="vendor_description">Business Description (max 255 characters):</label>
-      <textarea name="vendor_description" id="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
+    <!-- List of Items Vendor Sells in a Select List -->
+    <section id="vendor-items-list">
+      <h3>Your Items for Sale</h3>
+      <?php
+      $vendorItems = Item::findItemsByVendor($vendor_id);
+      if (!empty($vendorItems)) {
+        echo '<form action="vendor-dashboard.php" method="POST">';
+        echo '<select name="item_id">';
+        foreach ($vendorItems as $item) {
+          echo '<option value="' . htmlspecialchars($item['item_id']) . '">' . htmlspecialchars($item['item_name']) . '</option>';
+        }
+        echo '</select>';
+        echo '<button type="submit" name="remove_item_btn">Remove Selected Item</button>';
+        echo '</form>';
+      } else {
+        echo "<p>You haven't added any items yet.</p>";
+      }
+      ?>
     </section>
 
-    <hr>
-    <!-- Optional: Logo Update Section -->
-    <section id="upload-logo">
-      <h3>Upload Vendor Logo</h3>
-      <?php if (!empty($vendor->vendor_logo)): ?>
-        <p>Current Logo:</p>
-        <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
-        <label for="delete_logo">
-          <input type="checkbox" name="delete_logo" id="delete_logo" value="1">
-          Delete current logo
-        </label>
-      <?php endif; ?>
-      <br>
-      <label for="vendor_logo">Select New Logo (optional):</label>
-      <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
+    <!-- Items Form: Add Items for Sale -->
+    <section id="vendor-items">
+      <h3>Add Items for Sale</h3>
+      <form action="vendor-dashboard.php" method="POST">
+        <label for="item_name">Item Name:</label>
+        <input type="text" name="item_name" id="item_name" required>
+        <button type="submit" name="add_item_btn">Add Item</button>
+      </form>
     </section>
 
-    <hr>
-    <!-- Password Change Section -->
-    <section id="change-password">
-      <h3>Change Password</h3>
-      <p>If you wish to change your password, please fill in all fields below.</p>
-      <label for="current_password">Current Password:</label>
-      <input type="password" name="current_password" id="current_password"><br>
+    <!-- Main Form to Update Vendor Details & Change Password -->
+    <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
+      <input type="hidden" name="update_vendor" value="1">
+      <hr>
+      <!-- Update Vendor Details Section -->
+      <section id="update-details">
+        <h3>Update Vendor Details</h3>
+        <label for="vendor_name">Vendor Name:</label>
+        <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
 
-      <label for="new_password">New Password:</label>
-      <input type="password" name="new_password" id="new_password"><br>
+        <label for="vendor_website">Website URL:</label>
+        <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
 
-      <label for="confirm_password">Confirm New Password:</label>
-      <input type="password" name="confirm_password" id="confirm_password"><br>
-    </section>
+        <label for="vendor_description">Business Description (max 255 characters):</label>
+        <textarea name="vendor_description" id="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
+      </section>
 
-    <hr>
-    <button type="submit" name="update_vendor">Save Changes</button>
-  </form>
+      <hr>
+      <!-- Optional: Logo Update Section -->
+      <section id="upload-logo">
+        <h3>Upload Vendor Logo</h3>
+        <?php if (!empty($vendor->vendor_logo)): ?>
+          <p>Current Logo:</p>
+          <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
+          <label for="delete_logo">
+            <input type="checkbox" name="delete_logo" id="delete_logo" value="1">
+            Delete current logo
+          </label>
+        <?php endif; ?>
+        <br>
+        <label for="vendor_logo">Select New Logo (optional):</label>
+        <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
+      </section>
+
+      <hr>
+      <!-- Password Change Section -->
+      <section id="change-password">
+        <h3>Change Password</h3>
+        <p>If you wish to change your password, please fill in all fields below.</p>
+        <label for="current_password">Current Password:</label>
+        <input type="password" name="current_password" id="current_password"><br>
+
+        <label for="new_password">New Password:</label>
+        <input type="password" name="new_password" id="new_password"><br>
+
+        <label for="confirm_password">Confirm New Password:</label>
+        <input type="password" name="confirm_password" id="confirm_password"><br>
+      </section>
+
+      <hr>
+      <button type="submit" name="update_vendor">Save Changes</button>
+    </form>
 </body>
+</main>
 
 </html>
 <?php include_once FOOTER_FILE; ?>

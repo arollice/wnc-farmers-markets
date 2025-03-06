@@ -48,96 +48,98 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
   <title>Admin Panel</title>
 </head>
 
 <body>
-  <!-- Admin Panel Header -->
-  <h2>Admin Dashboard</h2>
-  <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
-  <a href="logout.php">Logout</a>
-  <hr>
+  <main>
+    <!-- Admin Panel Header -->
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
+    <a href="logout.php">Logout</a>
+    <hr>
 
-  <!-- Session Messages -->
-  <?php
-  if (isset($_SESSION['success_message'])) {
-    echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
-    unset($_SESSION['success_message']);
-  }
-  if (isset($_SESSION['error_message'])) {
-    echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
-    unset($_SESSION['error_message']);
-  }
-  ?>
+    <!-- Session Messages -->
+    <?php
+    if (isset($_SESSION['success_message'])) {
+      echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
+      unset($_SESSION['success_message']);
+    }
+    if (isset($_SESSION['error_message'])) {
+      echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
+      unset($_SESSION['error_message']);
+    }
+    ?>
 
-  <!-- Vendors Table for CRUD and Approval -->
-  <h3>Vendor Management</h3>
-  <?php if ($vendors): ?>
-    <table border="1">
-      <tr>
-        <th>Vendor ID</th>
-        <th>Name</th>
-        <th>Website</th>
-        <th>Description</th>
-        <th>Status</th>
-        <th>Approve</th>
-        <th>Edit</th>
-        <th>Delete</th>
-      </tr>
-      <?php foreach ($vendors as $vendor): ?>
+    <!-- Vendors Table for CRUD and Approval -->
+    <h3>Vendor Management</h3>
+    <?php if ($vendors): ?>
+      <table border="1">
         <tr>
-          <td><?= htmlspecialchars($vendor['vendor_id']); ?></td>
-          <td><?= htmlspecialchars($vendor['vendor_name']); ?></td>
-          <td><?= htmlspecialchars($vendor['vendor_website']); ?></td>
-          <td><?= htmlspecialchars($vendor['vendor_description']); ?></td>
-          <td><?= htmlspecialchars($vendor['status']); ?></td>
-          <td>
-            <?php if ($vendor['status'] === 'pending'): ?>
-              <form method="post">
-                <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id']); ?>">
-                <input type="hidden" name="action" value="approve">
-                <button type="submit">Approve</button>
-              </form>
-            <?php else: ?>
-              Approved
-            <?php endif; ?>
-          </td>
-          <td>
-            <a href="admin-edit-vendor.php?vendor_id=<?= htmlspecialchars($vendor['vendor_id']); ?>">Edit</a>
-
-          </td>
-          <td>
-            <form method="post" onsubmit="return confirm('Are you sure you want to delete this vendor?');">
-              <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id']); ?>">
-              <input type="hidden" name="action" value="delete">
-              <button type="submit">Delete</button>
-            </form>
-          </td>
+          <th>Vendor ID</th>
+          <th>Name</th>
+          <th>Website</th>
+          <th>Description</th>
+          <th>Status</th>
+          <th>Approve</th>
+          <th>Edit</th>
+          <th>Delete</th>
         </tr>
-      <?php endforeach; ?>
-    </table>
-  <?php else: ?>
-    <p>No vendors found.</p>
-  <?php endif; ?>
+        <?php foreach ($vendors as $vendor): ?>
+          <tr>
+            <td><?= htmlspecialchars($vendor['vendor_id']); ?></td>
+            <td><?= htmlspecialchars($vendor['vendor_name']); ?></td>
+            <td><?= htmlspecialchars($vendor['vendor_website']); ?></td>
+            <td><?= htmlspecialchars($vendor['vendor_description']); ?></td>
+            <td><?= htmlspecialchars($vendor['status']); ?></td>
+            <td class="<?= $vendor['status'] === 'approved' ? 'approved-cell' : '' ?>">
+              <?php if ($vendor['status'] === 'pending'): ?>
+                <form method="post">
+                  <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id']); ?>">
+                  <input type="hidden" name="action" value="approve">
+                  <button type="submit">Approve</button>
+                </form>
+              <?php else: ?>
+                Approved
+              <?php endif; ?>
+            </td>
 
-  <hr>
-  <!-- Public Vendors Listing (Only Approved Vendors) -->
-  <h3>Approved Vendors (Public Directory)</h3>
-  <?php
-  $stmt = $pdo->prepare("SELECT * FROM vendor WHERE status = 'approved'");
-  $stmt->execute();
-  $approved_vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-  if ($approved_vendors):
-  ?>
-    <ul>
-      <?php foreach ($approved_vendors as $v): ?>
-        <li><?= htmlspecialchars($v['vendor_name']); ?> - <?= htmlspecialchars($v['vendor_description']); ?></li>
-      <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>No approved vendors at this time.</p>
-  <?php endif; ?>
+            <td>
+              <a href="admin-edit-vendor.php?vendor_id=<?= htmlspecialchars($vendor['vendor_id']); ?>">Edit</a>
+
+            </td>
+            <td>
+              <form method="post" onsubmit="return confirm('Are you sure you want to delete this vendor?');">
+                <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id']); ?>">
+                <input type="hidden" name="action" value="delete">
+                <button type="submit">Delete</button>
+              </form>
+            </td>
+          </tr>
+        <?php endforeach; ?>
+      </table>
+    <?php else: ?>
+      <p>No vendors found.</p>
+    <?php endif; ?>
+
+    <hr>
+    <!-- Public Vendors Listing (Only Approved Vendors) -->
+    <h3>Approved Vendors (Public Directory)</h3>
+    <?php
+    $stmt = $pdo->prepare("SELECT * FROM vendor WHERE status = 'approved'");
+    $stmt->execute();
+    $approved_vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($approved_vendors):
+    ?>
+      <ul>
+        <?php foreach ($approved_vendors as $v): ?>
+          <li><?= htmlspecialchars($v['vendor_name']); ?> - <?= htmlspecialchars($v['vendor_description']); ?></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php else: ?>
+      <p>No approved vendors at this time.</p>
+    <?php endif; ?>
+  </main>
 </body>
 
 </html>

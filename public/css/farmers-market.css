@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
 
+* {
+  box-sizing: border-box;
+}
+
 body {
   background-color: #faf8ef;
   font-family: 'Inter', sans-serif;
@@ -8,11 +12,29 @@ body {
   margin: 0 auto;
 }
 
-h1,
-button {
+h1 {
   color: #333;
   font-family: 'Bagel Fat One', system-ui;
   letter-spacing: 0.05em;
+  margin: 0.5rem 0;
+}
+
+h2,
+h3,
+h4 {
+  margin: 0.5rem 0;
+}
+
+label,
+input[type='text'],
+button {
+  margin: 1rem 0;
+}
+
+input[type='text']:focus {
+  outline: none;
+  border-color: #3bb454;
+  box-shadow: 0 0 5px rgba(59, 180, 84, 0.5);
 }
 
 header {
@@ -20,6 +42,28 @@ header {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding: 0 1rem 1.5rem;
+}
+
+a {
+  color: inherit;
+  padding: 1rem 0;
+}
+
+header > h1 {
+  margin: 2rem 0;
+}
+
+footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0.5rem;
+}
+
+footer > p {
+  margin: 0.25rem 0;
+  padding: 0 0.5rem;
 }
 
 nav ul {
@@ -34,16 +78,78 @@ nav ul li {
   padding: 5px;
 }
 
-main {
+nav a,
+#login a {
+  padding: 0 0.25rem;
+  position: relative;
+  text-decoration: none;
+}
+
+nav a::after,
+#login a::after {
+  background-color: #3bb454;
+  bottom: -3px;
+  content: '';
+  height: 2px;
+  left: 0;
+  position: absolute;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.3s ease-in-out;
+  width: 100%;
+}
+
+nav a:hover::after,
+#login a:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
+}
+
+img {
+  border-radius: 8px;
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+#market-items > div {
+  width: 100%;
+  max-width: 301px; /* Ensures the container won't grow beyond 301px */
+  aspect-ratio: 301 / 250; /* Maintains the 301:250 ratio */
+  overflow: hidden;
+  border-radius: 8px; /* Rounded corners on the container */
+}
+
+#market-items > div img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Ensures the image fills the container while preserving its aspect ratio */
+  display: block;
+}
+
+main,
+noscript {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: 1rem;
   padding: 1rem;
+}
+
+noscript li {
+  margin: 1rem 0;
+}
+
+noscript a {
+  color: inherit;
+  padding: 1rem 0.25rem;
 }
 
 aside {
   display: flex;
   justify-content: space-around;
+  margin: 1rem;
   padding: 1rem;
 }
 
@@ -62,7 +168,364 @@ aside div {
   margin: 0.5rem 1rem;
 }
 
-main p,
 #coming-soon p {
+  margin: 0 1rem;
+}
+
+main p {
   margin: 0;
+}
+
+section#search {
+  display: flex;
+  grid-template-columns: 3fr 1fr;
+  justify-content: space-around;
+  margin: 0.5rem 1rem;
+  padding: 1rem;
+}
+
+#search > section {
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 1rem;
+}
+
+#search > aside {
+  align-items: center;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  font: 30px 'Bagel Fat One', system-ui;
+  justify-content: center;
+  letter-spacing: 0.05rem;
+  margin: 0 1rem;
+  padding-right: 2rem;
+}
+
+#search > aside > p {
+  margin: 0;
+}
+
+#map-container {
+  margin: 0.5rem 1rem;
+  max-width: 98%;
+}
+
+#region-page-info {
+  margin: 0.5rem 1rem;
+}
+
+#markets {
+  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: auto;
+  gap: 2rem;
+  padding: 0 0 0.5rem;
+}
+
+.market-card {
+  background-color: #fff;
+  border: solid 1px #ddd;
+  border-radius: 10px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+}
+
+#single-market-card {
+  display: flex;
+  padding: 1rem;
+}
+
+.market-card > h2 {
+  border-bottom: 1px solid #ddd;
+  display: block;
+  padding: 0 0.25em;
+}
+
+.market-card p {
+  margin: 0.15em 0;
+  padding: 0.15rem 0.5rem;
+}
+
+.market-policies {
+  border-top: 1px solid #ddd;
+  padding: 0.25rem;
+}
+
+#login {
+  align-items: center;
+  display: flex;
+  justify-content: space-around;
+}
+
+#login a {
+  font-weight: bold;
+}
+
+.vendor-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 1rem;
+  margin: 0;
+}
+
+.vendor-item {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.vendor-item:hover {
+  transform: translateY(-3px);
+}
+
+.vendor-item a {
+  color: inherit;
+  display: block;
+  padding: 1rem;
+  text-decoration: none;
+}
+
+.vendor-item img {
+  display: block;
+  height: auto;
+  margin: 0 auto 0.5rem;
+  max-width: 100%;
+}
+
+.vendor-item h3 {
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+#vendor-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 0.5rem 1rem;
+}
+
+#vendor-details p {
+  padding: 0.5rem;
+}
+
+#intro {
+  margin-bottom: 2.5rem;
+}
+
+#intro h2 {
+  border-bottom: 1px solid #ddd;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+}
+
+#wnc-farming-traditions {
+  margin-bottom: 2.5rem;
+}
+
+#wnc-farming-traditions h2 {
+  color: #333;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#why-markets-matter {
+  margin-bottom: 2.5rem;
+}
+
+#why-markets-matter h2 {
+  color: #333;
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+}
+
+#why-markets-matter h3 {
+  border-top: 1px solid #ddd;
+  color: #444;
+  margin: 1rem 0;
+  padding: 1rem 0 0;
+}
+
+#intro p,
+#wnc-farming-traditions p,
+#why-markets-matter p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+#intro a,
+#wnc-farming-traditions a,
+#why-markets-matter a {
+  color: #3bb454;
+  text-decoration: none;
+}
+
+#intro a:hover,
+#wnc-farming-traditions a:hover,
+#why-markets-matter a:hover {
+  text-decoration: underline;
+}
+
+#why-markets-matter small {
+  color: #666;
+  display: block;
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}
+
+form label {
+  color: #333;
+  display: block;
+  font-weight: bold;
+  margin: 1rem 0;
+  max-width: 300px;
+}
+
+form input[type='text'],
+form input[type='url'],
+form input[type='password'],
+form textarea,
+form select {
+  border: 1px solid #e6e6e6;
+  border-radius: 4px;
+  box-sizing: border-box;
+  color: #333;
+  font-size: 1rem;
+  margin: 1rem;
+  max-width: 300px;
+  padding: 0.5rem;
+  width: 100%;
+}
+
+form input[type='text']:focus,
+form input[type='url']:focus,
+form input[type='password']:focus,
+form textarea:focus,
+form select:focus {
+  border-color: #3bb454;
+  box-shadow: 0 0 5px rgba(59, 180, 84, 0.5);
+  outline: none;
+}
+
+form input[type='file'] {
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+
+form input[type='checkbox'] {
+  margin-right: 0.5rem;
+}
+
+form button,
+form input[type='submit'] {
+  background-color: #3bb454;
+  border: none;
+  border-radius: 4px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 1rem 0;
+  padding: 0.6rem 1.2rem;
+  transition: background-color 0.2s ease-in-out;
+}
+
+form button:hover,
+form input[type='submit']:hover {
+  background-color: #32a044;
+}
+
+.logout-message {
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 500px;
+  text-align: center;
+  background-color: #f7f7f7;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.logout-message p {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
+.logout-message a {
+  color: #3bb454;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.logout-message a:hover {
+  text-decoration: underline;
+}
+
+.approved-cell {
+  background-color: #ddd;
+}
+
+@media (max-width: 800px) {
+  #market-items {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  #search {
+    flex-direction: column;
+  }
+
+  #search {
+    grid-template-columns: none;
+  }
+
+  #search > aside {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
+    margin: 0;
+  }
+
+  #search > aside p {
+    order: 1;
+    flex: 1;
+    margin: 0;
+  }
+
+  #search > aside img {
+    order: 2;
+    margin: 0;
+  }
+
+  #map-container {
+    height: auto;
+    margin: 0;
+    width: 100%;
+  }
+
+  #markets {
+    grid-template-columns: 1fr;
+  }
+
+  nav ul {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  nav ul li {
+    margin: 5px 0;
+  }
 }

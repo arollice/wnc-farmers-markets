@@ -55,27 +55,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
   <title>Login</title>
 </head>
 
 <body>
-  <h2>Login</h2>
-  <?php
-  if (!empty($error)) {
-    echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
-  }
-  // Display the flash message if it exists.
-  if (isset($_SESSION['success_message'])) {
-    echo "<p style='color:green;'>" . htmlspecialchars($_SESSION['success_message']) . "</p>";
-    unset($_SESSION['success_message']);
-  }
-  ?>
-  <form method="POST">
-    <label>Username: <input type="text" name="username" required></label><br>
-    <label>Password: <input type="password" name="password" required></label><br>
-    <button type="submit">Login</button>
-  </form>
+  <main>
+    <h2>Login</h2>
+    <?php
+    if (!empty($error)) {
+      echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
+    }
+    // Display the flash message if it exists.
+    if (isset($_SESSION['success_message'])) {
+      echo "<p style='color:green;'>" . htmlspecialchars($_SESSION['success_message']) . "</p>";
+      unset($_SESSION['success_message']);
+    }
+    ?>
+    <form method="POST">
+      <label>Username: <input type="text" name="username" required></label><br>
+      <label>Password: <input type="password" name="password" required></label><br>
+      <button type="submit">Login</button>
+    </form>
+  </main>
 </body>
 
 </html>

@@ -20,30 +20,29 @@ $policies = Market::fetchMarketPolicies();
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>All Markets</title>
-  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-  <h1>All Markets</h1>
-
-  <?php foreach ($markets as $market): ?>
-    <?= Market::renderMarketCard($market) ?>
+  <main>
+    <h1>All Markets</h1>
+    <div id="markets">
+      <?php foreach ($markets as $market): ?>
+        <?= Market::renderMarketCard($market) ?>
+      <?php endforeach; ?>
+    </div>
     <hr>
-  <?php endforeach; ?>
-
-  <?php if ($policies): ?>
-    <section class="market-policies">
-      <h2>Market Policies</h2>
-      <ul>
-        <?php foreach ($policies as $policy): ?>
-          <li><?= htmlspecialchars($policy['policy_description']) ?></li>
-        <?php endforeach; ?>
-      </ul>
-    </section>
-  <?php endif; ?>
+    <?php if ($policies): ?>
+      <section class="market-policies">
+        <h2>Market Policies</h2>
+        <ul>
+          <?php foreach ($policies as $policy): ?>
+            <li><?= htmlspecialchars($policy['policy_description']) ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </section>
+    <?php endif; ?>
+  </main>
 
 </body>
 
