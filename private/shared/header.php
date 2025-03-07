@@ -38,7 +38,8 @@ if (!defined('PUBLIC_PATH')) {
 
     <input type="checkbox" id="menu-toggle-checkbox" hidden>
     <!-- Label acts as the hamburger icon -->
-    <label for="menu-toggle-checkbox" id="menu-toggle-label" aria-label="Toggle navigation">☰</label>
+    <label for="menu-toggle-checkbox" id="menu-toggle-label" aria-label="Toggle navigation">&#9776;
+    </label>
     <!-- Navigation Menu -->
     <nav id="nav-menu">
       <ul>

@@ -534,6 +534,7 @@ form input[type='submit']:hover {
 
 @media (max-width: 600px) {
   header {
+    align-items: flex-start;
     display: flex;
     flex-direction: column;
     padding: 0.5rem 1rem;
@@ -548,12 +549,13 @@ form input[type='submit']:hover {
   }
 
   header > a {
+    align-self: center;
     order: -1;
   }
 
   #menu-toggle-label {
     cursor: pointer;
-    display: block;
+    display: flex;
     font-size: 2rem;
     margin: 0.5rem;
     order: 1; /* Ensures the hamburger appears last */
