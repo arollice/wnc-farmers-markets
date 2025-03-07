@@ -530,7 +530,9 @@ form input[type='submit']:hover {
   #markets {
     grid-template-columns: 1fr;
   }
+}
 
+@media (max-width: 600px) {
   header {
     display: flex;
     flex-direction: column;

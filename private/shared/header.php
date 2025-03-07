@@ -23,7 +23,6 @@ if (!defined('PUBLIC_PATH')) {
 
   <link rel="stylesheet" type="text/css" href="<?= PUBLIC_PATH ?>/css/farmers-market.css">
 
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/css/select2.min.css" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -43,10 +42,11 @@ if (!defined('PUBLIC_PATH')) {
     <!-- Navigation Menu -->
     <nav id="nav-menu">
       <ul>
-        <li><a href="index.php">Home</a></li>
-        <li><a href="about.php">About</a></li>
-        <li><a href="vendors.php">Vendors</a></li>
-        <li><a href="contact.php">Contact</a></li>
+        <li><a href="<?= PUBLIC_PATH ?>/index.php">Home</a></li>
+        <li><a href="<?= PUBLIC_PATH ?>/regions.php">Regions</a></li>
+        <li><a href="<?= PUBLIC_PATH ?>/markets.php">Markets</a></li>
+        <li><a href="<?= PUBLIC_PATH ?>/vendors.php">Vendors</a></li>
+        <li><a href="<?= PUBLIC_PATH ?>/about.php">About</a></li>
       </ul>
     </nav>
   </header>
