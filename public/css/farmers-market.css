@@ -66,6 +66,10 @@ footer > p {
   padding: 0 0.5rem;
 }
 
+#menu-toggle-label {
+  display: none;
+}
+
 nav ul {
   display: flex;
   flex-direction: row;
@@ -478,13 +482,20 @@ form input[type='submit']:hover {
 
 @media (max-width: 800px) {
   #market-items {
+    align-items: center;
     display: flex;
     flex-direction: column;
-    align-items: center;
   }
 
   #search {
     flex-direction: column;
+    margin: 0;
+  }
+
+  #search > section,
+  #search > input[type='text'] {
+    margin: 0;
+    padding: 0;
   }
 
   #search {
@@ -492,17 +503,17 @@ form input[type='submit']:hover {
   }
 
   #search > aside {
+    align-items: center;
     flex-direction: row;
     justify-content: space-between;
-    align-items: center;
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
   #search > aside p {
-    order: 1;
     flex: 1;
     margin: 0;
+    order: 1;
   }
 
   #search > aside img {
@@ -520,12 +531,56 @@ form input[type='submit']:hover {
     grid-template-columns: 1fr;
   }
 
-  nav ul {
+  header {
+    display: flex;
     flex-direction: column;
-    align-items: center;
+    padding: 0.5rem 1rem;
   }
 
-  nav ul li {
-    margin: 5px 0;
+  header > h1 {
+    display: none;
+  }
+
+  header > p {
+    order: 1;
+  }
+
+  header > a {
+    order: -1;
+  }
+
+  #menu-toggle-label {
+    cursor: pointer;
+    display: block;
+    font-size: 2rem;
+    margin: 0.5rem;
+    order: 1; /* Ensures the hamburger appears last */
+  }
+
+  #nav-menu {
+    display: none;
+    order: 3;
+  }
+
+  #menu-toggle-checkbox:checked ~ #nav-menu {
+    display: block;
+  }
+
+  #nav-menu ul {
+    flex-direction: column;
+    padding: 0;
+    margin: 0;
+  }
+
+  #nav-menu ul li {
+    margin: 0.5rem 0;
+    list-style: none;
+  }
+
+  #nav-menu a {
+    display: block;
+    padding: 0.5rem;
+    text-decoration: none;
+    color: inherit;
   }
 }
