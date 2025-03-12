@@ -1,6 +1,5 @@
 <?php
 require_once('../private/config.php');
-include_once HEADER_FILE;
 
 if (!isset($_GET['id'])) {
   die("Market ID not provided.");
@@ -15,6 +14,8 @@ $vendors = Vendor::findVendorsByMarket($market_id, ['approved' => true]);
 if (!$market) {
   die("Market not found.");
 }
+
+include_once HEADER_FILE;
 ?>
 <!DOCTYPE html>
 <html lang="en">

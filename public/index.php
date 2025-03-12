@@ -1,17 +1,17 @@
 <?php
-session_start();
 include_once('../private/config.php');
-include_once HEADER_FILE;
 
 if (isset($_SESSION['success_message'])) {
   echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
   unset($_SESSION['success_message']);
 }
+
+include_once HEADER_FILE;
 ?>
 
 <main>
-  <h1>Seasonal Harvest Highlights</h1>
-  <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
+  <h1>WNC Farmers Markets Collective</h1>
+  <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we’re here to support and celebrate the vibrant local food scene.</p>
 </main>
 <aside id="market-items">
   <div>
@@ -34,6 +34,10 @@ if (isset($_SESSION['success_message'])) {
     <p>Seasonal Plants & Greenery</p>
   </div>
 </aside>
+<section id="seasonal-harvest">
+  <h2>Seasonal Harvest Highlights</h2>
+  <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
+</section>
 <section id="search">
   <section>
     <h2>Looking for something specific? See who sells what you're looking for!</h2>

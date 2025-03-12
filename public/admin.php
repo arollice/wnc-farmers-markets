@@ -1,7 +1,5 @@
 <?php
 include_once('../private/config.php');
-session_start();
-include_once HEADER_FILE;
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   header('Location: login.php');
@@ -43,6 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Fetch all vendors for display.
 $stmt = $pdo->query("SELECT * FROM vendor");
 $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+include_once HEADER_FILE;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -141,6 +141,6 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <?php endif; ?>
   </main>
 </body>
+<?php include_once FOOTER_FILE; ?>
 
 </html>
-<?php include_once FOOTER_FILE; ?>

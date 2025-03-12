@@ -133,6 +133,7 @@ img {
 }
 
 main,
+#seasonal-harvest,
 noscript {
   display: flex;
   flex-direction: column;
@@ -176,7 +177,8 @@ aside div {
   margin: 0 1rem;
 }
 
-main p {
+main p,
+#seasonal-harvest p {
   margin: 0;
 }
 

@@ -3,6 +3,16 @@
 define('PRIVATE_PATH', __DIR__);
 define('PROJECT_ROOT', dirname(PRIVATE_PATH));
 
+// Set session cookie parameters (this should already be in your config)
+session_set_cookie_params(0, '/');
+
+// Set the session save path to your custom folder.
+// PROJECT_ROOT is defined as the parent directory of your private folder.
+//session_save_path(PROJECT_ROOT . '/sessions');
+
+// Start the session
+session_start();
+
 // Set a web-friendly public path (relative to localhost)
 define('PUBLIC_PATH', '/web289/public');
 

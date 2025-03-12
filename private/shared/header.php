@@ -29,7 +29,6 @@ if (!defined('PUBLIC_PATH')) {
 
 <body>
   <header>
-    <h1>WNC Farmers Markets Collective</h1>
     <a href="<?= PUBLIC_PATH ?>/index.php">
       <img src="<?= PUBLIC_PATH ?>/img/wnc-logo-color.png" alt="WNC Farmers Markets Logo" width="200" height="auto">
     </a>

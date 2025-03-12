@@ -1,7 +1,7 @@
 <?php
 include_once('../private/config.php');
 include_once('../private/validation.php');
-session_start();
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 

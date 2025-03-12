@@ -6,7 +6,6 @@ $currentPage = 'regions';
 $regions = Region::fetchAllRegions();
 
 include_once HEADER_FILE;
-
 ?>
 <!-- Hide map container if JavaScript is disabled -->
 <noscript>

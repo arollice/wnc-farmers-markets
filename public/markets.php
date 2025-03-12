@@ -1,10 +1,9 @@
 <?php
 require_once('../private/config.php');
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-
-include_once HEADER_FILE;
 
 $markets = Market::fetchAllMarkets();
 
@@ -15,6 +14,8 @@ if (!$markets) {
 
 // Fetch policies once
 $policies = Market::fetchMarketPolicies();
+
+include_once HEADER_FILE;
 ?>
 <!DOCTYPE html>
 <html lang="en">

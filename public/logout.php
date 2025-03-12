@@ -1,7 +1,5 @@
 <?php
-session_start();
 include_once('../private/config.php');
-include HEADER_FILE;
 
 $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
 
@@ -19,6 +17,8 @@ session_destroy();
 // Start a new session for the flash message.
 session_start();
 $_SESSION['success_message'] = htmlspecialchars("$username, you are now logged out.");
+
+include HEADER_FILE;
 ?>
 <main class="logout-message">
   <p><?= $_SESSION['success_message'] ?></p>

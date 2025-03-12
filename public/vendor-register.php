@@ -3,11 +3,6 @@ include_once('../private/config.php');
 
 $currencies = Currency::fetchAllCurrencies();
 
-include_once HEADER_FILE;
-
-
-session_start();
-
 $sticky = $_SESSION['sticky'] ?? [];
 
 
@@ -19,6 +14,8 @@ if (isset($_SESSION['success_message'])) {
   echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
   unset($_SESSION['success_message']);
 }
+
+include_once HEADER_FILE;
 ?>
 
 <h1>Vendor Registration</h1>

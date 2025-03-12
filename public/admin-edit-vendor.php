@@ -1,9 +1,6 @@
 <?php
-session_start();
 include_once('../private/config.php');
 include_once('../private/validation.php');
-include HEADER_FILE;
-
 
 $pdo = DatabaseObject::get_database();
 
@@ -99,6 +96,8 @@ $vendor = new Vendor();
 foreach ($vendorData as $key => $value) {
   $vendor->$key = $value;
 }
+
+include HEADER_FILE;
 ?>
 <!DOCTYPE html>
 <html lang="en">

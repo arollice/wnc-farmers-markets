@@ -1,10 +1,9 @@
 <?php
 include_once('../private/config.php');
-include_once HEADER_FILE;
 
 $vendors = Vendor::findAllWithFilters(['approved' => true]);
 
-
+include_once HEADER_FILE;
 ?>
 <section id="login">
   <a href="<?= PUBLIC_PATH ?>/vendor-register.php" class="btn">Become a Vendor</a>
@@ -21,7 +20,8 @@ $vendors = Vendor::findAllWithFilters(['approved' => true]);
       <ul class="vendor-list">
         <?php foreach ($vendors as $vendor) : ?>
           <li class="vendor-item">
-            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+            <a href="<?= PUBLIC_PATH ?>/vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+
               <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo">
               <h3><?= htmlspecialchars($vendor['vendor_name']) ?></h3>
             </a>

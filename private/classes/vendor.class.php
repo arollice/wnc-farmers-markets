@@ -149,19 +149,19 @@ class Vendor extends DatabaseObject
 
   public static function findMarketsByVendor($vendor_id)
   {
-    global $pdo; // Use the PDO connection from config.php
+    // Use the standard database connection method
+    $pdo = DatabaseObject::get_database();
 
     $sql = "SELECT m.* 
-            FROM market AS m
-            INNER JOIN vendor_market AS vm ON m.market_id = vm.market_id
-            WHERE vm.vendor_id = :vendor_id";
+          FROM market AS m
+          INNER JOIN vendor_market AS vm ON m.market_id = vm.market_id
+          WHERE vm.vendor_id = :vendor_id";
 
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':vendor_id' => $vendor_id]);
-    $markets = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-    return $markets;
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
 
   /**
    * Updates the vendor's details based on provided form data and file uploads.
