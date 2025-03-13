@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.1.0
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost:3306
--- Generation Time: Mar 12, 2025 at 03:54 PM
--- Server version: 5.7.23-23
--- PHP Version: 8.1.31
+-- Host: localhost:8889
+-- Generation Time: Mar 13, 2025 at 01:18 PM
+-- Server version: 5.7.34
+-- PHP Version: 7.4.21
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -62,6 +62,7 @@ CREATE TABLE `item` (
 INSERT INTO `item` (`item_id`, `item_name`) VALUES
 (29, 'Apples'),
 (45, 'Baked Goods'),
+(54, 'Bananas'),
 (53, 'beens'),
 (30, 'Berries'),
 (46, 'Beverages'),
@@ -198,14 +199,14 @@ CREATE TABLE `region` (
 --
 
 INSERT INTO `region` (`region_id`, `region_name`, `latitude`, `longitude`) VALUES
-(1, 'Asheville', 35.5981680, -82.5523860),
-(2, 'Black Mountain', 35.6172610, -82.3237400),
-(3, 'Candler', 35.5358890, -82.6939030),
-(4, 'Hendersonville', 35.3196980, -82.4673760),
-(5, 'Waynesville', 35.4887440, -82.9919790),
-(6, 'Brevard', 35.2329180, -82.7329660),
-(7, 'Marshall', 35.7982360, -82.6831240),
-(8, 'Weaverville', 35.6971860, -82.5633240);
+(1, 'Asheville', '35.5981680', '-82.5523860'),
+(2, 'Black Mountain', '35.6172610', '-82.3237400'),
+(3, 'Candler', '35.5358890', '-82.6939030'),
+(4, 'Hendersonville', '35.3196980', '-82.4673760'),
+(5, 'Waynesville', '35.4887440', '-82.9919790'),
+(6, 'Brevard', '35.2329180', '-82.7329660'),
+(7, 'Marshall', '35.7982360', '-82.6831240'),
+(8, 'Weaverville', '35.6971860', '-82.5633240');
 
 -- --------------------------------------------------------
 
@@ -315,7 +316,7 @@ INSERT INTO `vendor` (`vendor_id`, `vendor_name`, `vendor_website`, `vendor_logo
 (14, 'Oak Ridge Maple Syrup', NULL, NULL, 'Craft maple syrup produced locally in Oak Ridge.', 'approved'),
 (15, 'Smoky Mountain Goat Cheese', NULL, NULL, 'Artisan goat cheeses made in the Smoky Mountains.', 'approved'),
 (16, 'Rolling Hills Coffee Roasters', NULL, NULL, 'Local coffee roasters offering freshly roasted specialty coffees.', 'approved'),
-(23, 'TestVendor', NULL, 'uploads/vendor_23_1741196674_67c88d8265b0f.png', 'testing testing testing... TESTING! TESTING!', 'pending');
+(23, 'TestVendor', NULL, 'uploads/vendor_23_1741711071_67d066dfa5372.png', 'testing testing testing... TESTING! TESTING!', 'pending');
 
 -- --------------------------------------------------------
 
@@ -535,7 +536,6 @@ INSERT INTO `vendor_market` (`vendor_id`, `market_id`, `attending_date`) VALUES
 (16, 4, NULL),
 (23, 1, NULL),
 (23, 2, NULL),
-(23, 3, NULL),
 (23, 4, NULL),
 (23, 5, NULL),
 (23, 6, NULL),
@@ -663,7 +663,7 @@ ALTER TABLE `currency`
 -- AUTO_INCREMENT for table `item`
 --
 ALTER TABLE `item`
-  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=54;
+  MODIFY `item_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=55;
 
 --
 -- AUTO_INCREMENT for table `market`
