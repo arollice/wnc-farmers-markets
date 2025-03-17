@@ -11,26 +11,26 @@ include_once HEADER_FILE;
 
 <main>
   <h1>WNC Farmers Markets Collective</h1>
-  <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we’re here to support and celebrate the vibrant local food scene.</p>
+  <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we're here to support and celebrate the vibrant local food scene.</p>
 </main>
 <aside id="market-items">
   <div>
-    <img src="img/peaches.jpg" width="301" height="250" alt="Peaches in a crate by LuAnn Hunt on Unsplash.">
+    <img src="img/peaches.webp" width="301" height="250" alt="Peaches in a crate by LuAnn Hunt on Unsplash.">
     <p>Fruits</p>
   </div>
 
   <div>
-    <img src="img/veggies.jpg" width="301" height="250" alt="Leeks and carrots by Peter Wendt on Unsplash.">
+    <img src="img/veggies.webp" width="301" height="250" alt="Leeks and carrots by Peter Wendt on Unsplash.">
     <p>Vegetables</p>
   </div>
 
   <div>
-    <img src="img/chickens.jpg" width="301" height="250" alt="Chickens in a coop by Karol Klajar on Unsplash.">
+    <img src="img/chickens.webp" width="301" height="250" alt="Chickens in a coop by Karol Klajar on Unsplash.">
     <p>Meats & Poultry</p>
   </div>
 
   <div>
-    <img src="img/plants.jpg" width="301" height="250" alt="Seasonal plants by Tom Jur on Unsplash.">
+    <img src="img/plants.webp" width="301" height="250" alt="Seasonal plants by Tom Jur on Unsplash.">
     <p>Seasonal Plants & Greenery</p>
   </div>
 </aside>
@@ -73,9 +73,14 @@ include_once HEADER_FILE;
     ?>
 
     <!-- Show Spell Check Suggestion -->
-    <?php if ($suggested_term) : ?>
-      <p>Did you mean: <a href="index.php?search_term=<?= urlencode($suggested_term) ?>"><strong><?= htmlspecialchars($suggested_term) ?></strong></a>?</p>
+    <?php if ($suggested_term && strtolower($suggested_term) !== strtolower($search_term)) : ?>
+      <p>Did you mean:
+        <a href="index.php?search_term=<?= urlencode($suggested_term) ?>">
+          <strong><?= htmlspecialchars($suggested_term) ?></strong>
+        </a>?
+      </p>
     <?php endif; ?>
+
 
     <!-- Display Search Results -->
     <?php if ($search_term): ?>
@@ -101,7 +106,7 @@ include_once HEADER_FILE;
   </section>
   <aside>
     <p>Supporting Local, one market at a time.</p>
-    <img src="img/smiley.svg" width="50" height="auto" alt="A retro smiley face.">
+    <img src="img/smiley.svg" width="50" height="50" alt="A retro smiley face.">
   </aside>
 </section>
 

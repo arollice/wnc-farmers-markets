@@ -1,5 +1,4 @@
 <?php
-// Ensure config.php is included
 if (!defined('PUBLIC_PATH')) {
   include_once __DIR__ . '/../private/config.php';
 }
@@ -13,24 +12,23 @@ if (!defined('PUBLIC_PATH')) {
   <title>WNC Farmers Market</title>
 
   <?php if (isset($currentPage) && $currentPage === 'regions'): ?>
-    <!-- Leaflet CSS from CDN -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <!-- Leaflet JS from CDN -->
     <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
     <!-- Custom JS for your regions map -->
     <script src="<?= PUBLIC_PATH ?>/js/leaflet-map.js" defer></script>
   <?php endif; ?>
 
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <link rel="stylesheet" type="text/css" href="<?= PUBLIC_PATH ?>/css/farmers-market.css">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
+<?php $currentUri = $_SERVER['REQUEST_URI']; ?>
 
 <body>
-  <header>
+  <header id="reusable-header">
     <a href="<?= PUBLIC_PATH ?>/index.php">
-      <img src="<?= PUBLIC_PATH ?>/img/wnc-logo-color.png" alt="WNC Farmers Markets Logo" width="200" height="auto">
+      <img src="<?= PUBLIC_PATH ?>/img/wnc-logo-color.webp" alt="WNC Farmers Markets Logo" width="200" height="150">
     </a>
 
     <p><em>Your central resource for farmers markets in Western North Carolina</em></p>
@@ -42,11 +40,36 @@ if (!defined('PUBLIC_PATH')) {
     <!-- Navigation Menu -->
     <nav id="nav-menu">
       <ul>
-        <li><a href="<?= PUBLIC_PATH ?>/index.php">Home</a></li>
-        <li><a href="<?= PUBLIC_PATH ?>/regions.php">Regions</a></li>
-        <li><a href="<?= PUBLIC_PATH ?>/markets.php">Markets</a></li>
-        <li><a href="<?= PUBLIC_PATH ?>/vendors.php">Vendors</a></li>
-        <li><a href="<?= PUBLIC_PATH ?>/about.php">About</a></li>
+        <li>
+          <a href="<?= PUBLIC_PATH ?>/index.php"
+            class="<?= ($currentUri == PUBLIC_PATH . '/index.php' || $currentUri == PUBLIC_PATH . '/') ? 'active' : '' ?>">
+            Home
+          </a>
+        </li>
+        <li>
+          <a href="<?= PUBLIC_PATH ?>/regions.php"
+            class="<?= ($currentUri == PUBLIC_PATH . '/regions.php') ? 'active' : '' ?>">
+            Regions
+          </a>
+        </li>
+        <li>
+          <a href="<?= PUBLIC_PATH ?>/markets.php"
+            class="<?= ($currentUri == PUBLIC_PATH . '/markets.php') ? 'active' : '' ?>">
+            Markets
+          </a>
+        </li>
+        <li>
+          <a href="<?= PUBLIC_PATH ?>/vendors.php"
+            class="<?= ($currentUri == PUBLIC_PATH . '/vendors.php') ? 'active' : '' ?>">
+            Vendors
+          </a>
+        </li>
+        <li>
+          <a href="<?= PUBLIC_PATH ?>/about.php"
+            class="<?= ($currentUri == PUBLIC_PATH . '/about.php') ? 'active' : '' ?>">
+            About
+          </a>
+        </li>
       </ul>
     </nav>
   </header>

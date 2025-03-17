@@ -40,12 +40,13 @@ class Item extends DatabaseObject
 
     // Search vendors based on the corrected or original search term
     $query = "SELECT i.item_id, i.item_name, v.vendor_id, v.vendor_name
-              FROM item i
-              JOIN vendor_item vi ON i.item_id = vi.item_id
-              JOIN vendor v ON vi.vendor_id = v.vendor_id
-              WHERE i.item_name LIKE :search_term
-                AND v.status = 'approved'
-              ORDER BY i.item_name ASC";
+    FROM item i
+    JOIN vendor_item vi ON i.item_id = vi.item_id
+    JOIN vendor v ON vi.vendor_id = v.vendor_id
+    WHERE LOWER(i.item_name) LIKE LOWER(:search_term)
+      AND v.status = 'approved'
+    ORDER BY i.item_name ASC";
+
 
     $stmt = $pdo->prepare($query);
     $stmt->execute([':search_term' => '%' . $final_search_term . '%']);

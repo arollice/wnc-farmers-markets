@@ -53,10 +53,11 @@ include_once HEADER_FILE;
 
 <body>
   <main>
-    <!-- Admin Panel Header -->
-    <h2>Admin Dashboard</h2>
-    <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
-    <a href="logout.php">Logout</a>
+    <header class="dashboard-header">
+      <h2>Admin Dashboard</h2>
+      <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
+      <a href="logout.php">Logout</a>
+    </header>
     <hr>
 
     <!-- Session Messages -->

@@ -2,43 +2,27 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-// ===== DEBUG: Output initial session data =====
-echo "<pre>DEBUG: Initial Session Data:\n" . print_r($_SESSION, true) . "</pre>";
-
-// Redirect if not logged in as vendor.
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'vendor') {
-  echo "<pre>DEBUG: Not logged in as vendor. Session Data:\n" . print_r($_SESSION, true) . "</pre>";
-  // header('Location: login.php');
-  // exit;
+  header('Location: login.php');
+  exit;
 }
 
-// ===== DEBUG: Check session values =====
-echo "<pre>DEBUG: Session User ID: " . ($_SESSION['user_id'] ?? 'not set') . "\nSession Role: " . ($_SESSION['role'] ?? 'not set') . "</pre>";
-
-// Retrieve the user account record and vendor information.
 $userAccount = UserAccount::find_by_id($_SESSION['user_id']);
 if (!$userAccount || empty($userAccount->vendor_id)) {
-  echo "<pre>DEBUG: Invalid user account or missing vendor_id. UserAccount: " . print_r($userAccount, true) . "</pre>";
-  // header('Location: logout.php');
-  // exit;
+
+  header('Location: logout.php');
+  exit;
 }
 $vendor_id = $userAccount->vendor_id;
 
-// ===== DEBUG: Output user account details =====
-echo "<pre>DEBUG: User Account Details:\n" . print_r($userAccount, true) . "</pre>";
-
-// Get vendor data as an array.
 $vendorData = Vendor::findVendorById($vendor_id);
 if (!$vendorData) {
   $_SESSION['error_message'] = "Vendor record not found.";
   echo "<pre>DEBUG: No vendor data found for Vendor ID: $vendor_id</pre>";
-  // header("Location: vendor-dashboard.php");
-  // exit;
+  header("Location: vendor-dashboard.php");
+  exit;
 }
-// Convert the array to a Vendor object.
+
 $vendor = new Vendor();
 foreach ($vendorData as $key => $value) {
   $vendor->$key = $value;
@@ -46,28 +30,23 @@ foreach ($vendorData as $key => $value) {
 
 $status = isset($vendor->status) ? $vendor->status : 'Unknown';
 
-// ===== DEBUG: Output vendor data =====
-echo "<pre>DEBUG: Vendor Data:\n" . print_r($vendorData, true) . "\nConverted Vendor Object:\n" . print_r($vendor, true) . "</pre>";
-
 $all_markets = Market::fetchAllMarkets();
 $currencies   = Currency::fetchAllCurrencies();
 
 $pdo = DatabaseObject::get_database();
 
-// --- Process Form Submissions --- //
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   if (isset($_POST['add_market_btn'])) {
-    // Process adding a market using the Vendor class method.
+
     $market_to_add = intval($_POST['add_market'] ?? 0);
-    echo "<pre>DEBUG: add_market_btn pressed. Market to add: $market_to_add</pre>";
     if (validateMarketId($market_to_add) && $vendor->addMarket($market_to_add)) {
       $_SESSION['success_message'] = "Market added successfully.";
     } else {
       $_SESSION['error_message'] = "Invalid market ID or you are already attending that market.";
     }
-    // header("Location: vendor-dashboard.php");
-    // exit;
+    header("Location: vendor-dashboard.php");
+    exit;
   } elseif (isset($_POST['remove_market_btn'])) {
     // Process removing a market using the Vendor class method.
     $market_to_remove = intval($_POST['remove_market'] ?? 0);
@@ -77,33 +56,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       $_SESSION['error_message'] = "Invalid market ID or an error occurred while removing the market.";
     }
-    // header("Location: vendor-dashboard.php");
-    // exit;
+    header("Location: vendor-dashboard.php");
+    exit;
   } elseif (isset($_POST['add_item_btn'])) {
     // Process Adding an Item
     $item_name = trim($_POST['item_name']);
     echo "<pre>DEBUG: add_item_btn pressed. Item name: $item_name</pre>";
     if (empty($item_name)) {
       $_SESSION['error_message'] = "Please enter an item name.";
-      // header("Location: vendor-dashboard.php");
-      // exit;
+      header("Location: vendor-dashboard.php");
+      exit;
     }
 
-    // Use the public spellCheck method.
     $corrected_item_name = Item::spellCheck($item_name);
-    // If a correction is available and the vendor hasn't confirmed a choice:
+
     if ($corrected_item_name && strtolower($corrected_item_name) !== strtolower($item_name) && !isset($_POST['confirm_spell'])) {
-      // Store suggestion info in session and redirect.
+
       $_SESSION['spell_suggestion'] = [
         'original'   => $item_name,
         'suggestion' => $corrected_item_name
       ];
       echo "<pre>DEBUG: Spell suggestion available.\nOriginal: $item_name\nSuggestion: $corrected_item_name</pre>";
-      // header("Location: vendor-dashboard.php");
-      // exit;
+      header("Location: vendor-dashboard.php");
+      exit;
     }
 
-    // If the vendor has confirmed the suggestion choice, use it accordingly.
     if (isset($_POST['confirm_spell'])) {
       if ($_POST['confirm_spell'] === 'accept') {
         $item_name = $_SESSION['spell_suggestion']['suggestion'];
@@ -113,7 +90,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       unset($_SESSION['spell_suggestion']);
     }
 
-    // Check if the item already exists (ignoring case)
     $stmt = $pdo->prepare("SELECT item_id FROM item WHERE LOWER(item_name) = LOWER(?)");
     $stmt->execute([$item_name]);
     $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -122,19 +98,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($existing_item) {
       $item_id = $existing_item['item_id'];
     } else {
-      // Insert new item into the item table.
       $stmt = $pdo->prepare("INSERT INTO item (item_name) VALUES (?)");
       if ($stmt->execute([$item_name])) {
         $item_id = $pdo->lastInsertId();
       } else {
         $_SESSION['error_message'] = "Error adding new item.";
         echo "<pre>DEBUG: Error inserting new item: $item_name</pre>";
-        // header("Location: vendor-dashboard.php");
-        // exit;
+        header("Location: vendor-dashboard.php");
+        exit;
       }
     }
 
-    // Link the item to the vendor (assuming a vendor_item table with vendor_id and item_id columns)
     $stmt = $pdo->prepare("SELECT COUNT(*) FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
     $stmt->execute([$vendor_id, $item_id]);
     $count = $stmt->fetchColumn();
@@ -149,16 +123,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       $_SESSION['error_message'] = "Item already exists in your profile.";
     }
-    // header("Location: vendor-dashboard.php");
-    // exit;
+    header("Location: vendor-dashboard.php");
+    exit;
   } elseif (isset($_POST['remove_item_btn'])) {
-    // Process removing an item from the vendor's list.
+
     $item_id = intval($_POST['item_id'] ?? 0);
     echo "<pre>DEBUG: remove_item_btn pressed. Item ID: $item_id</pre>";
     if ($item_id <= 0) {
       $_SESSION['error_message'] = "Invalid item ID.";
-      // header("Location: vendor-dashboard.php");
-      // exit;
+      header("Location: vendor-dashboard.php");
+      exit;
     }
     $stmt = $pdo->prepare("DELETE FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
     if ($stmt->execute([$vendor_id, $item_id])) {
@@ -166,17 +140,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       $_SESSION['error_message'] = "Error removing the item.";
     }
-    // header("Location: vendor-dashboard.php");
-    // exit;
+    header("Location: vendor-dashboard.php");
+    exit;
   } elseif (isset($_POST['update_vendor'])) {
-    // Process main vendor update and optional password change.
+
     $errors = [];
     echo "<pre>DEBUG: update_vendor pressed. POST data:\n" . print_r($_POST, true) . "</pre>";
 
-    // Update vendor details using the Vendor class method.
     $result = $vendor->updateDetails($_POST, $_FILES);
 
-    // Process password change if any of the password fields are provided.
     if (!empty($_POST['current_password']) || !empty($_POST['new_password']) || !empty($_POST['confirm_password'])) {
       if (empty($_POST['current_password']) || empty($_POST['new_password']) || empty($_POST['confirm_password'])) {
         $errors[] = "Please fill in all password fields.";
@@ -209,8 +181,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $_SESSION['error_message'] = implode("<br>", $errors);
     }
     echo "<pre>DEBUG: update_vendor processed. Errors: " . print_r($errors, true) . "</pre>";
-    // header("Location: vendor-dashboard.php");
-    // exit;
+    header("Location: vendor-dashboard.php");
+    exit;
   }
 }
 include_once HEADER_FILE;
@@ -224,11 +196,12 @@ include_once HEADER_FILE;
 
 <body>
   <main>
-    <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
-    <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
-    <a href="logout.php">Logout</a>
+    <header class="dashboard-header">
+      <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
+      <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
+      <a href="logout.php">Logout</a>
+    </header>
 
-    <!-- Session Messages -->
     <?php
     if (isset($_SESSION['success_message'])) {
       echo "<div style='padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; margin-bottom:10px;'>";
@@ -244,7 +217,6 @@ include_once HEADER_FILE;
     }
     ?>
 
-    <!-- Spell Check Suggestion Block -->
     <?php
     if (isset($_SESSION['spell_suggestion'])) {
       $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
@@ -265,7 +237,6 @@ include_once HEADER_FILE;
     }
     ?>
 
-    <!-- Display Current Markets -->
     <section id="current-markets">
       <h3>Markets You Are Attending</h3>
       <?php
@@ -282,9 +253,7 @@ include_once HEADER_FILE;
       ?>
     </section>
 
-    <!-- Incremental Market Update Forms -->
     <h3>Modify Markets You Are Attending</h3>
-    <!-- Form to Add a Market -->
     <?php
     $all_markets = Market::fetchAllMarkets();
     $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
@@ -319,7 +288,7 @@ include_once HEADER_FILE;
     </form>
 
     <br>
-    <!-- Form to Remove a Market -->
+
     <form action="vendor-dashboard.php" method="POST">
       <label for="remove_market">Remove a Market:</label>
       <select name="remove_market" id="remove_market">
@@ -334,7 +303,6 @@ include_once HEADER_FILE;
       <button type="submit" name="remove_market_btn">Remove Market</button>
     </form>
 
-    <!-- List of Items Vendor Sells in a Select List -->
     <section id="vendor-items-list">
       <h3>Your Items for Sale</h3>
       <?php
@@ -354,7 +322,6 @@ include_once HEADER_FILE;
       ?>
     </section>
 
-    <!-- Items Form: Add Items for Sale -->
     <section id="vendor-items">
       <h3>Add Items for Sale</h3>
       <form action="vendor-dashboard.php" method="POST">
@@ -364,11 +331,10 @@ include_once HEADER_FILE;
       </form>
     </section>
 
-    <!-- Main Form to Update Vendor Details & Change Password -->
     <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="update_vendor" value="1">
       <hr>
-      <!-- Update Vendor Details Section -->
+
       <section id="update-details">
         <h3>Update Vendor Details</h3>
         <label for="vendor_name">Vendor Name:</label>
@@ -379,7 +345,7 @@ include_once HEADER_FILE;
         <textarea name="vendor_description" id="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
       </section>
       <hr>
-      <!-- Optional: Logo Update Section -->
+
       <section id="upload-logo">
         <h3>Upload Vendor Logo</h3>
         <?php if (!empty($vendor->vendor_logo)): ?>
@@ -395,7 +361,7 @@ include_once HEADER_FILE;
         <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
       </section>
       <hr>
-      <!-- Password Change Section -->
+
       <section id="change-password">
         <h3>Change Password</h3>
         <p>If you wish to change your password, please fill in all fields below.</p>

@@ -60,7 +60,7 @@ class DBSessionHandler implements SessionHandlerInterface
   }
 
   // Garbage collection to delete old sessions.
-  public function gc(int $maxlifetime)
+  public function gc($maxlifetime)
   {
     $old = time() - $maxlifetime;
     $stmt = $this->pdo->prepare("DELETE FROM {$this->table} WHERE last_access < :old");
