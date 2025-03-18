@@ -59,7 +59,6 @@ header.dashboard-header a {
 
 a {
   color: inherit;
-  padding: 1rem 0;
 }
 
 header > h1 {
@@ -255,8 +254,9 @@ section#search {
   padding-right: 2rem;
 }
 
-#search > aside > p {
-  margin: 0;
+#search > aside > p,
+.attending-vendors {
+  margin: 0 0 1rem;
 }
 
 #map-container {
@@ -370,6 +370,10 @@ section#search {
 
 #vendor-details p {
   padding: 0.5rem;
+}
+
+.attending-vendors li {
+  margin-bottom: 0.5rem;
 }
 
 #intro {
@@ -542,8 +546,27 @@ td {
   text-decoration: underline;
 }
 
-.approved-cell {
-  background-color: #f1efef;
+.disabled-btn {
+  background-color: #ddd;
+  border: 1px solid #ddd;
+  color: #777;
+  cursor: not-allowed;
+  padding: 0.6rem 1.2rem;
+  font-size: 1rem;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.table-admin-id,
+.table-vendor-id {
+  text-align: center;
+}
+
+#admin-account-management {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  justify-content: space-between;
 }
 
 @media (max-width: 800px) {

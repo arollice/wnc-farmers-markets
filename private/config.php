@@ -43,3 +43,23 @@ DatabaseObject::set_database($pdo);
 
 // Initialize the session manager (this registers your custom session handler and calls session_start())
 $sessionManager = new SessionManager($pdo);
+
+// Breadcrumb initialization with exclusion of certain URLs
+if (!isset($_SESSION['breadcrumbs'])) {
+  $_SESSION['breadcrumbs'] = [];
+}
+
+$current_url = $_SERVER['REQUEST_URI'];
+
+// Check if the current URL contains "fetch-regions" (case-sensitive)
+if (strpos($current_url, 'fetch-regions') === false) {
+  // If the current URL is not already in the breadcrumbs, or if it's been seen before, update the chain
+  $found_key = array_search($current_url, $_SESSION['breadcrumbs']);
+  if ($found_key !== false) {
+    // Keep only the breadcrumbs up to the current URL
+    $_SESSION['breadcrumbs'] = array_slice($_SESSION['breadcrumbs'], 0, $found_key + 1);
+  } else {
+    // Append the current URL if it's new
+    $_SESSION['breadcrumbs'][] = $current_url;
+  }
+}

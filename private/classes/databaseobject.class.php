@@ -105,7 +105,11 @@ class DatabaseObject
 
     $stmt = self::$database->prepare($sql);
     foreach ($attributes as $key => $value) {
-      $stmt->bindValue(':' . $key, $value);
+      if (is_null($value)) {
+        $stmt->bindValue(':' . $key, null, PDO::PARAM_NULL);
+      } else {
+        $stmt->bindValue(':' . $key, $value);
+      }
     }
     $result = $stmt->execute();
     if ($result) {
@@ -114,6 +118,7 @@ class DatabaseObject
     }
     return $result;
   }
+
 
   // Update an existing record using a prepared statement
   protected function update()

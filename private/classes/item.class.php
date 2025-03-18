@@ -62,25 +62,32 @@ class Item extends DatabaseObject
   {
     // Custom Dictionary of Common Misspellings
     $manual_corrections = [
-      'meet' => 'meat',
-      'met' => 'meat',
-      'appel' => 'apple',
-      'beens' => 'beans',
-      'banans' => 'bananas',
-      'bannas' => 'bananas',
-      'bannanas' => 'bananas',
-      'lettcue' => 'lettuce',
-      'strwabery' => 'strawberry',
-      'bluberry' => 'blueberry',
-      'honeyy' => 'honey',
-      'poutlry' => 'poultry',
-      'pultry' => 'poultry',
-      'poltry' => 'poultry',
-      'diary' => 'dairy',
-      'dairey' => 'dairy',
-      'darry' => 'dairy',
-      'sirup' => 'syrup'
+      'meet'      => 'Meat',
+      'met'       => 'Meat',
+      'appel'     => 'Apple',
+      'beens'     => 'Beans',
+      'banans'    => 'Bananas',
+      'bannas'    => 'Bananas',
+      'bannanas'  => 'Bananas',
+      'lettcue'   => 'Lettuce',
+      'strwabery' => 'Strawberry',
+      'bluberry'  => 'Blueberry',
+      'honeyy'    => 'Honey',
+      'poutlry'   => 'Poultry',
+      'pultry'    => 'Poultry',
+      'poltry'    => 'Poultry',
+      'diary'     => 'Dairy',
+      'dairey'    => 'Dairy',
+      'darry'     => 'Dairy',
+      'sirup'     => 'Syrup',
+      'erbs'      => 'Herbs',
+      'foish'     => 'Fish',
+      'samon'     => 'Salmon',
+      'salman'    => 'Salmon',
+      'salmen'    => 'Salmon',
+      'salomn'    => 'Salmon'
     ];
+
 
     $lower_text = strtolower($text);
     if (array_key_exists($lower_text, $manual_corrections)) {
@@ -115,7 +122,7 @@ class Item extends DatabaseObject
     if ($http_code === 200) {
       $data = json_decode($response, true);
       if (!empty($data['edits'])) {
-        return $data['edits'][0]['replacement'] ?? null;
+        return ucwords(strtolower($data['edits'][0]['replacement'] ?? null));
       }
     }
 
@@ -149,6 +156,6 @@ class Item extends DatabaseObject
     }
 
     // Set a confidence threshold (e.g., 75% similarity)
-    return ($highest_similarity > 75) ? $best_match : null;
+    return ($highest_similarity > 75) ? ucwords(strtolower($best_match)) : null;
   }
 }

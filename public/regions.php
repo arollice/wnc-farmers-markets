@@ -34,7 +34,7 @@ include_once HEADER_FILE;
     <ul>
       <?php foreach ($regions as $region) : ?>
         <li>
-          <a href="market-details.php?id=<?= htmlspecialchars($region['region_id']) ?>">
+          <a href="market-details.php?id=<?= htmlspecialchars($region['region_id']) ?>&source=regions.php">
             <?= htmlspecialchars($region['region_name']) ?>
           </a>
         </li>

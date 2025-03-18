@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
   }).addTo(map);
 
+  
   // Fetch regions and their associated market data
   fetch("fetch-regions.php")
       .then((response) => response.json())

@@ -20,7 +20,7 @@ include_once HEADER_FILE;
       <ul class="vendor-list">
         <?php foreach ($vendors as $vendor) : ?>
           <li class="vendor-item">
-            <a href="<?= PUBLIC_PATH ?>/vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+            <a href="<?= PUBLIC_PATH ?>/vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>&source=vendors.php">
 
               <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo">
               <h3><?= htmlspecialchars($vendor['vendor_name']) ?></h3>

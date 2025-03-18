@@ -6,6 +6,8 @@ if (!isset($_GET['id'])) {
   die("Vendor ID not provided.");
 }
 
+$_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
+
 $vendor_id = intval($_GET['id']);
 $market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null;
 
@@ -84,7 +86,7 @@ include_once HEADER_FILE;
     <!-- Display Markets Attending by the Vendor -->
     <h2>Markets Attending</h2>
     <?php if (!empty($vendorMarkets)): ?>
-      <ul>
+      <ul class="attending-vendors">
         <?php foreach ($vendorMarkets as $market): ?>
           <li>
             <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
@@ -97,12 +99,18 @@ include_once HEADER_FILE;
       <p>This vendor is not attending any markets.</p>
     <?php endif; ?>
 
-    <!-- Back Button -->
-    <?php if (!empty($market_id)): ?>
-      <p><a href="market-details.php?id=<?= htmlspecialchars($market_id) ?>">Back to Market Details</a></p>
-    <?php else: ?>
-      <p><a href="vendors.php">Back to Vendors</a></p>
-    <?php endif; ?>
+    <?php
+
+    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
+
+    // Check if the breadcrumbs array exists and has at least 2 items.
+    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
+      // Get the second-to-last entry (the previous page)
+      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
+    }
+    ?>
+    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+
   </main>
   <?php include_once FOOTER_FILE; ?>
 </body>

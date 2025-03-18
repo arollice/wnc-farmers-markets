@@ -5,6 +5,8 @@ if (!isset($_GET['id'])) {
   die("Market ID not provided.");
 }
 
+$_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
+
 $market_id = intval($_GET['id']);
 $market = Market::fetchMarketDetails($market_id); // Fetch market details
 $policies = Market::fetchMarketPolicies(); // Fetch selected policies
@@ -35,10 +37,10 @@ include_once HEADER_FILE;
     <!-- Vendors Attending This Market -->
     <h2>Attending Vendors</h2>
     <?php if (!empty($vendors)) : ?>
-      <ul>
+      <ul class="attending-vendors">
         <?php foreach ($vendors as $vendor) : ?>
           <li>
-            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>&market_id=<?= htmlspecialchars($market_id) ?>">
+            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
               <?= htmlspecialchars($vendor['vendor_name']) ?>
             </a>
             <?php if (!empty($vendor['vendor_website'])) : ?>
@@ -63,7 +65,18 @@ include_once HEADER_FILE;
       </section>
     <?php endif; ?>
 
-    <a href="regions.php">Back to Map</a>
+    <?php
+
+    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
+
+    // Check if the breadcrumbs array exists and has at least 2 items.
+    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
+      // Get the second-to-last entry (the previous page)
+      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
+    }
+    ?>
+    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+
   </main>
 
 </body>

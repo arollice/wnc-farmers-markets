@@ -1,6 +1,8 @@
 <?php
 include_once('../private/config.php');
 
+$_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
+
 if (isset($_SESSION['success_message'])) {
   echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
   unset($_SESSION['success_message']);
@@ -43,7 +45,7 @@ include_once HEADER_FILE;
     <h2>Looking for something specific? See who sells what you're looking for!</h2>
 
     <!-- Search Form -->
-    <form method="GET" action="index.php">
+    <form method="GET" action="index.php#results">
       <label for="search_term">Search for items:</label>
       <input type="text" name="search_term" id="search_term" placeholder="Search for items..."
         value="<?= isset($_GET['search_term']) ? htmlspecialchars($_GET['search_term']) : ''; ?>" />
@@ -75,34 +77,39 @@ include_once HEADER_FILE;
     <!-- Show Spell Check Suggestion -->
     <?php if ($suggested_term && strtolower($suggested_term) !== strtolower($search_term)) : ?>
       <p>Did you mean:
-        <a href="index.php?search_term=<?= urlencode($suggested_term) ?>">
+        <a href="index.php?search_term=<?= urlencode($suggested_term) ?>#results">
           <strong><?= htmlspecialchars($suggested_term) ?></strong>
         </a>?
       </p>
     <?php endif; ?>
 
-
     <!-- Display Search Results -->
-    <?php if ($search_term): ?>
-      <h3>Search Results for: <?= htmlspecialchars($search_term) ?></h3>
+    <div id="results">
+      <?php if ($search_term): ?>
+        <h3>Search Results for: <?= htmlspecialchars($search_term) ?></h3>
 
-      <?php if (!empty($items)) : ?>
-        <ul>
-          <?php foreach ($items as $item_id => $item_name) : ?>
-            <li>
-              <strong><?= htmlspecialchars($item_name) ?></strong> - Vendors:
-              <ul>
-                <?php foreach ($vendors as $vendor_id => $vendor_name) : ?>
-                  <li><a href="vendor-details.php?id=<?= $vendor_id ?>"><?= htmlspecialchars($vendor_name) ?></a></li>
-                <?php endforeach; ?>
-              </ul>
-            </li>
-          <?php endforeach; ?>
-        </ul>
-      <?php else : ?>
-        <p>No results found for "<?= htmlspecialchars($search_term) ?>"</p>
+        <?php if (!empty($items)) : ?>
+          <ul>
+            <?php foreach ($items as $item_id => $item_name) : ?>
+              <li>
+                <strong><?= htmlspecialchars($item_name) ?></strong> - Vendors:
+                <ul>
+                  <?php foreach ($vendors as $vendor_id => $vendor_name) : ?>
+                    <li><a href="vendor-details.php?id=<?= htmlspecialchars($vendor_id) ?>">
+                        <?= htmlspecialchars($vendor_name) ?>
+                      </a>
+
+                    </li>
+                  <?php endforeach; ?>
+                </ul>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        <?php else : ?>
+          <p>No results found for "<?= htmlspecialchars($search_term) ?>"</p>
+        <?php endif; ?>
       <?php endif; ?>
-    <?php endif; ?>
+    </div>
   </section>
   <aside>
     <p>Supporting Local, one market at a time.</p>
