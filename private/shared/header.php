@@ -18,6 +18,9 @@ if (!defined('PUBLIC_PATH')) {
     <script src="<?= PUBLIC_PATH ?>/js/leaflet-map.js" defer></script>
   <?php endif; ?>
 
+  <script src="<?= PUBLIC_PATH ?>/js/farmers-market.js"></script>
+
+
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <link rel="stylesheet" type="text/css" href="<?= PUBLIC_PATH ?>/css/farmers-market.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">

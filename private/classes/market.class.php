@@ -134,9 +134,62 @@ class Market extends DatabaseObject
         </ul>
       <?php endif; ?>
     </div>
+  <?php
+    return ob_get_clean();
+  }
+
+  /**
+   * Renders a collapsible market card.
+   * The header always shows the market name,
+   * and the content (all details after the market name) is hidden by default.
+   *
+   * @param array $market    The market data.
+   * @param array|null $policies Optional policies related to the market.
+   * @return string          The HTML output for the collapsible market card.
+   */
+  public static function renderCollapsibleMarketCard(array $market, ?array $policies = null): string
+  {
+    ob_start();
+  ?>
+    <div class="collapsible-card">
+      <div class="collapsible-header">
+        <h2><?= htmlspecialchars($market['market_name']) ?></h2>
+      </div>
+      <div class="collapsible-content">
+        <div class="collapsible-content-inner">
+          <p><strong>Location:</strong> <?= htmlspecialchars($market['city']) ?>, <?= htmlspecialchars($market['state_name']) ?> <?= htmlspecialchars($market['zip_code']) ?></p>
+          <p><strong>Parking Info:</strong> <?= htmlspecialchars($market['parking_info']) ?></p>
+          <?php if (!empty($market['market_open']) && !empty($market['market_close'])) : ?>
+            <p><strong>Market Hours:</strong> <?= date("g:i A", strtotime($market['market_open'])) ?> - <?= date("g:i A", strtotime($market['market_close'])) ?></p>
+          <?php endif; ?>
+          <?php if (!empty($market['market_days'])) : ?>
+            <p><strong>Market Days:</strong> <?= htmlspecialchars($market['market_days']) ?></p>
+          <?php endif; ?>
+          <?php if (!empty($market['market_season'])) : ?>
+            <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_season']) ?></p>
+          <?php endif; ?>
+          <?php if (!empty($market['last_market_date'])) : ?>
+            <p><strong>Last Market Date:</strong> <?= date('F j, Y', strtotime($market['last_market_date'])) ?></p>
+          <?php endif; ?>
+          <?php if (!empty($policies)) : ?>
+            <h3>Market Policies</h3>
+            <ul>
+              <?php foreach ($policies as $policy) : ?>
+                <li>
+                  <strong><?= htmlspecialchars($policy['policy_name']) ?>:</strong>
+                  <?= nl2br(htmlspecialchars($policy['policy_description'])) ?>
+                </li>
+              <?php endforeach; ?>
+            </ul>
+          <?php endif; ?>
+        </div>
+      </div>
+    </div>
+
 <?php
     return ob_get_clean();
   }
+
 
   public static function getVendorIdsForMarket($market_id)
   {

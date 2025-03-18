@@ -16,7 +16,7 @@ h1 {
   color: #333;
   font-family: 'Bagel Fat One', system-ui;
   letter-spacing: 0.05em;
-  margin: 0.5rem 0;
+  margin: 1rem 0;
 }
 
 h2,
@@ -269,12 +269,24 @@ section#search {
 }
 
 #markets {
-  align-items: stretch;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: auto;
-  gap: 2rem;
-  padding: 0 0 0.5rem;
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 600px;
+  margin: 0;
+}
+
+#markets-noscript {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+#markets > h1 {
+  padding: 0 2rem;
 }
 
 .market-card {
@@ -303,6 +315,55 @@ section#search {
 .market-card p {
   margin: 0.15em 0;
   padding: 0.15rem 0.5rem;
+}
+
+.collapsible-card {
+  background-color: transparent; /* Transparent initially */
+  margin: 1rem 0;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
+.collapsible-header {
+  background-color: transparent;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  height: 60px;
+  line-height: 60px;
+  overflow: hidden;
+  padding: 0 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.collapsible-content {
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+  max-height: none;
+  opacity: 1;
+  overflow: hidden;
+  padding: 1rem;
+  transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out;
+}
+
+.collapsible-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+  padding: 0 1rem;
+}
+
+.collapsible-content.collapsed.open {
+  max-height: 500px;
+  opacity: 1;
+  padding: 1rem;
+}
+
+.collapsible-card.expanded {
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.collapsible-card.expanded .collapsible-header {
+  background-color: #fff;
 }
 
 .market-policies {
