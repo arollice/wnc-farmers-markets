@@ -1,3 +1,5 @@
+'use strict'
+
 document.addEventListener("DOMContentLoaded", function() {
   // Add the 'collapsed' class to all collapsible content elements
   document.querySelectorAll('.collapsible-content').forEach(el => {

@@ -16,14 +16,22 @@ h1 {
   color: #333;
   font-family: 'Bagel Fat One', system-ui;
   letter-spacing: 0.05em;
-  margin: 1rem 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+#search label,
+p {
+  margin: 0.5rem 0.5rem;
+  padding: 0 0.25rem;
 }
 
 h2,
 h3,
 h4 {
-  font-weight: 600;
-  margin: 0.5rem 0;
+  font-weight: 700;
 }
 
 label,
@@ -138,16 +146,48 @@ nav a::after {
   width: 100%;
 }
 
-/* Underline appears on hover */
 nav a:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
 }
 
-/* Underline remains for the active link */
 nav a.active::after {
   transform: scaleX(1);
   transform-origin: bottom left;
+}
+
+.breadcrumb-trail ul {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+}
+
+.breadcrumb-trail li {
+  margin-right: 0.5rem;
+}
+
+.breadcrumb-trail li + li:before {
+  content: '>';
+  margin-right: 0.5rem;
+  color: #666;
+}
+
+.breadcrumb-trail a {
+  text-decoration: none; /* Remove any default underline */
+  color: #3bb454;
+  position: static;
+}
+
+.breadcrumb-trail a::after {
+  content: none;
+}
+
+.breadcrumb-trail a:hover {
+  color: #3bb454;
+  text-decoration: underline;
 }
 
 img {
@@ -156,21 +196,6 @@ img {
   height: auto;
   margin: 0 auto;
   max-width: 100%;
-}
-
-#market-items > div {
-  width: 100%;
-  max-width: 301px;
-  aspect-ratio: 301 / 250;
-  overflow: hidden;
-  border-radius: 8px;
-}
-
-#market-items > div img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 main,
@@ -207,22 +232,6 @@ aside div {
   margin: 0 1rem;
 }
 
-#coming-soon {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  margin: 0.5rem 1rem;
-}
-
-#coming-soon p {
-  margin: 0 1rem;
-}
-
-main p,
-#seasonal-harvest p {
-  margin: 0;
-}
-
 section#search {
   display: flex;
   grid-template-columns: 3fr 1fr;
@@ -238,10 +247,6 @@ section#search {
   justify-content: center;
 }
 
-#search > section #search_term {
-  margin: 0 1rem 1rem 0;
-}
-
 #search > aside {
   align-items: center;
   display: flex;
@@ -254,7 +259,6 @@ section#search {
   padding-right: 2rem;
 }
 
-#search > aside > p,
 .attending-vendors {
   margin: 0 0 1rem;
 }
@@ -275,18 +279,6 @@ section#search {
   gap: 1rem;
   max-width: 600px;
   margin: 0;
-}
-
-#markets-noscript {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-#markets > h1 {
-  padding: 0 2rem;
 }
 
 .market-card {
@@ -319,6 +311,7 @@ section#search {
 
 .collapsible-card {
   background-color: transparent; /* Transparent initially */
+  border-radius: 8px;
   margin: 1rem 0;
   overflow: hidden;
   transition: background-color 0.3s ease;
@@ -326,7 +319,8 @@ section#search {
 
 .collapsible-header {
   background-color: transparent;
-  border-bottom: 1px solid #ddd;
+  border: 1px solid #ddd;
+  border-radius: 8px 8px 0 0;
   cursor: pointer;
   height: 60px;
   line-height: 60px;
@@ -336,8 +330,8 @@ section#search {
 }
 
 .collapsible-content {
-  background-color: #f9f9f9;
-  border-top: 1px solid #ddd;
+  background-color: #3bb4547d;
+  border: 1px solid #ddd;
   max-height: none;
   opacity: 1;
   overflow: hidden;
@@ -346,13 +340,15 @@ section#search {
 }
 
 .collapsible-content.collapsed {
+  border-top: none;
+  margin-top: 3px;
   max-height: 0;
   opacity: 0;
   padding: 0 1rem;
 }
 
 .collapsible-content.collapsed.open {
-  max-height: 500px;
+  max-height: 400px;
   opacity: 1;
   padding: 1rem;
 }
@@ -363,7 +359,7 @@ section#search {
 }
 
 .collapsible-card.expanded .collapsible-header {
-  background-color: #fff;
+  background-color: #fcc66f;
 }
 
 .market-policies {
@@ -489,11 +485,11 @@ section#search {
   text-decoration: none;
 }
 
-#intro a:hover,
+/*#intro a:hover,
 #wnc-farming-traditions a:hover,
 #why-markets-matter a:hover {
   text-decoration: underline;
-}
+}*/
 
 #why-markets-matter small {
   color: #666;

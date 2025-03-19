@@ -1,6 +1,10 @@
 <?php
 require_once('../private/config.php');
 
+$breadcrumbs = isset($_SESSION['breadcrumbs']) ? $_SESSION['breadcrumbs'] : [];
+
+$breadcrumbTrail = array_slice($breadcrumbs, -2);
+
 if (!isset($_GET['id'])) {
   die("Market ID not provided.");
 }
@@ -28,6 +32,18 @@ include_once HEADER_FILE;
 
 <body>
   <main>
+    <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+      <ul>
+        <?php foreach ($breadcrumbTrail as $crumb): ?>
+          <li>
+            <a href="<?= htmlspecialchars($crumb) ?>">
+              <?= htmlspecialchars(ucfirst(basename(parse_url($crumb, PHP_URL_PATH), ".php"))) ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    </nav>
+
     <h1><?= htmlspecialchars($market['market_name']) ?> - Market Details</h1>
 
     <div id="single-market-card">

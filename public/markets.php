@@ -19,8 +19,8 @@ include_once HEADER_FILE;
 </head>
 
 <body>
-  <main>
-    <h1>All Markets</h1>
+  <main class="no-js">
+    <h1>Market Directory</h1>
     <div id="markets">
       <?php foreach ($markets as $market): ?>
         <?= Market::renderCollapsibleMarketCard($market, $policies) ?>

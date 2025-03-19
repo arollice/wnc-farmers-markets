@@ -26,7 +26,11 @@ if (!defined('PUBLIC_PATH')) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<?php $currentUri = $_SERVER['REQUEST_URI']; ?>
+<?php
+// Use parse_url to get only the path portion of the URI.
+$currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+?>
+
 
 <body>
   <header id="reusable-header">
