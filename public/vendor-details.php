@@ -45,12 +45,13 @@ include_once HEADER_FILE;
         <?php foreach ($breadcrumbTrail as $crumb): ?>
           <li>
             <a href="<?= htmlspecialchars($crumb) ?>">
-              <?= htmlspecialchars(ucfirst(basename(parse_url($crumb, PHP_URL_PATH), ".php"))) ?>
+              <?= htmlspecialchars(Utils::displayName($crumb)) ?>
             </a>
           </li>
         <?php endforeach; ?>
       </ul>
     </nav>
+
     <h1><?= htmlspecialchars($vendor['vendor_name']) ?></h1>
 
     <div id="vendor-details">

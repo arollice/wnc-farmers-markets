@@ -8,6 +8,10 @@ if (isset($_SESSION['success_message'])) {
   unset($_SESSION['success_message']);
 }
 
+$all_featured_vendors = Vendor::findAllWithFilters(['approved' => true]);
+
+$featured_vendors = array_slice($all_featured_vendors, 0, 4);
+
 include_once HEADER_FILE;
 ?>
 
@@ -15,7 +19,7 @@ include_once HEADER_FILE;
   <h1>WNC Farmers Markets Collective</h1>
   <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we're here to support and celebrate the vibrant local food scene.</p>
 </main>
-<aside id="market-items">
+<!--<aside id="market-items">
   <div>
     <img src="img/peaches.webp" width="301" height="250" alt="Peaches in a crate by LuAnn Hunt on Unsplash.">
     <p>Fruits</p>
@@ -28,13 +32,25 @@ include_once HEADER_FILE;
 
   <div>
     <img src="img/chickens.webp" width="301" height="250" alt="Chickens in a coop by Karol Klajar on Unsplash.">
-    <p>Meats & Poultry</p>
+    <p>Meat & Poultry</p>
   </div>
 
   <div>
     <img src="img/plants.webp" width="301" height="250" alt="Seasonal plants by Tom Jur on Unsplash.">
     <p>Seasonal Plants & Greenery</p>
   </div>
+</aside>-->
+<aside id="featured-vendors">
+  <?php foreach ($featured_vendors as $vendor): ?>
+    <div class="vendor-card" data-vendor-id="<?= htmlspecialchars($vendor['vendor_id']); ?>">
+      <img src="<?= htmlspecialchars($vendor['vendor_logo'] ?: 'img/default_vendor.jpg'); ?>" width="301" height="250" alt="<?= htmlspecialchars($vendor['vendor_name']); ?>">
+      <div class="vendor-overlay">
+        <h2><?= htmlspecialchars($vendor['vendor_name']); ?></h2>
+        <p><?= htmlspecialchars($vendor['vendor_description']); ?></p>
+        <a class="view-more" href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']); ?>">View More</a>
+      </div>
+    </div>
+  <?php endforeach; ?>
 </aside>
 <section id="seasonal-harvest">
   <h2>Seasonal Harvest Highlights</h2>
