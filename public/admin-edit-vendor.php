@@ -10,26 +10,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if (isset($_POST['update_vendor'])) {
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
     if (!validateVendorId($vendor_id)) {
-      $_SESSION['error_message'] = "Invalid vendor ID.";
+      Utils::setFlashMessage('error', "Invalid vendor ID.");
       header("Location: admin.php");
       exit;
     }
+
     $vendorData = Vendor::findVendorById($vendor_id);
     if (!$vendorData) {
-      $_SESSION['error_message'] = "Vendor not found.";
+      Utils::setFlashMessage('error', "Vendor not found.");
       header("Location: admin.php");
       exit;
     }
+
     // Convert vendor data (array) to Vendor object.
     $vendor = new Vendor();
     foreach ($vendorData as $key => $value) {
       $vendor->$key = $value;
     }
+
     $result = $vendor->updateDetails($_POST, $_FILES);
     if ($result['success']) {
-      $_SESSION['success_message'] = "Vendor updated successfully.";
+      Utils::setFlashMessage('success', "Vendor updated successfully.");
     } else {
-      $_SESSION['error_message'] = implode("<br>", $result['errors']);
+      Utils::setFlashMessage('error', implode("<br>", $result['errors']));
     }
     header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id);
     exit;
@@ -46,9 +49,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $vendor->$key = $value;
         }
         if ($vendor->addMarket($market_to_add)) {
-          $_SESSION['success_message'] = "Market added successfully.";
+          Utils::setFlashMessage('success', "Market added successfully.");
         } else {
-          $_SESSION['error_message'] = "Vendor is already attending that market or an error occurred.";
+          Utils::setFlashMessage('error', "Vendor is already attending that market or an error occurred.");
         }
       }
     }
@@ -67,9 +70,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           $vendor->$key = $value;
         }
         if ($vendor->removeMarket($market_to_remove)) {
-          $_SESSION['success_message'] = "Market removed successfully.";
+          Utils::setFlashMessage('success', "Market removed successfully.");
         } else {
-          $_SESSION['error_message'] = "An error occurred while removing the market.";
+          Utils::setFlashMessage('error', "An error occurred while removing the market.");
         }
       }
     }
@@ -81,16 +84,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // For GET requests, retrieve vendor data.
 $vendor_id = intval($_GET['vendor_id'] ?? 0);
 if (!validateVendorId($vendor_id)) {
-  $_SESSION['error_message'] = "Invalid vendor ID.";
+  Utils::setFlashMessage('error', "Invalid vendor ID.");
   header("Location: admin.php");
   exit;
 }
+
 $vendorData = Vendor::findVendorById($vendor_id);
 if (!$vendorData) {
-  $_SESSION['error_message'] = "Vendor not found.";
+  Utils::setFlashMessage('error', "Vendor not found.");
   header("Location: admin.php");
   exit;
 }
+
 // Convert vendor data (array) to Vendor object.
 $vendor = new Vendor();
 foreach ($vendorData as $key => $value) {
@@ -110,23 +115,13 @@ include HEADER_FILE;
   <main>
     <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
 
-    <!-- Display session messages -->
-    <?php
-    if (isset($_SESSION['success_message'])) {
-      echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
-      unset($_SESSION['success_message']);
-    }
-    if (isset($_SESSION['error_message'])) {
-      echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
-      unset($_SESSION['error_message']);
-    }
-    ?>
+    <?php Utils::displayFlashMessages(); ?>
+
 
     <!-- Main Vendor Update Form -->
     <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
 
-      <h3>Modify Vendor Details</h3>
       <label for="vendor_name">Vendor Name:</label>
       <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
 
@@ -228,6 +223,6 @@ include HEADER_FILE;
   </main>
 </body>
 
-</html>
-
 <?php include FOOTER_FILE; ?>
+
+</html>

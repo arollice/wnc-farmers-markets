@@ -6,14 +6,7 @@ $currencies = Currency::fetchAllCurrencies();
 $sticky = $_SESSION['sticky'] ?? [];
 
 
-if (isset($_SESSION['error_message'])) {
-  echo '<div class="error">' . $_SESSION['error_message'] . '</div>';
-  unset($_SESSION['error_message']);
-}
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
-  unset($_SESSION['success_message']);
-}
+Utils::displayFlashMessages();
 
 include_once HEADER_FILE;
 ?>

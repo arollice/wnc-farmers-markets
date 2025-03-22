@@ -3,10 +3,7 @@ include_once('../private/config.php');
 
 $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
 
-if (isset($_SESSION['success_message'])) {
-  echo '<div class="success">' . $_SESSION['success_message'] . '</div>';
-  unset($_SESSION['success_message']);
-}
+Utils::displayFlashMessages();
 
 $all_featured_vendors = Vendor::findAllWithFilters(['approved' => true]);
 
@@ -19,27 +16,7 @@ include_once HEADER_FILE;
   <h1>WNC Farmers Markets Collective</h1>
   <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we're here to support and celebrate the vibrant local food scene.</p>
 </main>
-<!--<aside id="market-items">
-  <div>
-    <img src="img/peaches.webp" width="301" height="250" alt="Peaches in a crate by LuAnn Hunt on Unsplash.">
-    <p>Fruits</p>
-  </div>
 
-  <div>
-    <img src="img/veggies.webp" width="301" height="250" alt="Leeks and carrots by Peter Wendt on Unsplash.">
-    <p>Vegetables</p>
-  </div>
-
-  <div>
-    <img src="img/chickens.webp" width="301" height="250" alt="Chickens in a coop by Karol Klajar on Unsplash.">
-    <p>Meat & Poultry</p>
-  </div>
-
-  <div>
-    <img src="img/plants.webp" width="301" height="250" alt="Seasonal plants by Tom Jur on Unsplash.">
-    <p>Seasonal Plants & Greenery</p>
-  </div>
-</aside>-->
 <aside id="featured-vendors">
   <?php foreach ($featured_vendors as $vendor): ?>
     <div class="vendor-card" data-vendor-id="<?= htmlspecialchars($vendor['vendor_id']); ?>">
@@ -52,6 +29,7 @@ include_once HEADER_FILE;
     </div>
   <?php endforeach; ?>
 </aside>
+
 <section id="seasonal-harvest">
   <h2>Seasonal Harvest Highlights</h2>
   <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>

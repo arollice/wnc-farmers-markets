@@ -20,12 +20,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       // Set the status to approved.
       $vendor->status = 'approved';
       if ($vendor->save()) {
-        $_SESSION['success_message'] = "Vendor ID $vendor_id approved.";
+        Utils::setFlashMessage('success', "Vendor ID $vendor_id approved.");
       } else {
-        $_SESSION['error_message'] = "Error approving vendor ID $vendor_id.";
+        Utils::setFlashMessage('error', "Error approving vendor ID $vendor_id.");
       }
     } else {
-      $_SESSION['error_message'] = "Vendor not found.";
+      Utils::setFlashMessage('error', "Vendor not found.");
     }
     header("Location: admin.php");
     exit;
@@ -35,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve the vendor object.
     $vendor = Vendor::find_by_id($vendor_id);
     if ($vendor && $vendor->delete()) {
-      $_SESSION['success_message'] = "Vendor ID $vendor_id deleted.";
+      Utils::setFlashMessage('success', "Vendor ID $vendor_id deleted.");
     } else {
-      $_SESSION['error_message'] = "Error deleting vendor ID $vendor_id.";
+      Utils::setFlashMessage('error', "Error deleting vendor ID $vendor_id.");
     }
     header("Location: admin.php");
     exit;
@@ -48,13 +48,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   if ($admin_id > 0 && $action === 'delete_admin') {
     // Prevent an admin from deleting their own account.
     if ($admin_id == $_SESSION['user_id']) {
-      $_SESSION['error_message'] = "You cannot delete your own admin account.";
+      Utils::setFlashMessage('error', "You cannot delete your own admin account.");
     } else {
       $admin = UserAccount::find_by_id($admin_id);
       if ($admin && $admin->delete()) {
-        $_SESSION['success_message'] = "Admin ID $admin_id deleted.";
+        Utils::setFlashMessage('success', "Admin ID $admin_id deleted.");
       } else {
-        $_SESSION['error_message'] = "Error deleting admin ID $admin_id.";
+        Utils::setFlashMessage('error', "Error deleting admin ID $admin_id.");
       }
     }
     header("Location: admin.php");
@@ -73,7 +73,6 @@ include_once HEADER_FILE;
 
 <head>
   <title>Admin Panel</title>
-  <!-- No inline styles for buttons; use your external CSS file for styling .disabled-btn etc. -->
 </head>
 
 <body>
@@ -85,17 +84,7 @@ include_once HEADER_FILE;
     </header>
     <hr>
 
-    <!-- Session Messages -->
-    <?php
-    if (isset($_SESSION['success_message'])) {
-      echo "<div>" . htmlspecialchars($_SESSION['success_message']) . "</div>";
-      unset($_SESSION['success_message']);
-    }
-    if (isset($_SESSION['error_message'])) {
-      echo "<div>" . htmlspecialchars($_SESSION['error_message']) . "</div>";
-      unset($_SESSION['error_message']);
-    }
-    ?>
+    <?php Utils::displayFlashMessages(); ?>
 
     <!-- Admin Accounts Management Section -->
     <section id="admin-account-management">

@@ -9,7 +9,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'vendor') {
 
 $userAccount = UserAccount::find_by_id($_SESSION['user_id']);
 if (!$userAccount || empty($userAccount->vendor_id)) {
-
   header('Location: logout.php');
   exit;
 }
@@ -17,8 +16,7 @@ $vendor_id = $userAccount->vendor_id;
 
 $vendorData = Vendor::findVendorById($vendor_id);
 if (!$vendorData) {
-  $_SESSION['error_message'] = "Vendor record not found.";
-  echo "<pre>DEBUG: No vendor data found for Vendor ID: $vendor_id</pre>";
+  Utils::setFlashMessage('error', "Vendor record not found.");
   header("Location: vendor-dashboard.php");
   exit;
 }
@@ -41,20 +39,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $market_to_add = intval($_POST['add_market'] ?? 0);
     if (validateMarketId($market_to_add) && $vendor->addMarket($market_to_add)) {
-      $_SESSION['success_message'] = "Market added successfully.";
+      Utils::setFlashMessage('success', "Market added successfully.");
     } else {
-      $_SESSION['error_message'] = "Invalid market ID or you are already attending that market.";
+      Utils::setFlashMessage('error', "Invalid market ID or you are already attending that market.");
     }
     header("Location: vendor-dashboard.php");
     exit;
   } elseif (isset($_POST['remove_market_btn'])) {
     // Process removing a market using the Vendor class method.
     $market_to_remove = intval($_POST['remove_market'] ?? 0);
+    // Debug output (optional)
     echo "<pre>DEBUG: remove_market_btn pressed. Market to remove: $market_to_remove</pre>";
     if (validateMarketId($market_to_remove) && $vendor->removeMarket($market_to_remove)) {
-      $_SESSION['success_message'] = "Market removed successfully.";
+      Utils::setFlashMessage('success', "Market removed successfully.");
     } else {
-      $_SESSION['error_message'] = "Invalid market ID or an error occurred while removing the market.";
+      Utils::setFlashMessage('error', "Invalid market ID or an error occurred while removing the market.");
     }
     header("Location: vendor-dashboard.php");
     exit;
@@ -63,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $item_name = trim($_POST['item_name']);
     echo "<pre>DEBUG: add_item_btn pressed. Item name: $item_name</pre>";
     if (empty($item_name)) {
-      $_SESSION['error_message'] = "Please enter an item name.";
+      Utils::setFlashMessage('error', "Please enter an item name.");
       header("Location: vendor-dashboard.php");
       exit;
     }
@@ -71,12 +70,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $corrected_item_name = Item::spellCheck($item_name);
 
     if ($corrected_item_name && strtolower($corrected_item_name) !== strtolower($item_name) && !isset($_POST['confirm_spell'])) {
-
       $_SESSION['spell_suggestion'] = [
         'original'   => $item_name,
         'suggestion' => $corrected_item_name
       ];
-      echo "<pre>DEBUG: Spell suggestion available.\nOriginal: $item_name\nSuggestion: $corrected_item_name</pre>";
       header("Location: vendor-dashboard.php");
       exit;
     }
@@ -102,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       if ($stmt->execute([$item_name])) {
         $item_id = $pdo->lastInsertId();
       } else {
-        $_SESSION['error_message'] = "Error adding new item.";
+        Utils::setFlashMessage('error', "Error adding new item.");
         echo "<pre>DEBUG: Error inserting new item: $item_name</pre>";
         header("Location: vendor-dashboard.php");
         exit;
@@ -116,12 +113,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($count == 0) {
       $stmt = $pdo->prepare("INSERT INTO vendor_item (vendor_id, item_id) VALUES (?, ?)");
       if ($stmt->execute([$vendor_id, $item_id])) {
-        $_SESSION['success_message'] = "Item added successfully.";
+        Utils::setFlashMessage('success', "Item added successfully.");
       } else {
-        $_SESSION['error_message'] = "Error linking item to your profile.";
+        Utils::setFlashMessage('error', "Error linking item to your profile.");
       }
     } else {
-      $_SESSION['error_message'] = "Item already exists in your profile.";
+      Utils::setFlashMessage('error', "Item already exists in your profile.");
     }
     header("Location: vendor-dashboard.php");
     exit;
@@ -130,15 +127,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $item_id = intval($_POST['item_id'] ?? 0);
     echo "<pre>DEBUG: remove_item_btn pressed. Item ID: $item_id</pre>";
     if ($item_id <= 0) {
-      $_SESSION['error_message'] = "Invalid item ID.";
+      Utils::setFlashMessage('error', "Invalid item ID.");
       header("Location: vendor-dashboard.php");
       exit;
     }
     $stmt = $pdo->prepare("DELETE FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
     if ($stmt->execute([$vendor_id, $item_id])) {
-      $_SESSION['success_message'] = "Item removed successfully.";
+      Utils::setFlashMessage('success', "Item removed successfully.");
     } else {
-      $_SESSION['error_message'] = "Error removing the item.";
+      Utils::setFlashMessage('error', "Error removing the item.");
     }
     header("Location: vendor-dashboard.php");
     exit;
@@ -176,9 +173,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-      $_SESSION['success_message'] = "Profile updated successfully." . (!empty($_POST['new_password']) ? " Your password has also been updated." : "");
+      Utils::setFlashMessage('success', "Profile updated successfully." . (!empty($_POST['new_password']) ? " Your password has also been updated." : ""));
     } else {
-      $_SESSION['error_message'] = implode("<br>", $errors);
+      Utils::setFlashMessage('error', implode("<br>", $errors));
     }
     echo "<pre>DEBUG: update_vendor processed. Errors: " . print_r($errors, true) . "</pre>";
     header("Location: vendor-dashboard.php");
@@ -203,38 +200,8 @@ include_once HEADER_FILE;
     </header>
 
     <?php
-    if (isset($_SESSION['success_message'])) {
-      echo "<div style='padding:10px; background:#d4edda; color:#155724; border:1px solid #c3e6cb; margin-bottom:10px;'>";
-      echo htmlspecialchars($_SESSION['success_message']);
-      echo "</div>";
-      unset($_SESSION['success_message']);
-    }
-    if (isset($_SESSION['error_message'])) {
-      echo "<div style='padding:10px; background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; margin-bottom:10px;'>";
-      echo htmlspecialchars($_SESSION['error_message']);
-      echo "</div>";
-      unset($_SESSION['error_message']);
-    }
-    ?>
-
-    <?php
-    if (isset($_SESSION['spell_suggestion'])) {
-      $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
-      $suggestion = htmlspecialchars($_SESSION['spell_suggestion']['suggestion']);
-      echo "<div style='padding:10px; background:#fff3cd; color:#856404; border:1px solid #ffeeba; margin-bottom:10px;'>";
-      echo "Did you mean <strong>$suggestion</strong> instead of <strong>$original</strong>? ";
-      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>
-              <input type='hidden' name='item_name' value='$original'>
-              <input type='hidden' name='confirm_spell' value='decline'>
-              <button type='submit' name='add_item_btn'>Ignore Suggestion</button>
-            </form>";
-      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>
-              <input type='hidden' name='item_name' value='$original'>
-              <input type='hidden' name='confirm_spell' value='accept'>
-              <button type='submit' name='add_item_btn'>Accept Suggestion</button>
-            </form>";
-      echo "</div>";
-    }
+    Utils::displayFlashMessages();
+    Utils::displaySpellSuggestion();
     ?>
 
     <section id="current-markets">
