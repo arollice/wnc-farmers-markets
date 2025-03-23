@@ -113,7 +113,11 @@ include HEADER_FILE;
 
 <body>
   <main>
-    <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
+    <header class="dashboard-header">
+      <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
+
+      <p><a href="admin.php">Back to Admin Dashboard</a></p>
+    </header>
 
     <?php Utils::displayFlashMessages(); ?>
 
@@ -134,7 +138,7 @@ include HEADER_FILE;
       <!-- Optional: Logo Update -->
       <?php if (!empty($vendor->vendor_logo)): ?>
         <p>Current Logo:</p>
-        <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
+        <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150" id="admin-edit-logo"><br>
         <label for="delete_logo">
           <input type="checkbox" name="delete_logo" id="delete_logo" value="1"> Delete current logo
         </label><br>
@@ -218,8 +222,6 @@ include HEADER_FILE;
       </select>
       <button type="submit" name="remove_market_btn">Remove Market</button>
     </form>
-
-    <p><a href="admin.php">Back to Admin Dashboard</a></p>
   </main>
 </body>
 

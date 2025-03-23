@@ -86,12 +86,11 @@ include_once HEADER_FILE;
 
     <?php Utils::displayFlashMessages(); ?>
 
-    <!-- Admin Accounts Management Section -->
     <section id="admin-account-management">
       <h3>Admin Accounts Management</h3>
       <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
       <?php
-      // Fetch all admin accounts from the user_account table.
+
       $stmt = $pdo->prepare("SELECT * FROM user_account WHERE role = 'admin'");
       $stmt->execute();
       $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -189,7 +188,7 @@ include_once HEADER_FILE;
     $approved_vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
     if ($approved_vendors):
     ?>
-      <ul>
+      <ul id="approved-vendors">
         <?php foreach ($approved_vendors as $v): ?>
           <li><?= htmlspecialchars($v['vendor_name']); ?> - <?= htmlspecialchars($v['vendor_description']); ?></li>
         <?php endforeach; ?>

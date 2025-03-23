@@ -20,12 +20,23 @@ h1 {
 
 h1,
 h2,
-h3,
-h4,
-#search label,
-p {
-  margin: 0.5rem 0.5rem;
-  padding: 0 0.25rem;
+p,
+section,
+#single-market-card,
+.breadcrumb-trail,
+#change-password,
+#upload-logo,
+#update-details,
+#current-markets,
+#vendor-item-list,
+#vendor-items {
+  margin: 0.25rem 1rem;
+  padding: 0.25rem 1rem;
+}
+
+#search label {
+  margin: 0.5rem 1rem;
+  padding: 0 1rem;
 }
 
 h2,
@@ -161,10 +172,15 @@ nav a.active::after {
   transform-origin: bottom left;
 }
 
+.breadcrumb-trail {
+  margin: 0.25rem;
+  padding: 0 0.25rem;
+}
+
 .breadcrumb-trail ul {
   list-style: none;
   padding: 0;
-  margin: 0.5rem 0;
+  margin: 0;
   display: flex;
   flex-wrap: wrap;
   font-size: 0.9rem;
@@ -203,6 +219,24 @@ img {
   max-width: 100%;
 }
 
+.vendor-logo {
+  display: flex;
+  justify-content: flex-start;
+  height: auto;
+  margin: 1rem;
+  max-width: 200px;
+}
+
+#upload-logo {
+  display: flex;
+  flex-direction: column;
+}
+
+#upload-logo > img {
+  justify-content: flex-start;
+  margin: 1rem 0;
+}
+
 main,
 #seasonal-harvest,
 noscript {
@@ -238,7 +272,7 @@ aside div {
 }
 
 /**** Index Page *****/
-section#search {
+section #search {
   display: flex;
   grid-template-columns: 3fr 1fr;
   justify-content: space-around;
@@ -536,6 +570,11 @@ section#search {
   margin-bottom: 0.5rem;
 }
 
+#current-markets li,
+#approved-vendors li {
+  margin: 0.5rem;
+}
+
 /**** About Page *****/
 #intro {
   margin-bottom: 2.5rem;
@@ -571,8 +610,8 @@ section#search {
 #why-markets-matter h3 {
   border-top: 1px solid #ddd;
   color: #444;
-  margin: 1rem 0;
-  padding: 1rem 0 0;
+  margin: 0.75rem 1rem 0;
+  padding: 0.75rem 1rem 0;
 }
 
 #intro p,
@@ -602,6 +641,7 @@ form label {
   display: block;
   font-weight: bold;
   margin: 1rem 0;
+  padding: 0 1rem;
   max-width: 300px;
 }
 
@@ -657,6 +697,10 @@ form input[type='submit'] {
 form button:hover,
 form input[type='submit']:hover {
   background-color: #32a044;
+}
+
+#update-vendor {
+  margin: 1rem 3.25rem;
 }
 
 /**** Dashboards *****/

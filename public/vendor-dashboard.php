@@ -218,57 +218,56 @@ include_once HEADER_FILE;
         echo "<p>You are not attending any markets.</p>";
       }
       ?>
+
+      <h3>Modify Markets You Are Attending</h3>
+      <?php
+      $all_markets = Market::fetchAllMarkets();
+      $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+      $currentMarketIds = [];
+      if (!empty($vendorMarkets)) {
+        foreach ($vendorMarkets as $market) {
+          $currentMarketIds[] = $market['market_id'];
+        }
+      }
+      // Build array of available markets (those not already added)
+      $available_markets = [];
+      foreach ($all_markets as $market) {
+        if (!in_array($market['market_id'], $currentMarketIds)) {
+          $available_markets[] = $market;
+        }
+      }
+      ?>
+      <form action="vendor-dashboard.php" method="POST">
+        <label for="add_market">Add a Market:</label>
+        <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
+          <?php
+          if (empty($available_markets)) {
+            echo '<option value="">All markets added</option>';
+          } else {
+            foreach ($available_markets as $market) {
+              echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+            }
+          }
+          ?>
+        </select>
+        <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
+      </form>
+      <br>
+
+      <form action="vendor-dashboard.php" method="POST">
+        <label for="remove_market">Remove a Market:</label>
+        <select name="remove_market" id="remove_market">
+          <?php
+          if (!empty($vendorMarkets)) {
+            foreach ($vendorMarkets as $market) {
+              echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
+            }
+          }
+          ?>
+        </select>
+        <button type="submit" name="remove_market_btn">Remove Market</button>
+      </form>
     </section>
-
-    <h3>Modify Markets You Are Attending</h3>
-    <?php
-    $all_markets = Market::fetchAllMarkets();
-    $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
-    $currentMarketIds = [];
-    if (!empty($vendorMarkets)) {
-      foreach ($vendorMarkets as $market) {
-        $currentMarketIds[] = $market['market_id'];
-      }
-    }
-    // Build array of available markets (those not already added)
-    $available_markets = [];
-    foreach ($all_markets as $market) {
-      if (!in_array($market['market_id'], $currentMarketIds)) {
-        $available_markets[] = $market;
-      }
-    }
-    ?>
-    <form action="vendor-dashboard.php" method="POST">
-      <label for="add_market">Add a Market:</label>
-      <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
-        <?php
-        if (empty($available_markets)) {
-          echo '<option value="">All markets added</option>';
-        } else {
-          foreach ($available_markets as $market) {
-            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-          }
-        }
-        ?>
-      </select>
-      <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
-    </form>
-
-    <br>
-
-    <form action="vendor-dashboard.php" method="POST">
-      <label for="remove_market">Remove a Market:</label>
-      <select name="remove_market" id="remove_market">
-        <?php
-        if (!empty($vendorMarkets)) {
-          foreach ($vendorMarkets as $market) {
-            echo '<option value="' . htmlspecialchars($market['market_id']) . '">' . htmlspecialchars($market['market_name']) . '</option>';
-          }
-        }
-        ?>
-      </select>
-      <button type="submit" name="remove_market_btn">Remove Market</button>
-    </form>
 
     <section id="vendor-items-list">
       <h3>Your Items for Sale</h3>
@@ -317,7 +316,7 @@ include_once HEADER_FILE;
         <h3>Upload Vendor Logo</h3>
         <?php if (!empty($vendor->vendor_logo)): ?>
           <p>Current Logo:</p>
-          <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150"><br>
+          <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150" height="150"><br>
           <label for="delete_logo">
             <input type="checkbox" name="delete_logo" id="delete_logo" value="1">
             Delete current logo
@@ -340,7 +339,7 @@ include_once HEADER_FILE;
         <input type="password" name="confirm_password" id="confirm_password"><br>
       </section>
       <hr>
-      <button type="submit" name="update_vendor">Save Changes</button>
+      <button type="submit" name="update_vendor" id="update-vendor">Save Changes</button>
     </form>
   </main>
 </body>
