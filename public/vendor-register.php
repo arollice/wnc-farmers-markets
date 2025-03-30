@@ -13,7 +13,7 @@ include_once HEADER_FILE;
 ?>
 
 <main>
-  <h1>Vendor Registration</h1>
+  <h2>Vendor Registration</h2>
   <p>Register your business to be listed in the WNC Farmers Market.</p>
 
   <!-- Display inline error message if one exists -->
@@ -52,24 +52,23 @@ include_once HEADER_FILE;
 
     <section id="select-markets">
       <h3>Select Markets to Attend</h3>
-      <label for="markets">Select Markets:</label>
-      <select id="markets" name="market_ids[]" multiple="multiple" style="width:300px;">
+      <div class="checkbox-markets">
         <?php
         $all_markets = Market::fetchAllMarkets();
         $selectedMarkets = $sticky['market_ids'] ?? [];
         foreach ($all_markets as $market):
         ?>
-          <option value="<?= htmlspecialchars($market['market_id']); ?>"
-            <?= in_array($market['market_id'], $selectedMarkets) ? 'selected' : '' ?>>
+          <label>
+            <input type="checkbox" name="market_ids[]" value="<?= htmlspecialchars($market['market_id']); ?>"
+              <?= in_array($market['market_id'], $selectedMarkets) ? 'checked' : '' ?>>
             <?= htmlspecialchars($market['market_name']); ?>
-          </option>
+          </label>
         <?php endforeach; ?>
-      </select>
+      </div>
     </section>
-    <p><small>Hold Control or Command key to select multiple markets</small></p>
 
-    <label>Accepted Payments:</label>
-    <div class="checkbox-group">
+    <section>
+      <label>Accepted Payments:</label>
       <?php
       $selectedPayments = $sticky['accepted_payments'] ?? [];
       foreach ($currencies as $currency): ?>
@@ -79,7 +78,7 @@ include_once HEADER_FILE;
           <?= htmlspecialchars($currency['currency_name']) ?>
         </label>
       <?php endforeach; ?>
-    </div>
+    </section>
 
     <button type="submit">Register</button>
   </form>

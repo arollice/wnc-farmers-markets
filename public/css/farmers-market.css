@@ -22,6 +22,7 @@ h1,
 h2,
 p,
 section,
+form,
 #single-market-card,
 .breadcrumb-trail,
 #change-password,
@@ -45,7 +46,6 @@ h4 {
   font-weight: 700;
 }
 
-label,
 input[type='text'],
 button {
   margin: 1rem 0;
@@ -219,7 +219,8 @@ img {
   max-width: 100%;
 }
 
-.vendor-logo {
+.vendor-logo,
+#admin-edit-logo {
   display: flex;
   justify-content: flex-start;
   height: auto;
@@ -648,7 +649,6 @@ form label {
   display: block;
   font-weight: bold;
   margin: 1rem 0;
-  padding: 0 1rem;
   max-width: 300px;
 }
 
