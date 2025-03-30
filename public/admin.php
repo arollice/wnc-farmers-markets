@@ -8,21 +8,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $pdo = DatabaseObject::get_database();
 
-// Process actions (approve, delete, delete_admin) submitted via POST.
+// Process POST actions.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $action = $_POST['action'] ?? '';
   $vendor_id = intval($_POST['vendor_id'] ?? 0);
+  $admin_id = intval($_POST['admin_id'] ?? 0);
 
+  // Approve Vendor Action.
   if ($vendor_id > 0 && $action === 'approve') {
-    // Retrieve the Vendor object.
     $vendor = Vendor::find_by_id($vendor_id);
     if ($vendor) {
-      // Set the status to approved.
       $vendor->status = 'approved';
       if ($vendor->save()) {
-        Utils::setFlashMessage('success', "Vendor ID $vendor_id approved.");
+        // Using vendor_name instead of the vendor_id.
+        Utils::setFlashMessage('success', "Vendor '{$vendor->vendor_name}' approved.");
       } else {
-        Utils::setFlashMessage('error', "Error approving vendor ID $vendor_id.");
+        Utils::setFlashMessage('error', "Error approving vendor '{$vendor->vendor_name}'.");
       }
     } else {
       Utils::setFlashMessage('error', "Vendor not found.");
@@ -31,36 +32,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  if ($vendor_id > 0 && $action === 'delete') {
-    // Retrieve the vendor object.
-    $vendor = Vendor::find_by_id($vendor_id);
-    if ($vendor && $vendor->delete()) {
-      Utils::setFlashMessage('success', "Vendor ID $vendor_id deleted.");
+  // Edit Admin Action.
+  if ($admin_id > 0 && $action === 'edit_admin') {
+    $admin = UserAccount::find_by_id($admin_id);
+    if ($admin) {
+      $username = trim($_POST['username'] ?? '');
+      $email = trim($_POST['email'] ?? '');
+      // (Optional) Add any validation for $username and $email here.
+      $admin->username = $username;
+      $admin->email = $email;
+      if ($admin->save()) {
+        // Using admin username in the message.
+        Utils::setFlashMessage('success', "Admin '{$admin->username}' updated successfully.");
+      } else {
+        Utils::setFlashMessage('error', "Error updating admin '{$admin->username}'.");
+      }
     } else {
-      Utils::setFlashMessage('error', "Error deleting vendor ID $vendor_id.");
+      Utils::setFlashMessage('error', "Admin not found.");
     }
     header("Location: admin.php");
     exit;
   }
 
-  // Process delete admin action.
-  $admin_id = intval($_POST['admin_id'] ?? 0);
+  // Delete Vendor Action.
+  if ($vendor_id > 0 && $action === 'delete') {
+    $vendor = Vendor::find_by_id($vendor_id);
+    if ($vendor && $vendor->delete()) {
+      Utils::setFlashMessage('success', "Vendor '{$vendor->vendor_name}' deleted.");
+    } else {
+      Utils::setFlashMessage('error', "Error deleting vendor.");
+    }
+    header("Location: admin.php");
+    exit;
+  }
+
+  // Delete Admin Action.
   if ($admin_id > 0 && $action === 'delete_admin') {
-    // Prevent an admin from deleting their own account.
     if ($admin_id == $_SESSION['user_id']) {
       Utils::setFlashMessage('error', "You cannot delete your own admin account.");
     } else {
       $admin = UserAccount::find_by_id($admin_id);
       if ($admin && $admin->delete()) {
-        Utils::setFlashMessage('success', "Admin ID $admin_id deleted.");
+        Utils::setFlashMessage('success', "Admin '{$admin->username}' deleted.");
       } else {
-        Utils::setFlashMessage('error', "Error deleting admin ID $admin_id.");
+        Utils::setFlashMessage('error', "Error deleting admin.");
       }
     }
     header("Location: admin.php");
     exit;
   }
 }
+
+// Set the edit mode for admin accounts from the GET parameter.
+$edit_admin_id = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
 
 // Fetch all vendors for display.
 $stmt = $pdo->query("SELECT * FROM vendor");
@@ -90,38 +114,75 @@ include_once HEADER_FILE;
       <h3>Admin Accounts Management</h3>
       <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
       <?php
-
       $stmt = $pdo->prepare("SELECT * FROM user_account WHERE role = 'admin'");
       $stmt->execute();
       $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
       if ($admins):
       ?>
         <table>
-          <tr>
-            <th>Admin ID</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Actions</th>
-          </tr>
-          <?php foreach ($admins as $admin): ?>
+          <thead>
             <tr>
-              <td class="table-admin-id"><?= htmlspecialchars($admin['user_id']); ?></td>
-              <td><?= htmlspecialchars($admin['username']); ?></td>
-              <td><?= htmlspecialchars($admin['email']); ?></td>
-              <td>
-                <?php if ($admin['user_id'] != $_SESSION['user_id']): ?>
-                  <form method="post" onsubmit="return confirm('Are you sure you want to delete this admin?');">
-                    <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
-                    <input type="hidden" name="action" value="delete_admin">
-                    <button type="submit">Delete Admin</button>
-                  </form>
-                <?php else: ?>
-                  <!-- Disabled button for the current admin -->
-                  <button type="button" class="disabled-btn" disabled>Current Admin</button>
-                <?php endif; ?>
-              </td>
+              <th>Admin ID</th>
+              <th>Username</th>
+              <th>Email</th>
+              <th>Edit</th>
+              <th>Delete</th>
             </tr>
-          <?php endforeach; ?>
+          </thead>
+          <tbody>
+            <?php foreach ($admins as $admin): ?>
+              <?php if ($admin['user_id'] === $edit_admin_id): ?>
+                <!-- Editable Row -->
+                <form method="post">
+                  <tr>
+                    <td>
+                      <?= htmlspecialchars($admin['user_id']); ?>
+                      <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
+                    </td>
+                    <td>
+                      <input type="text" name="username" value="<?= htmlspecialchars($admin['username']); ?>">
+                    </td>
+                    <td>
+                      <input type="email" name="email" value="<?= htmlspecialchars($admin['email']); ?>">
+                    </td>
+                    <td>
+                      <input type="hidden" name="action" value="edit_admin">
+                      <button type="submit">Save</button>
+                    </td>
+                    <td>
+                      <!-- Cancel link reloads without the edit GET parameter -->
+                      <a href="admin.php">Cancel</a>
+                    </td>
+                  </tr>
+                </form>
+              <?php else: ?>
+                <!-- Read-Only Row -->
+                <tr>
+                  <td><?= htmlspecialchars($admin['user_id']); ?></td>
+                  <td><?= htmlspecialchars($admin['username']); ?></td>
+                  <td><?= htmlspecialchars($admin['email']); ?></td>
+                  <td>
+                    <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
+                      <del>Edit</del>
+                    <?php else: ?>
+                      <a href="admin.php?edit=<?= htmlspecialchars($admin['user_id']); ?>">Edit</a>
+                    <?php endif; ?>
+                  </td>
+                  <td>
+                    <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
+                      <button type="button" class="disabled-btn" disabled>Current Admin</button>
+                    <?php else: ?>
+                      <form method="post" onsubmit="return confirm('Are you sure you want to delete this admin?');" style="display:inline;">
+                        <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
+                        <input type="hidden" name="action" value="delete_admin">
+                        <button type="submit">Delete</button>
+                      </form>
+                    <?php endif; ?>
+                  </td>
+                </tr>
+              <?php endif; ?>
+            <?php endforeach; ?>
+          </tbody>
         </table>
       <?php else: ?>
         <p>No admin accounts found.</p>

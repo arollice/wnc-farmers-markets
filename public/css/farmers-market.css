@@ -243,8 +243,8 @@ noscript {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 1rem;
-  padding: 1rem;
+  margin: 0.5rem 1rem;
+  padding: 0.5rem 1rem;
 }
 
 noscript li {
@@ -272,12 +272,12 @@ aside div {
 }
 
 /**** Index Page *****/
-section #search {
-  display: flex;
-  grid-template-columns: 3fr 1fr;
-  justify-content: space-around;
-  margin: 0.5rem 1rem;
-  padding: 1rem;
+#search {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  grid-template-rows: 1fr;
+  justify-content: space-between;
+  padding: 0 1rem;
 }
 
 #search > section {
@@ -285,6 +285,8 @@ section #search {
   flex: 2;
   flex-direction: column;
   justify-content: center;
+  margin: 0;
+  padding: 0;
 }
 
 #search > aside {
@@ -297,6 +299,11 @@ section #search {
   letter-spacing: 0.05rem;
   margin: 0 1rem;
   padding-right: 2rem;
+}
+
+#search > aside > p {
+  margin: -1.5rem 1rem 1rem;
+  padding: -1.5rem 0.5rem 0.5rem;
 }
 
 .attending-vendors {
@@ -344,10 +351,10 @@ section #search {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.7); /* Base overlay background */
+  background: rgba(0, 0, 0, 0.7);
   color: #fff;
   display: flex;
-  flex-direction: column; /* Stack content vertically */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   text-align: center;
@@ -703,6 +710,10 @@ form input[type='submit']:hover {
   margin: 1rem 3.25rem;
 }
 
+form #search_term {
+  margin-left: 1.75rem;
+}
+
 /**** Dashboards *****/
 table {
   background-color: #fff;
@@ -848,11 +859,16 @@ td {
     gap: 1rem;
   }
 
+  #menu-toggle-label,
+  #nav-menu {
+    margin: 0 1rem;
+    padding: 1.5rem 1.5rem 0;
+  }
+
   #menu-toggle-label {
     cursor: pointer;
     display: flex;
     font-size: 2rem;
-    margin: 0.5rem;
     order: 1; /* Ensures the hamburger appears last */
   }
 
@@ -878,8 +894,13 @@ td {
 
   #nav-menu a {
     display: block;
-    padding: 0.5rem;
+    padding: 0.25rem;
     text-decoration: none;
     color: inherit;
   }
+}
+
+.register_error > li {
+  color: #ff0000;
+  list-style-type: none;
 }

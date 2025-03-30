@@ -1,7 +1,6 @@
 <?php
 include_once('../private/config.php');
 include_once('../private/validation.php');
-include_once('../private/Utils.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -50,10 +49,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       'market_ids'         => $_POST['market_ids'] ?? [],
       'accepted_payments'  => $accepted_payments,
     ];
-    Utils::setFlashMessage('error', '<ul><li>' . implode('</li><li>', $errors) . '</li></ul>');
+    // Use a unique key for vendor registration errors
+    $_SESSION['register_error'] = '<ul class="register_error"><li>' . implode('</li><li>', $errors) . '</li></ul>';
+
     header("Location: vendor-register.php");
     exit;
   }
+
 
   // Register the vendor.
   $vendorData = [

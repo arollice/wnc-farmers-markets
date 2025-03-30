@@ -63,4 +63,24 @@ class UserAccount extends DatabaseObject
     $this->last_login = date("Y-m-d H:i:s");
     return $this->save();
   }
+
+  public static function find_by_username($username)
+  {
+    $sql = "SELECT * FROM " . static::$table_name . " WHERE username = :username LIMIT 1";
+    $stmt = self::$database->prepare($sql);
+    $stmt->bindValue(':username', $username);
+    $stmt->execute();
+    $record = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $record ? static::instantiate($record) : false;
+  }
+
+  public static function find_by_email($email)
+  {
+    $sql = "SELECT * FROM " . static::$table_name . " WHERE email = :email LIMIT 1";
+    $stmt = self::$database->prepare($sql);
+    $stmt->bindValue(':email', $email);
+    $stmt->execute();
+    $record = $stmt->fetch(PDO::FETCH_ASSOC);
+    return $record ? static::instantiate($record) : false;
+  }
 }

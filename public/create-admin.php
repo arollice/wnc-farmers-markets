@@ -18,7 +18,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Check if passwords match.
   if ($adminPassword !== $adminPasswordConfirm) {
+    // Store submitted values in session so they persist on reload.
+    $_SESSION['sticky'] = $_POST;
     Utils::setFlashMessage('error', "Passwords do not match.");
+    header("Location: create-admin.php");
+    exit;
+  }
+
+  // Pre-check for duplicate username.
+  $existingAdmin = UserAccount::find_by_username($adminName);
+  if ($existingAdmin) {
+    $_SESSION['sticky'] = $_POST;
+    Utils::setFlashMessage('error', "Username '$adminName' already exists.");
+    header("Location: create-admin.php");
+    exit;
+  }
+
+  // Pre-check for duplicate email.
+  $existingEmail = UserAccount::find_by_email($adminEmail);
+  if ($existingEmail) {
+    $_SESSION['sticky'] = $_POST;
+    Utils::setFlashMessage('error', "Email '$adminEmail' is already in use.");
     header("Location: create-admin.php");
     exit;
   }
@@ -31,15 +51,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     'vendor_id' => null
   ];
 
-  // Use the UserAccount class's register() method.
-  $new_admin = UserAccount::register($data);
-  if ($new_admin) {
-    Utils::setFlashMessage('success', "Admin account created successfully.");
-  } else {
-    Utils::setFlashMessage('error', "Error creating admin account.");
+  try {
+    // Use the UserAccount class's register() method.
+    $new_admin = UserAccount::register($data);
+    if ($new_admin) {
+      Utils::setFlashMessage('success', "Admin account created successfully.");
+      header("Location: admin.php");
+      exit;
+    } else {
+      Utils::setFlashMessage('error', "Error creating admin account.");
+      header("Location: create-admin.php");
+      exit;
+    }
+  } catch (PDOException $e) {
+    // Check for duplicate entry error code.
+    if ($e->getCode() == 23000) {
+      Utils::setFlashMessage('error', "Username or email already exists.");
+    } else {
+      Utils::setFlashMessage('error', "Error creating admin account: " . $e->getMessage());
+    }
+    header("Location: create-admin.php");
+    exit;
   }
-  header("Location: admin.php");
-  exit;
 }
 
 include_once HEADER_FILE;
@@ -54,6 +87,10 @@ include_once HEADER_FILE;
 <body>
   <main>
     <h2>Add New Admin</h2>
+    <?php if (!empty($_SESSION['register_error'])): ?>
+      <div class="register_error"><?= $_SESSION['register_error'] ?></div>
+      <?php unset($_SESSION['register_error']); ?>
+    <?php endif; ?>
 
     <?php Utils::displayFlashMessages(); ?>
 
@@ -81,6 +118,5 @@ include_once HEADER_FILE;
 </body>
 <?php
 unset($_SESSION['sticky']);
-include_once FOOTER_FILE; ?>
-
-</html>
+include_once FOOTER_FILE;
+?>

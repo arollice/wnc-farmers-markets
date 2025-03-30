@@ -4,9 +4,10 @@ include_once('../private/config.php');
 $currencies = Currency::fetchAllCurrencies();
 
 $sticky = $_SESSION['sticky'] ?? [];
+$regError = $_SESSION['register_error'] ?? '';
 
-
-Utils::displayFlashMessages();
+// Clear the error after retrieving it.
+unset($_SESSION['register_error']);
 
 include_once HEADER_FILE;
 ?>
@@ -14,6 +15,11 @@ include_once HEADER_FILE;
 <main>
   <h1>Vendor Registration</h1>
   <p>Register your business to be listed in the WNC Farmers Market.</p>
+
+  <!-- Display inline error message if one exists -->
+  <?php if (!empty($regError)): ?>
+    <div class="register_error"><?= $regError ?></div>
+  <?php endif; ?>
 
   <form action="<?= PUBLIC_PATH ?>/process-vendor-registration.php" method="POST">
     <label for="vendor_name">Business Name:</label>
@@ -23,7 +29,6 @@ include_once HEADER_FILE;
     <label for="vendor_username">Username:</label>
     <input type="text" id="vendor_username" name="vendor_username" required
       value="<?= htmlspecialchars($sticky['vendor_username'] ?? '') ?>">
-
 
     <label for="vendor_email">Email:</label>
     <input type="email" id="vendor_email" name="vendor_email" required
@@ -60,7 +65,6 @@ include_once HEADER_FILE;
           </option>
         <?php endforeach; ?>
       </select>
-
     </section>
     <p><small>Hold Control or Command key to select multiple markets</small></p>
 
