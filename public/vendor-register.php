@@ -14,6 +14,7 @@ include_once HEADER_FILE;
 
 <main>
   <h2>Vendor Registration</h2>
+
   <p>Register your business to be listed in the WNC Farmers Market.</p>
 
   <!-- Display inline error message if one exists -->

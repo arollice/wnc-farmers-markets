@@ -5,6 +5,7 @@ $vendors = Vendor::findAllWithFilters(['approved' => true]);
 
 include_once HEADER_FILE;
 ?>
+
 <section id="login">
   <a href="<?= PUBLIC_PATH ?>/vendor-register.php" class="btn">Become a Vendor</a>
   <p>Already a vendor? <a href="login.php">Login here</a>.</p>

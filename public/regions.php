@@ -7,6 +7,7 @@ $regions = Region::fetchAllRegions();
 
 include_once HEADER_FILE;
 ?>
+
 <!-- Hide map container if JavaScript is disabled -->
 <noscript>
   <style>
@@ -42,7 +43,6 @@ include_once HEADER_FILE;
     </ul>
   </noscript>
 </main>
-
 
 <?php
 include_once FOOTER_FILE;

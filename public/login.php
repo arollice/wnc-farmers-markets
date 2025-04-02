@@ -42,35 +42,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 include HEADER_FILE;
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
+<main>
+  <h2>Login</h2>
+  <?php
+  if (!empty($error)) {
+    echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
+  }
 
-<head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-</head>
+  Utils::displayFlashMessages();
+  ?>
+  <form method="POST">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required>
+    <br>
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required>
+    <br>
+    <button type="submit">Login</button>
+  </form>
+</main>
 
-<body>
-  <main>
-    <h2>Login</h2>
-    <?php
-    if (!empty($error)) {
-      echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
-    }
-
-    Utils::displayFlashMessages();
-    ?>
-    <form method="POST">
-      <label for="username">Username:</label>
-      <input type="text" id="username" name="username" required>
-      <br>
-      <label for="password">Password:</label>
-      <input type="password" id="password" name="password" required>
-      <br>
-      <button type="submit">Login</button>
-    </form>
-  </main>
-</body>
 <?php include FOOTER_FILE; ?>
-
-</html>

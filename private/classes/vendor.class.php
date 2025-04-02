@@ -1,5 +1,6 @@
 <?php
-include_once('../private/filterable.php'); // Include the Filterable trait
+include_once('../private/filterable.php');
+//include_once('../config.php');
 
 class Vendor extends DatabaseObject
 {
@@ -139,14 +140,6 @@ class Vendor extends DatabaseObject
     }
   }
 
-  public function associatePayments($accepted_payments)
-  {
-    if (!empty($accepted_payments)) {
-      return Currency::associateVendorPayments($this->{self::$primary_key}, $accepted_payments);
-    }
-    return true;
-  }
-
   public static function findMarketsByVendor($vendor_id)
   {
     // Use the standard database connection method
@@ -264,5 +257,24 @@ class Vendor extends DatabaseObject
     $pdo = DatabaseObject::get_database();
     $stmt = $pdo->prepare("DELETE FROM vendor_market WHERE vendor_id = ? AND market_id = ?");
     return $stmt->execute([$this->vendor_id, $market_id]);
+  }
+
+  public function associatePayments($accepted_payments)
+  {
+    // Check if any payment methods were provided
+    if (!empty($accepted_payments)) {
+      // Get the database connection
+      $pdo = DatabaseObject::get_database();
+
+      // Delete any existing vendor_currency entries for this vendor
+      $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
+      $stmt->execute([$this->vendor_id]);
+
+      // Now, associate the new payment methods using the Currency class method
+      return Currency::associateVendorPayments($this->vendor_id, $accepted_payments);
+    }
+    // If no payment methods were provided, you could choose to leave the existing ones
+    // or treat it as a successful update. Here, we'll simply return true.
+    return true;
   }
 }

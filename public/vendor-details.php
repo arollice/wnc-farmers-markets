@@ -29,107 +29,98 @@ $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
 include_once HEADER_FILE;
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="utf-8">
-  <title><?= htmlspecialchars($vendor['vendor_name']) ?> - Vendor Details</title>
-  <!-- Include additional CSS/JS if needed -->
-</head>
-
-<body>
-  <main>
-    <nav class="breadcrumb-trail" aria-label="Breadcrumb">
-      <ul>
-        <?php foreach ($breadcrumbTrail as $crumb): ?>
-          <li>
-            <a href="<?= htmlspecialchars($crumb) ?>">
-              <?= htmlspecialchars(Utils::displayName($crumb)) ?>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    </nav>
-
-    <h1><?= htmlspecialchars($vendor['vendor_name']) ?></h1>
-
-    <div id="vendor-details">
-      <?php if (!empty($vendor['vendor_logo'])): ?>
-        <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
-      <?php else: ?>
-        <p>No logo available for this vendor.</p>
-      <?php endif; ?>
-
-      <p><strong>Description:</strong>
-        <?= !empty($vendor['vendor_description']) ? htmlspecialchars($vendor['vendor_description']) : 'No description available.' ?>
-      </p>
-
-      <p><strong>Website:</strong>
-        <?php if (!empty($vendor['vendor_website'])): ?>
-          <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">
-            <?= htmlspecialchars($vendor['vendor_website']) ?>
+<main>
+  <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+    <ul>
+      <?php foreach ($breadcrumbTrail as $crumb): ?>
+        <li>
+          <a href="<?= htmlspecialchars($crumb) ?>">
+            <?= htmlspecialchars(Utils::displayName($crumb)) ?>
           </a>
-        <?php else: ?>
-          No website available.
-        <?php endif; ?>
-      </p>
-    </div>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </nav>
 
-    <!-- Display Items Sold -->
-    <h2>Items Sold</h2>
-    <?php if (!empty($items)): ?>
-      <ul>
-        <?php foreach ($items as $item): ?>
-          <li><?= htmlspecialchars($item['item_name']) ?></li>
-        <?php endforeach; ?>
-      </ul>
+  <h1><?= htmlspecialchars($vendor['vendor_name']) ?></h1>
+
+  <div id="vendor-details">
+    <?php if (!empty($vendor['vendor_logo'])): ?>
+      <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
     <?php else: ?>
-      <p>No items listed for this vendor.</p>
+      <p>No logo available for this vendor.</p>
     <?php endif; ?>
 
-    <!-- Display Accepted Payment Methods -->
-    <h2>Accepted Payment Methods</h2>
-    <?php if (!empty($payment_methods)): ?>
-      <ul>
-        <?php foreach ($payment_methods as $method): ?>
-          <li><?= htmlspecialchars($method) ?></li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>No payment methods listed for this vendor.</p>
-    <?php endif; ?>
+    <p><strong>Description:</strong>
+      <?= !empty($vendor['vendor_description']) ? htmlspecialchars($vendor['vendor_description']) : 'No description available.' ?>
+    </p>
 
-    <!-- Display Markets Attending by the Vendor -->
-    <h2>Markets Attending</h2>
-    <?php if (!empty($vendorMarkets)): ?>
-      <ul class="attending-vendors">
-        <?php foreach ($vendorMarkets as $market): ?>
-          <li>
-            <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
-              <?= htmlspecialchars($market['market_name']) ?>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>This vendor is not attending any markets.</p>
-    <?php endif; ?>
+    <p><strong>Website:</strong>
+      <?php if (!empty($vendor['vendor_website'])): ?>
+        <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">
+          <?= htmlspecialchars($vendor['vendor_website']) ?>
+        </a>
+      <?php else: ?>
+        No website available.
+      <?php endif; ?>
+    </p>
+  </div>
 
-    <?php
+  <!-- Display Items Sold -->
+  <h2>Items Sold</h2>
 
-    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
+  <?php if (!empty($items)): ?>
+    <ul>
+      <?php foreach ($items as $item): ?>
+        <li><?= htmlspecialchars($item['item_name']) ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <p>No items listed for this vendor.</p>
+  <?php endif; ?>
 
-    // Check if the breadcrumbs array exists and has at least 2 items.
-    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
-      // Get the second-to-last entry (the previous page)
-      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
-    }
-    ?>
-    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+  <!-- Display Accepted Payment Methods -->
+  <h2>Accepted Payment Methods</h2>
 
-  </main>
-  <?php include_once FOOTER_FILE; ?>
-</body>
+  <?php if (!empty($payment_methods)): ?>
+    <ul>
+      <?php foreach ($payment_methods as $method): ?>
+        <li><?= htmlspecialchars($method) ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <p>No payment methods listed for this vendor.</p>
+  <?php endif; ?>
 
-</html>
+  <!-- Display Markets Attending by the Vendor -->
+  <h2>Markets Attending</h2>
+
+  <?php if (!empty($vendorMarkets)): ?>
+    <ul class="attending-vendors">
+      <?php foreach ($vendorMarkets as $market): ?>
+        <li>
+          <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
+            <?= htmlspecialchars($market['market_name']) ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <p>This vendor is not attending any markets.</p>
+  <?php endif; ?>
+
+  <?php
+
+  $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
+
+  // Check if the breadcrumbs array exists and has at least 2 items.
+  if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
+    // Get the second-to-last entry (the previous page)
+    $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
+  }
+  ?>
+  <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+
+</main>
+
+<?php include_once FOOTER_FILE; ?>

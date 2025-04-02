@@ -77,45 +77,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include_once HEADER_FILE;
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <title>Create New Admin</title>
-</head>
+<main>
+  <h2>Add New Admin</h2>
+  <?php if (!empty($_SESSION['register_error'])): ?>
+    <div class="register_error"><?= $_SESSION['register_error'] ?></div>
+    <?php unset($_SESSION['register_error']); ?>
+  <?php endif; ?>
 
-<body>
-  <main>
-    <h2>Add New Admin</h2>
-    <?php if (!empty($_SESSION['register_error'])): ?>
-      <div class="register_error"><?= $_SESSION['register_error'] ?></div>
-      <?php unset($_SESSION['register_error']); ?>
-    <?php endif; ?>
+  <?php Utils::displayFlashMessages(); ?>
 
-    <?php Utils::displayFlashMessages(); ?>
+  <form action="create-admin.php" method="post">
+    <label for="admin_name">Username:</label>
+    <input type="text" id="admin_name" name="admin_name" required
+      value="<?= htmlspecialchars($sticky['admin_name'] ?? '') ?>">
 
-    <form action="create-admin.php" method="post">
-      <label for="admin_name">Username:</label>
-      <input type="text" id="admin_name" name="admin_name" required
-        value="<?= htmlspecialchars($sticky['admin_name'] ?? '') ?>">
+    <label for="admin_email">Email:</label>
+    <input type="email" id="admin_email" name="admin_email" required
+      value="<?= htmlspecialchars($sticky['admin_email'] ?? '') ?>">
 
-      <label for="admin_email">Email:</label>
-      <input type="email" id="admin_email" name="admin_email" required
-        value="<?= htmlspecialchars($sticky['admin_email'] ?? '') ?>">
+    <label for="admin_password">Password:</label>
+    <input type="password" id="admin_password" name="admin_password" required
+      minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
+      placeholder="At least 8 characters, including uppercase, lowercase & numbers">
 
-      <label for="admin_password">Password:</label>
-      <input type="password" id="admin_password" name="admin_password" required
-        minlength="8" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}"
-        placeholder="At least 8 characters, including uppercase, lowercase & numbers">
+    <label for="admin_password_confirm">Confirm Password:</label>
+    <input type="password" id="admin_password_confirm" name="admin_password_confirm" required minlength="8">
 
-      <label for="admin_password_confirm">Confirm Password:</label>
-      <input type="password" id="admin_password_confirm" name="admin_password_confirm" required minlength="8">
+    <button type="submit">Create Admin</button>
+  </form>
+  <p><a href="admin.php">Return to Dashboard</a></p>
+</main>
 
-      <button type="submit">Create Admin</button>
-    </form>
-    <p><a href="admin.php">Return to Dashboard</a></p>
-  </main>
-</body>
 <?php
 unset($_SESSION['sticky']);
 include_once FOOTER_FILE;

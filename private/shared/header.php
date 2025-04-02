@@ -25,13 +25,12 @@ if (!defined('PUBLIC_PATH')) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
-<?php
-// Use parse_url to get only the path portion of the URI.
-$currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-?>
-
-
 <body>
+  <?php
+  // Use parse_url to get only the path portion of the URI.
+  $currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+  ?>
+
   <header id="reusable-header">
     <a href="<?= PUBLIC_PATH ?>/index.php">
       <img src="<?= PUBLIC_PATH ?>/img/wnc-logo-color.webp" alt="WNC Farmers Markets Logo" width="200" height="150">

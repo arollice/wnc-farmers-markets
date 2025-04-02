@@ -63,4 +63,20 @@ class Utils
       echo "</div>";
     }
   }
+
+  /**
+   * Validates the file size of an uploaded file.
+   *
+   * @param array $file The $_FILES entry for the file.
+   * @param int $maxFileSize Maximum allowed file size in bytes.
+   * @return bool True if the file size is within the allowed limit, false otherwise.
+   */
+  public static function validateFileSize($file, $maxFileSize)
+  {
+    if (isset($file) && $file['error'] !== UPLOAD_ERR_NO_FILE) {
+      return $file['size'] <= $maxFileSize;
+    }
+    // If no file is uploaded, consider it valid.
+    return true;
+  }
 }

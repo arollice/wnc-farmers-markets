@@ -23,80 +23,70 @@ if (!$market) {
 
 include_once HEADER_FILE;
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <title>Market Details - <?= htmlspecialchars($market['market_name']) ?></title>
-</head>
+<main>
+  <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+    <ul>
+      <?php foreach ($breadcrumbTrail as $crumb): ?>
+        <li>
+          <a href="<?= htmlspecialchars($crumb) ?>">
+            <?= htmlspecialchars(Utils::displayName($crumb)) ?>
+          </a>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  </nav>
 
-<body>
-  <main>
-    <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+  <h1><?= htmlspecialchars($market['market_name']) ?> - Market Details</h1>
+
+  <div id="single-market-card">
+    <?= Market::renderMarketCard($market) ?>
+  </div>
+
+  <!-- Vendors Attending This Market -->
+  <h2>Attending Vendors</h2>
+
+  <?php if (!empty($vendors)) : ?>
+    <ul class="attending-vendors">
+      <?php foreach ($vendors as $vendor) : ?>
+        <li>
+          <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+            <?= htmlspecialchars($vendor['vendor_name']) ?>
+          </a>
+          <?php if (!empty($vendor['vendor_website'])) : ?>
+            - <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">Website</a>
+          <?php endif; ?>
+        </li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else : ?>
+    <p>No vendors are currently listed for this market.</p>
+  <?php endif; ?>
+
+  <!-- Display Market Policies at the Bottom -->
+  <?php if (!empty($policies)) : ?>
+    <section class="market-policies">
+      <h2>Market Policies</h2>
       <ul>
-        <?php foreach ($breadcrumbTrail as $crumb): ?>
-          <li>
-            <a href="<?= htmlspecialchars($crumb) ?>">
-              <?= htmlspecialchars(Utils::displayName($crumb)) ?>
-            </a>
-          </li>
+        <?php foreach ($policies as $policy) : ?>
+          <li><?= htmlspecialchars($policy['policy_description']) ?></li>
         <?php endforeach; ?>
       </ul>
-    </nav>
+    </section>
+  <?php endif; ?>
 
-    <h1><?= htmlspecialchars($market['market_name']) ?> - Market Details</h1>
+  <?php
 
-    <div id="single-market-card">
-      <?= Market::renderMarketCard($market) ?>
-    </div>
+  $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
 
-    <!-- Vendors Attending This Market -->
-    <h2>Attending Vendors</h2>
-    <?php if (!empty($vendors)) : ?>
-      <ul class="attending-vendors">
-        <?php foreach ($vendors as $vendor) : ?>
-          <li>
-            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
-              <?= htmlspecialchars($vendor['vendor_name']) ?>
-            </a>
-            <?php if (!empty($vendor['vendor_website'])) : ?>
-              - <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">Website</a>
-            <?php endif; ?>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else : ?>
-      <p>No vendors are currently listed for this market.</p>
-    <?php endif; ?>
+  // Check if the breadcrumbs array exists and has at least 2 items.
+  if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
+    // Get the second-to-last entry (the previous page)
+    $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
+  }
+  ?>
+  <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
 
-    <!-- Display Market Policies at the Bottom -->
-    <?php if (!empty($policies)) : ?>
-      <section class="market-policies">
-        <h2>Market Policies</h2>
-        <ul>
-          <?php foreach ($policies as $policy) : ?>
-            <li><?= htmlspecialchars($policy['policy_description']) ?></li>
-          <?php endforeach; ?>
-        </ul>
-      </section>
-    <?php endif; ?>
-
-    <?php
-
-    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
-
-    // Check if the breadcrumbs array exists and has at least 2 items.
-    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
-      // Get the second-to-last entry (the previous page)
-      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
-    }
-    ?>
-    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
-
-  </main>
-
-</body>
+</main>
 
 <?php include_once FOOTER_FILE; ?>
-
-</html>

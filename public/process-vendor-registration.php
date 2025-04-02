@@ -56,7 +56,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-
   // Register the vendor.
   $vendorData = [
     'vendor_name'        => $vendor_name,

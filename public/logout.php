@@ -20,8 +20,10 @@ $_SESSION['success_message'] = htmlspecialchars("$username, you are now logged o
 
 include HEADER_FILE;
 ?>
+
 <main class="logout-message">
   <p><?= $_SESSION['success_message'] ?></p>
   <p><a href="index.php">Return to Home</a></p>
 </main>
+
 <?php include FOOTER_FILE; ?>

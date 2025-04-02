@@ -50,7 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
       Utils::setFlashMessage('error', "Admin not found.");
     }
-    header("Location: admin.php");
+    header("Location: admin.php#admin-account-management");
+
     exit;
   }
 
@@ -92,104 +93,98 @@ $vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include_once HEADER_FILE;
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <title>Admin Panel</title>
-</head>
+<main>
+  <header class="dashboard-header">
+    <h2>Admin Dashboard</h2>
+    <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
+    <a href="logout.php">Logout</a>
+  </header>
+  <hr>
 
-<body>
-  <main>
-    <header class="dashboard-header">
-      <h2>Admin Dashboard</h2>
-      <p>Welcome, <?= htmlspecialchars($_SESSION['username'] ?? 'Admin'); ?>!</p>
-      <a href="logout.php">Logout</a>
-    </header>
-    <hr>
+  <?php Utils::displayFlashMessages(); ?>
 
-    <?php Utils::displayFlashMessages(); ?>
-
-    <section id="admin-account-management">
-      <h3>Admin Accounts Management</h3>
-      <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
-      <?php
-      $stmt = $pdo->prepare("SELECT * FROM user_account WHERE role = 'admin'");
-      $stmt->execute();
-      $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
-      if ($admins):
-      ?>
-        <table>
-          <thead>
-            <tr>
-              <th>Admin ID</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Edit</th>
-              <th>Delete</th>
-            </tr>
-          </thead>
-          <tbody>
-            <?php foreach ($admins as $admin): ?>
-              <?php if ($admin['user_id'] === $edit_admin_id): ?>
-                <!-- Editable Row -->
-                <form method="post">
-                  <tr>
-                    <td>
-                      <?= htmlspecialchars($admin['user_id']); ?>
-                      <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
-                    </td>
-                    <td>
-                      <input type="text" name="username" value="<?= htmlspecialchars($admin['username']); ?>">
-                    </td>
-                    <td>
-                      <input type="email" name="email" value="<?= htmlspecialchars($admin['email']); ?>">
-                    </td>
-                    <td>
-                      <input type="hidden" name="action" value="edit_admin">
-                      <button type="submit">Save</button>
-                    </td>
-                    <td>
-                      <!-- Cancel link reloads without the edit GET parameter -->
-                      <a href="admin.php">Cancel</a>
-                    </td>
-                  </tr>
-                </form>
-              <?php else: ?>
-                <!-- Read-Only Row -->
+  <section id="admin-account-management">
+    <h3>Admin Accounts Management</h3>
+    <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
+    <?php
+    $stmt = $pdo->prepare("SELECT * FROM user_account WHERE role = 'admin'");
+    $stmt->execute();
+    $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    if ($admins):
+    ?>
+      <table>
+        <thead>
+          <tr>
+            <th>Admin ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Edit</th>
+            <th>Delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($admins as $admin): ?>
+            <?php if ($admin['user_id'] === $edit_admin_id): ?>
+              <!-- Editable Row -->
+              <form method="post">
                 <tr>
-                  <td><?= htmlspecialchars($admin['user_id']); ?></td>
-                  <td><?= htmlspecialchars($admin['username']); ?></td>
-                  <td><?= htmlspecialchars($admin['email']); ?></td>
                   <td>
-                    <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
-                      <del>Edit</del>
-                    <?php else: ?>
-                      <a href="admin.php?edit=<?= htmlspecialchars($admin['user_id']); ?>">Edit</a>
-                    <?php endif; ?>
+                    <?= htmlspecialchars($admin['user_id']); ?>
+                    <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
                   </td>
                   <td>
-                    <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
-                      <button type="button" class="disabled-btn" disabled>Current Admin</button>
-                    <?php else: ?>
-                      <form method="post" onsubmit="return confirm('Are you sure you want to delete this admin?');" style="display:inline;">
-                        <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
-                        <input type="hidden" name="action" value="delete_admin">
-                        <button type="submit">Delete</button>
-                      </form>
-                    <?php endif; ?>
+                    <input type="text" name="username" value="<?= htmlspecialchars($admin['username']); ?>">
+                  </td>
+                  <td>
+                    <input type="email" name="email" value="<?= htmlspecialchars($admin['email']); ?>">
+                  </td>
+                  <td>
+                    <input type="hidden" name="action" value="edit_admin">
+                    <button type="submit">Save</button>
+                  </td>
+                  <td>
+                    <!-- Cancel link reloads without the edit GET parameter -->
+                    <a href="admin.php">Cancel</a>
                   </td>
                 </tr>
-              <?php endif; ?>
-            <?php endforeach; ?>
-          </tbody>
-        </table>
-      <?php else: ?>
-        <p>No admin accounts found.</p>
-      <?php endif; ?>
-    </section>
+              </form>
+            <?php else: ?>
+              <!-- Read-Only Row -->
+              <tr>
+                <td><?= htmlspecialchars($admin['user_id']); ?></td>
+                <td><?= htmlspecialchars($admin['username']); ?></td>
+                <td><?= htmlspecialchars($admin['email']); ?></td>
+                <td>
+                  <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
+                    <del>Edit</del>
+                  <?php else: ?>
+                    <a href="admin.php?edit=<?= htmlspecialchars($admin['user_id']); ?>">Edit</a>
+                  <?php endif; ?>
+                </td>
+                <td>
+                  <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
+                    <button type="button" class="disabled-btn" disabled>Current Admin</button>
+                  <?php else: ?>
+                    <form method="post" onsubmit="return confirm('Are you sure you want to delete this admin?');" style="display:inline;">
+                      <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
+                      <input type="hidden" name="action" value="delete_admin">
+                      <button type="submit">Delete</button>
+                    </form>
+                  <?php endif; ?>
+                </td>
+              </tr>
+            <?php endif; ?>
+          <?php endforeach; ?>
+        </tbody>
+      </table>
+    <?php else: ?>
+      <p>No admin accounts found.</p>
+    <?php endif; ?>
+  </section>
 
-    <!-- Vendors Table for CRUD and Approval -->
+  <!-- Vendors Table for CRUD and Approval -->
+  <section>
     <h3>Vendor Management</h3>
     <?php if ($vendors): ?>
       <table>
@@ -239,26 +234,25 @@ include_once HEADER_FILE;
     <?php else: ?>
       <p>No vendors found.</p>
     <?php endif; ?>
+  </section>
+  <hr>
 
-    <hr>
-    <!-- Public Vendors Listing (Only Approved Vendors) -->
-    <h3>Approved Vendors (Public Directory)</h3>
-    <?php
-    $stmt = $pdo->prepare("SELECT * FROM vendor WHERE status = 'approved'");
-    $stmt->execute();
-    $approved_vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    if ($approved_vendors):
-    ?>
-      <ul id="approved-vendors">
-        <?php foreach ($approved_vendors as $v): ?>
-          <li><?= htmlspecialchars($v['vendor_name']); ?> - <?= htmlspecialchars($v['vendor_description']); ?></li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>No approved vendors at this time.</p>
-    <?php endif; ?>
-  </main>
-</body>
+  <!-- Public Vendors Listing (Only Approved Vendors) -->
+  <h3>Approved Vendors (Public Directory)</h3>
+  <?php
+  $stmt = $pdo->prepare("SELECT * FROM vendor WHERE status = 'approved'");
+  $stmt->execute();
+  $approved_vendors = $stmt->fetchAll(PDO::FETCH_ASSOC);
+  if ($approved_vendors):
+  ?>
+    <ul id="approved-vendors">
+      <?php foreach ($approved_vendors as $v): ?>
+        <li><?= htmlspecialchars($v['vendor_name']); ?> - <?= htmlspecialchars($v['vendor_description']); ?></li>
+      <?php endforeach; ?>
+    </ul>
+  <?php else: ?>
+    <p>No approved vendors at this time.</p>
+  <?php endif; ?>
+</main>
+
 <?php include_once FOOTER_FILE; ?>
-
-</html>

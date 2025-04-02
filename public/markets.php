@@ -11,22 +11,14 @@ $policies = Market::fetchMarketPolicies();
 
 include_once HEADER_FILE;
 ?>
-<!DOCTYPE html>
-<html lang="en">
 
-<head>
-  <title>All Markets</title>
-</head>
+<main class="no-js">
+  <h1>Market Directory</h1>
+  <div id="markets">
+    <?php foreach ($markets as $market): ?>
+      <?= Market::renderCollapsibleMarketCard($market, $policies) ?>
+    <?php endforeach; ?>
+  </div>
+</main>
 
-<body>
-  <main class="no-js">
-    <h1>Market Directory</h1>
-    <div id="markets">
-      <?php foreach ($markets as $market): ?>
-        <?= Market::renderCollapsibleMarketCard($market, $policies) ?>
-      <?php endforeach; ?>
-    </div>
-  </main>
-</body>
-
-</html>
+<?php include_once FOOTER_FILE; ?>
