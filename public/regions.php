@@ -20,7 +20,7 @@ include_once HEADER_FILE;
 <!-- Map container (JavaScript-based) -->
 <main>
   <div id="region-page-info">
-    <h1>Find a Market by Region</h1>
+    <h2>Find a Market by Region</h2>
     <p>Select a region below to explore related markets.</p>
   </div>
 

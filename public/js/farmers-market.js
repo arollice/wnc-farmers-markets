@@ -1,18 +1,20 @@
-'use strict'
+'use strict';
 
-// Market Cards
-document.addEventListener("DOMContentLoaded", function() {
-  // Add the 'collapsed' class to all collapsible content elements
-  document.querySelectorAll('.collapsible-content').forEach(el => {
-    el.classList.add('collapsed');
-  });
-
+document.addEventListener('DOMContentLoaded', function() {
+  // Remove 'no-js' and add 'js-enabled' to enable JS-specific CSS rules.
+  const mainElement = document.querySelector('main.no-js');
+  if (mainElement) {
+    mainElement.classList.remove('no-js');
+    mainElement.classList.add('js-enabled');
+  }
+  
+  // Set up accordion functionality
   const cards = document.querySelectorAll('.collapsible-card');
   
   cards.forEach(card => {
     const header = card.querySelector('.collapsible-header');
     header.addEventListener('click', function() {
-      // Close any other open cards
+      // Optionally close other cards if you want only one expanded at a time.
       cards.forEach(c => {
         if (c !== card) {
           c.classList.remove('expanded');
@@ -23,7 +25,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
       });
       
-      // Toggle the current card's collapsible content
+      // Toggle this card's collapsible content
       const content = card.querySelector('.collapsible-content');
       if (content) {
         content.classList.toggle('open');
@@ -36,5 +38,3 @@ document.addEventListener("DOMContentLoaded", function() {
     });
   });
 });
-
-

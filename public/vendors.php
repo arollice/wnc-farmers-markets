@@ -3,6 +3,11 @@ include_once('../private/config.php');
 
 $vendors = Vendor::findAllWithFilters(['approved' => true]);
 
+// Sort vendors alphabetically by vendor name
+usort($vendors, function ($a, $b) {
+  return strcasecmp($a['vendor_name'], $b['vendor_name']);
+});
+
 include_once HEADER_FILE;
 ?>
 

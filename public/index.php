@@ -13,27 +13,33 @@ include_once HEADER_FILE;
 ?>
 
 <main>
-  <h1>WNC Farmers Markets Collective</h1>
+  <h2>WNC Farmers Markets Collective</h2>
+
   <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we're here to support and celebrate the vibrant local food scene.</p>
 </main>
 
 <aside id="featured-vendors">
-  <?php foreach ($featured_vendors as $vendor): ?>
-    <div class="vendor-card" data-vendor-id="<?= htmlspecialchars($vendor['vendor_id']); ?>">
-      <img src="<?= htmlspecialchars($vendor['vendor_logo'] ?: 'img/default_vendor.jpg'); ?>" width="301" height="250" alt="<?= htmlspecialchars($vendor['vendor_name']); ?>">
-      <div class="vendor-overlay">
-        <h2><?= htmlspecialchars($vendor['vendor_name']); ?></h2>
-        <p><?= htmlspecialchars($vendor['vendor_description']); ?></p>
-        <a class="view-more" href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']); ?>">View More</a>
+  <h2>Featured Vendors</h2>
+  <div class="vendor-card-list">
+    <?php foreach ($featured_vendors as $vendor): ?>
+      <div class="vendor-card" data-vendor-id="<?= htmlspecialchars($vendor['vendor_id']); ?>">
+        <img src="<?= htmlspecialchars($vendor['vendor_logo'] ?: 'img/default_vendor.jpg'); ?>" width="301" height="250" alt="<?= htmlspecialchars($vendor['vendor_name']); ?>">
+        <div class="vendor-overlay">
+          <h2><?= htmlspecialchars($vendor['vendor_name']); ?></h2>
+          <p><?= htmlspecialchars($vendor['vendor_description']); ?></p>
+          <a class="view-more" href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']); ?>">View More</a>
+        </div>
       </div>
-    </div>
-  <?php endforeach; ?>
+  </div>
+<?php endforeach; ?>
 </aside>
 
-<section id="seasonal-harvest">
+<section>
   <h2>Seasonal Harvest Highlights</h2>
+
   <p>Bringing the freshest and most flavorful produce to farmers markets highlights the unique bounty of each time of year. From vibrant spring greens and summer berries to autumn pumpkins and winter root vegetables, these offerings connect communities with the rhythm of local agriculture. They not only celebrate the diversity of regional crops but also provide an opportunity to explore new ingredients and support sustainable farming practices. Seasonal harvests are a key draw for farmers markets, offering visitors a chance to savor produce at its peak while deepening their appreciation for the cycle of the seasons.</p>
 </section>
+
 <section id="search">
   <section>
     <h2>Looking for something specific? See who sells what you're looking for!</h2>
@@ -105,10 +111,10 @@ include_once HEADER_FILE;
       <?php endif; ?>
     </div>
   </section>
-  <aside>
+  <div>
     <p>Supporting Local, one market at a time.</p>
     <img src="img/smiley.svg" width="50" height="50" alt="A retro smiley face.">
-  </aside>
+  </div>
 </section>
 
 <?php include_once FOOTER_FILE; ?>

@@ -179,12 +179,17 @@ class Vendor extends DatabaseObject
     }
     $this->vendor_description = !empty($post['vendor_description']) ? trim($post['vendor_description']) : $this->vendor_description;
 
-    // Process accepted payments.
-    $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
-    $stmt->execute([$vendor_id]);
-    if (isset($post['accepted_payments']) && is_array($post['accepted_payments'])) {
-      $accepted_payments = $post['accepted_payments'];
-      Currency::associateVendorPayments($vendor_id, $accepted_payments);
+    //Process accepted or current accepted payments.
+    if (isset($post['accepted_payments'])) {
+      // Delete existing vendor payment associations.
+      $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
+      $stmt->execute([$vendor_id]);
+
+      // Re-associate payment methods if accepted_payments is an array.
+      if (is_array($post['accepted_payments'])) {
+        $accepted_payments = $post['accepted_payments'];
+        Currency::associateVendorPayments($vendor_id, $accepted_payments);
+      }
     }
 
     // Process logo deletion and file upload.

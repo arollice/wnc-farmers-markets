@@ -42,7 +42,7 @@ include_once HEADER_FILE;
     </ul>
   </nav>
 
-  <h1><?= htmlspecialchars($vendor['vendor_name']) ?></h1>
+  <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
 
   <div id="vendor-details">
     <?php if (!empty($vendor['vendor_logo'])): ?>
