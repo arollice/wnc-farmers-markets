@@ -5,6 +5,7 @@
   --background-color: #faf8ef;
   --focus-color: rgba(59, 180, 84, 0.5);
   --green: #3bb454;
+  --dark-green: #277d35;
   --white: #fff;
   --border-color: #ddd;
   --font-family: 'Inter', sans-serif;
@@ -53,8 +54,7 @@ form,
 }
 
 h2,
-h3,
-h4 {
+h3 {
   font-weight: 700;
 }
 
@@ -74,7 +74,25 @@ input[type='text']:focus {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin-bottom: 2rem;
   padding: 0 1rem 1.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+#reusable-header::before {
+  content: '';
+  background-image: url('../img/sean-nufer-farmers-market.webp');
+  background-size: cover;
+  background-position: center; /* Centers the image */
+  background-repeat: no-repeat;
+  height: 100%;
+  left: 0;
+  opacity: 0.3;
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: -1;
 }
 
 #reusable-header img {
@@ -96,6 +114,10 @@ a {
   color: var(--text-color);
 }
 
+#map > div.leaflet-pane.leaflet-map-pane > div.leaflet-pane.leaflet-popup-pane > div > a {
+  color: var(--text-color);
+}
+
 header > h1 {
   margin: 2rem 0;
 }
@@ -104,6 +126,7 @@ footer {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  margin: 1rem auto 0;
   padding: 2rem 0.5rem;
 }
 
@@ -210,7 +233,7 @@ nav a.active::after {
 }
 
 .breadcrumb-trail a {
-  color: var(--green);
+  color: var(--dark-green);
   position: static;
   text-decoration: none;
 }
@@ -397,7 +420,7 @@ aside div {
 
 /* Style for the "View More" link */
 .vendor-overlay .view-more {
-  background-color: var(--green);
+  background-color: var(--dark-green);
   border-radius: 4px;
   color: var(--white);
   display: inline-block;
@@ -411,18 +434,23 @@ aside div {
   background-color: var(--green);
 }
 
+/***** Regions page *****/
+#map-container {
+  max-width: 1175px; /* Adjust to your desired maximum width */
+  margin: 0.5rem auto 0; /* Centers the container */
+  width: 100%;
+}
+
 /**** Market Page *****/
 #markets {
-  align-items: center;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   gap: 1rem;
   max-width: 600px;
   margin: 0 auto;
-}
-
-.no-js > h1 {
-  align-self: center;
+  padding: 1rem 0;
 }
 
 .market-card {
@@ -433,7 +461,7 @@ aside div {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  margin: 0 auto; /* Centers each card */
+  margin: 0 auto;
   padding: 0;
 }
 
@@ -452,69 +480,6 @@ aside div {
 .market-card p {
   margin: 0.15em 0;
   padding: 0.15rem 0.5rem;
-}
-
-.collapsible-card {
-  background-color: transparent; /* Transparent initially */
-  border-radius: 8px;
-  margin: 1rem 0;
-  overflow: hidden;
-  transition: background-color 0.3s ease;
-}
-
-.collapsible-header {
-  background-color: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: 8px 8px 0 0;
-  cursor: pointer;
-  height: 60px;
-  line-height: 60px;
-  overflow: hidden;
-  padding: 0 1rem;
-  transition: background-color 0.3s ease;
-}
-
-.no-js .collapsible-header {
-  background-color: #fcc66f;
-}
-
-.collapsible-content {
-  background-color: #3bb4547d;
-  border: 1px solid var(--border-color);
-  max-height: none;
-  opacity: 1;
-  overflow: hidden;
-  padding: 1rem;
-  transition: max-height 0.5s ease-out, opacity 0.5s ease-out, padding 0.5s ease-out;
-}
-
-.collapsible-content.collapsed {
-  border-top: none;
-  margin-top: 3px;
-  max-height: 0;
-  opacity: 0;
-  padding: 0 1rem;
-}
-
-.collapsible-content.collapsed.open {
-  max-height: 400px;
-  opacity: 1;
-  padding: 1rem;
-}
-
-.collapsible-card.expanded {
-  background-color: var(--white);
-  border-radius: 8px;
-}
-
-.collapsible-card:not(.expanded) .collapsible-header {
-  background-color: transparent;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.collapsible-card.expanded .collapsible-header {
-  background-color: #fcc66f;
-  box-shadow: none;
 }
 
 .market-policies {
@@ -596,55 +561,52 @@ aside div {
 }
 
 /**** About Page *****/
-#intro {
-  margin-bottom: 2.5rem;
+#intro,
+#wnc-farming-traditions {
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 1rem;
+  padding: 1rem;
 }
 
 #intro h2 {
-  border-bottom: 1px solid var(--border-color);
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
+  font-size: 2rem;
 }
 
-#wnc-farming-traditions {
-  margin-bottom: 2.5rem;
-}
-
-#wnc-farming-traditions h2 {
-  color: var(--text-color);
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
+#intro h3,
+#wnc-farming-traditions h3 {
+  font-size: 1.5rem;
+  margin: 0.75rem 1rem 0;
+  padding: 0.75rem 1rem 0.5rem;
 }
 
 #why-markets-matter {
   margin-bottom: 2.5rem;
 }
 
-#why-markets-matter h2 {
-  color: var(--text-color);
-  font-size: 1.75rem;
-  margin-bottom: 1rem;
+#why-markets-matter h3:first-of-type {
+  font-size: 1.5rem;
 }
 
 #why-markets-matter h3 {
-  border-top: 1px solid var(--border-color);
   color: #444;
   margin: 0.75rem 1rem 0;
   padding: 0.75rem 1rem 0;
+}
+
+#intro p:last-of-type,
+#wnc-farming-traditions p:last-of-type {
+  padding-bottom: 1.5rem;
 }
 
 #intro p,
 #wnc-farming-traditions p,
 #why-markets-matter p {
   line-height: 1.6;
-  margin-bottom: 1rem;
+  margin-bottom: 0.25rem;
 }
 
-#intro a,
-#wnc-farming-traditions a,
 #why-markets-matter a {
-  color: var(--green);
+  color: var(--dark-green);
   text-decoration: none;
 }
 
@@ -702,7 +664,7 @@ form input[type='checkbox'] {
 
 form button,
 form input[type='submit'] {
-  background-color: var(--green);
+  background-color: var(--dark-green);
   border: none;
   border-radius: 4px;
   color: var(--white);
@@ -761,7 +723,7 @@ td {
 }
 
 .logout-message a {
-  color: var(--green);
+  color: var(--dark-green);
   font-weight: bold;
   text-decoration: none;
 }

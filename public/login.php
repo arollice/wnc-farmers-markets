@@ -48,9 +48,8 @@ include HEADER_FILE;
   if (!empty($error)) {
     echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
   }
-
-  Utils::displayFlashMessages();
   ?>
+
   <form method="POST">
     <label for="username">Username:</label>
     <input type="text" id="username" name="username" required>

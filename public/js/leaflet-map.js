@@ -13,20 +13,33 @@ document.addEventListener("DOMContentLoaded", function () {
   fetch("fetch-regions.php")
       .then((response) => response.json())
       .then((data) => {
-          data.forEach((region) => {
-              let marker = L.marker([region.latitude, region.longitude])
-                  .addTo(map)
-                  .bindTooltip(region.region_name, { permanent: false, direction: 'top' });
-
-              marker.on('click', function () {
-                  if (region.market_id) {
-                      console.log("Redirecting to market:", region.market_id);
-                      window.location.href = `market-details.php?id=${region.market_id}`;
-                  } else {
-                      alert("No market found for this region.");
-                  }
-              });
+        data.forEach((region) => {
+          let marker = L.marker([region.latitude, region.longitude])
+            .addTo(map)
+            .bindTooltip(region.region_name, { 
+              permanent: false, 
+              direction: 'top'
+            });
+        
+          marker.on('tooltipopen', function(e) {
+            // Set tooltip text color to black
+            e.tooltip._container.style.color = '#333';
+            // Also set the close button's color if it exists
+            var closeBtn = e.tooltip._container.querySelector('.leaflet-popup-close-button');
+            if (closeBtn) {
+              closeBtn.style.color = '#333';
+            }
           });
+        
+          marker.on('click', function () {
+            if (region.market_id) {
+              console.log("Redirecting to market:", region.market_id);
+              window.location.href = `market-details.php?id=${region.market_id}`;
+            } else {
+              alert("No market found for this region.");
+            }
+          });
+        });
       })
       .catch((error) => console.error("Error loading regions:", error));
 

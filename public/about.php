@@ -5,9 +5,8 @@ include_once HEADER_FILE;
 ?>
 
 <main>
-  <h2>About Us</h2>
-
   <section id="intro">
+    <h2>About Us</h2>
     <h3>Connecting Communities with Local Farmers & Artisans</h3>
     <p>
       WNC Farmers Markets is your guide to fresh, local, and sustainable shopping. Our mission is to connect communities
@@ -59,7 +58,7 @@ include_once HEADER_FILE;
       (This source discusses the economic benefits of local food systems and includes multipliers related to farmers market spending.)
     </p>
 
-    <h4>Local Retention Rates</h4>
+    <h3>Local Retention Rates</h3>
     <p>
       Studies report that for every <strong>$100 spent at a local farmers market</strong>, approximately <strong>62% stays in the local economy</strong>,
       compared to only <strong>25% at chain retailers</strong>.
@@ -70,7 +69,7 @@ include_once HEADER_FILE;
       (While the USDA ERS reports offer comprehensive data on market dynamics, check the latest reports for the most current figures.)
     </p>
 
-    <h4>Supporting Small Farms & Businesses</h4>
+    <h3>Supporting Small Farms & Businesses</h3>
     <p>
       Farmers markets allow small-scale farmers and artisans to sell directly to consumers, eliminating intermediaries and
       allowing them to capture a higher share of the final sale price. This <strong>direct-to-consumer model</strong> is well
@@ -82,7 +81,7 @@ include_once HEADER_FILE;
       (See the section discussing the benefits for small producers.)
     </p>
 
-    <h4>Vendor Demographics</h4>
+    <h3>Vendor Demographics</h3>
     <p>
       Data from the <strong>National Farmers Market Directory</strong> and surveys of farmers market vendors have consistently
       shown that a significant majority—often <strong>over 85%</strong>—of vendors at farmers markets are small business
