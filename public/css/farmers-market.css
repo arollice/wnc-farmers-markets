@@ -805,6 +805,11 @@ td {
   justify-content: space-between;
 }
 
+.register_error > li {
+  color: #ff0000;
+  list-style-type: none;
+}
+
 @media (max-width: 800px) {
   #featured-vendors {
     align-items: center;
@@ -865,6 +870,21 @@ td {
     padding: 0.5rem 1rem;
   }
 
+  #reusable-header::before {
+    content: '';
+    background-image: url('../img/sean-nufer-farmers-market-mobile.webp');
+    background-size: cover;
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat;
+    height: 100%;
+    left: 0;
+    opacity: 0.3;
+    position: absolute;
+    top: 0;
+    width: 100%;
+    z-index: -1;
+  }
+
   #reusable-header > h1 {
     display: none;
   }
@@ -922,9 +942,4 @@ td {
     padding: 0.25rem;
     text-decoration: none;
   }
-}
-
-.register_error > li {
-  color: #ff0000;
-  list-style-type: none;
 }
