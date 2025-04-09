@@ -1,126 +1,142 @@
-<?php
-require_once('../private/config.php');
+<!DOCTYPE html>
+<html lang="en">
 
-$breadcrumbs = isset($_SESSION['breadcrumbs']) ? $_SESSION['breadcrumbs'] : [];
+<head>
+  <meta charset="utf-8">
+  <title>WNC Farmers Market - Vendor Details</title>
+  <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
+</head>
 
-$breadcrumbTrail = array_slice($breadcrumbs, -2);
+<body>
+  <?php
+  require_once('../private/config.php');
 
-// Check if vendor ID is provided
-if (!isset($_GET['id'])) {
-  die("Vendor ID not provided.");
-}
+  $breadcrumbs = isset($_SESSION['breadcrumbs']) ? $_SESSION['breadcrumbs'] : [];
 
-$_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
+  $breadcrumbTrail = array_slice($breadcrumbs, -2);
 
-$vendor_id = intval($_GET['id']);
-$market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null;
+  // Check if vendor ID is provided
+  if (!isset($_GET['id'])) {
+    die("Vendor ID not provided.");
+  }
 
-$vendor = Vendor::findVendorById($vendor_id);
-$items = Item::findItemsByVendor($vendor_id);
-$payment_methods = Currency::findPaymentMethodsByVendor($vendor_id);
+  $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
 
-if (!$vendor) {
-  die("Vendor not found.");
-}
+  $vendor_id = intval($_GET['id']);
+  $market_id = isset($_GET['market_id']) ? intval($_GET['market_id']) : null;
 
-// Use the vendor object if available, otherwise use the static function
-$vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+  $vendor = Vendor::findVendorById($vendor_id);
+  $items = Item::findItemsByVendor($vendor_id);
+  $payment_methods = Currency::findPaymentMethodsByVendor($vendor_id);
 
-include_once HEADER_FILE;
-?>
+  if (!$vendor) {
+    die("Vendor not found.");
+  }
 
-<main>
-  <nav class="breadcrumb-trail" aria-label="Breadcrumb">
-    <ul>
-      <?php foreach ($breadcrumbTrail as $crumb): ?>
-        <li>
-          <a href="<?= htmlspecialchars($crumb) ?>">
-            <?= htmlspecialchars(Utils::displayName($crumb)) ?>
+  // Use the vendor object if available, otherwise use the static function
+  $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
+
+  include_once HEADER_FILE;
+  ?>
+
+  <main>
+    <nav class="breadcrumb-trail" aria-label="Breadcrumb">
+      <ul>
+        <?php foreach ($breadcrumbTrail as $crumb): ?>
+          <li>
+            <a href="<?= htmlspecialchars($crumb) ?>">
+              <?= htmlspecialchars(Utils::displayName($crumb)) ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    </nav>
+
+    <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
+
+    <div id="vendor-details">
+      <?php if (!empty($vendor['vendor_logo'])): ?>
+        <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
+      <?php else: ?>
+        <p>No logo available for this vendor.</p>
+      <?php endif; ?>
+
+      <p><strong>Description:</strong>
+        <?= !empty($vendor['vendor_description']) ? htmlspecialchars($vendor['vendor_description']) : 'No description available.' ?>
+      </p>
+
+      <p><strong>Website:</strong>
+        <?php if (!empty($vendor['vendor_website'])): ?>
+          <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">
+            <?= htmlspecialchars($vendor['vendor_website']) ?>
           </a>
-        </li>
-      <?php endforeach; ?>
-    </ul>
-  </nav>
+        <?php else: ?>
+          No website available.
+        <?php endif; ?>
+      </p>
+    </div>
 
-  <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
+    <!-- Display Items Sold -->
+    <h2>Items Sold</h2>
 
-  <div id="vendor-details">
-    <?php if (!empty($vendor['vendor_logo'])): ?>
-      <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
+    <?php if (!empty($items)): ?>
+      <ul>
+        <?php foreach ($items as $item): ?>
+          <li><?= htmlspecialchars($item['item_name']) ?></li>
+        <?php endforeach; ?>
+      </ul>
     <?php else: ?>
-      <p>No logo available for this vendor.</p>
+      <p>No items listed for this vendor.</p>
     <?php endif; ?>
 
-    <p><strong>Description:</strong>
-      <?= !empty($vendor['vendor_description']) ? htmlspecialchars($vendor['vendor_description']) : 'No description available.' ?>
-    </p>
+    <!-- Display Accepted Payment Methods -->
+    <h2>Accepted Payment Methods</h2>
 
-    <p><strong>Website:</strong>
-      <?php if (!empty($vendor['vendor_website'])): ?>
-        <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">
-          <?= htmlspecialchars($vendor['vendor_website']) ?>
-        </a>
-      <?php else: ?>
-        No website available.
-      <?php endif; ?>
-    </p>
-  </div>
+    <?php if (!empty($payment_methods)): ?>
+      <ul>
+        <?php foreach ($payment_methods as $method): ?>
+          <li><?= htmlspecialchars($method) ?></li>
+        <?php endforeach; ?>
+      </ul>
+    <?php else: ?>
+      <p>No payment methods listed for this vendor.</p>
+    <?php endif; ?>
 
-  <!-- Display Items Sold -->
-  <h2>Items Sold</h2>
+    <!-- Display Markets Attending by the Vendor -->
+    <h2>Markets Attending</h2>
 
-  <?php if (!empty($items)): ?>
-    <ul>
-      <?php foreach ($items as $item): ?>
-        <li><?= htmlspecialchars($item['item_name']) ?></li>
-      <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>No items listed for this vendor.</p>
-  <?php endif; ?>
+    <?php if (!empty($vendorMarkets)): ?>
+      <ul class="attending-vendors">
+        <?php foreach ($vendorMarkets as $market): ?>
+          <li>
+            <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
+              <?= htmlspecialchars($market['market_name']) ?>
+            </a>
+          </li>
+        <?php endforeach; ?>
+      </ul>
+    <?php else: ?>
+      <p>This vendor is not attending any markets.</p>
+    <?php endif; ?>
 
-  <!-- Display Accepted Payment Methods -->
-  <h2>Accepted Payment Methods</h2>
+    <?php
 
-  <?php if (!empty($payment_methods)): ?>
-    <ul>
-      <?php foreach ($payment_methods as $method): ?>
-        <li><?= htmlspecialchars($method) ?></li>
-      <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>No payment methods listed for this vendor.</p>
-  <?php endif; ?>
+    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
 
-  <!-- Display Markets Attending by the Vendor -->
-  <h2>Markets Attending</h2>
+    // Check if the breadcrumbs array exists and has at least 2 items.
+    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
+      // Get the second-to-last entry (the previous page)
+      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
+    }
+    ?>
+    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
 
-  <?php if (!empty($vendorMarkets)): ?>
-    <ul class="attending-vendors">
-      <?php foreach ($vendorMarkets as $market): ?>
-        <li>
-          <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
-            <?= htmlspecialchars($market['market_name']) ?>
-          </a>
-        </li>
-      <?php endforeach; ?>
-    </ul>
-  <?php else: ?>
-    <p>This vendor is not attending any markets.</p>
-  <?php endif; ?>
+  </main>
 
-  <?php
+  <?php include_once FOOTER_FILE; ?>
+</body>
 
-  $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
-
-  // Check if the breadcrumbs array exists and has at least 2 items.
-  if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
-    // Get the second-to-last entry (the previous page)
-    $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
-  }
-  ?>
-  <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
-
-</main>
-
-<?php include_once FOOTER_FILE; ?>
+</html>

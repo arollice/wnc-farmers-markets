@@ -3,10 +3,12 @@
 define('PRIVATE_PATH', __DIR__);
 define('PROJECT_ROOT', dirname(PRIVATE_PATH));
 
-// Set a web-friendly public path (relative to localhost)
+// This is the web-friendly path (for URLs)
+// If your public folder is at /web289/public on your server, this is correct:
 define('PUBLIC_PATH', '/web289/public');
 
-define('SHARED_PATH', PRIVATE_PATH . '/shared');
+// For file includes, build the path starting at the project root:
+define('SHARED_PATH', PROJECT_ROOT . '/public/shared');
 define('HEADER_FILE', SHARED_PATH . '/header.php');
 define('FOOTER_FILE', SHARED_PATH . '/footer.php');
 define('UPLOADS_PATH', PROJECT_ROOT . '/public/uploads');

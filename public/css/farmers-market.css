@@ -325,21 +325,31 @@ aside div {
   padding: 0;
 }
 
+#search > section > h2 + p {
+  font-style: italic;
+  font-weight: 500;
+}
+
+#search > section > h2 + p + form {
+  margin: 0;
+}
+
 #search > div {
-  align-items: center;
+  align-items: flex-start;
   display: flex;
   flex: 1;
   flex-direction: column;
   font: 30px 'Bagel Fat One', system-ui;
-  justify-content: center;
+  justify-content: start;
   letter-spacing: 0.05rem;
-  margin: 0 1rem;
+  margin-right: 2rem;
   padding-right: 2rem;
 }
 
-#search > div > p {
-  margin: -1.5rem 1rem 1rem;
-  padding: -1.5rem 0.5rem 0.5rem;
+#search #results + div > p {
+  align-self: start;
+  margin: 0;
+  padding: 0;
 }
 
 .attending-vendors {
@@ -436,9 +446,18 @@ aside div {
 
 /***** Regions page *****/
 #map-container {
-  max-width: 1175px; /* Adjust to your desired maximum width */
-  margin: 0.5rem auto 0; /* Centers the container */
+  max-width: 1200px;
+  margin: 0.5rem auto;
   width: 100%;
+}
+
+#map {
+  height: 600px;
+}
+
+#map-container .no-js,
+#map .no-js {
+  display: none;
 }
 
 /**** Market Page *****/
@@ -484,7 +503,38 @@ aside div {
 
 .market-policies {
   border-top: 1px solid var(--border-color);
-  padding: 0.25rem;
+  padding: 0.25em;
+}
+
+.collapsible-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease-in-out;
+}
+
+.toggle-collapsible:checked + .collapsible-header + .collapsible-content {
+  max-height: 500px;
+}
+
+.collapsible-card {
+  background-color: transparent;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  margin-bottom: 1em;
+  padding: 1rem;
+  transition: background-color 0.5s ease-in-out;
+}
+
+.collapsible-card.expanded {
+  background-color: #f0f8ff;
+}
+
+div.collapsible-card > label > span {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: bold;
+  margin: 0;
 }
 
 /**** Login *****/

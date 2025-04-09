@@ -1,6 +1,14 @@
 'use strict';
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Remove the "no-js" class from the map container, if present
+  var mapContainer = document.getElementById('map-container');
+  var map = document.getElementById('map');
+  if (mapContainer) {
+    mapContainer.classList.remove('no-js');
+    map.classList.remove('no-js');
+  }
+
   var map = L.map("map").setView([35.5951, -82.5515], 10); // Keep initial view on all markets
 
   // Add OpenStreetMap tiles
@@ -8,7 +16,6 @@ document.addEventListener("DOMContentLoaded", function () {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>',
   }).addTo(map);
 
-  
   // Fetch regions and their associated market data
   fetch("fetch-regions.php")
       .then((response) => response.json())

@@ -1,29 +1,45 @@
-<?php
-include_once('../private/config.php');
+<!DOCTYPE html>
+<html lang="en">
 
-$username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
+<head>
+  <meta charset="utf-8">
+  <title>WNC Farmers Market - Logout</title>
+  <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/farmers-market.js" defer></script>
+</head>
 
-// Unset all session variables.
-$_SESSION = array();
+<body>
+  <?php
+  include_once('../private/config.php');
 
-// Delete the session cookie if sessions use cookies.
-if (ini_get("session.use_cookies")) {
-  $params = session_get_cookie_params();
-  setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
-}
+  $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
 
-session_destroy();
+  // Unset all session variables.
+  $_SESSION = array();
 
-// Start a new session for the flash message.
-session_start();
-$_SESSION['success_message'] = htmlspecialchars("$username, you are now logged out.");
+  // Delete the session cookie if sessions use cookies.
+  if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000, $params["path"], $params["domain"], $params["secure"], $params["httponly"]);
+  }
 
-include HEADER_FILE;
-?>
+  session_destroy();
 
-<main class="logout-message">
-  <p><?= $_SESSION['success_message'] ?></p>
-  <p><a href="index.php">Return to Home</a></p>
-</main>
+  // Start a new session for the flash message.
+  session_start();
+  $_SESSION['success_message'] = htmlspecialchars("$username, you are now logged out.");
 
-<?php include FOOTER_FILE; ?>
+  include HEADER_FILE;
+  ?>
+
+  <main class="logout-message">
+    <p><?= $_SESSION['success_message'] ?></p>
+    <p><a href="index.php">Return to Home</a></p>
+  </main>
+
+  <?php include FOOTER_FILE; ?>
+</body>
+
+</html>

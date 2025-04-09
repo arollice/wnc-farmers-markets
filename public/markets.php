@@ -1,24 +1,40 @@
-<?php
-require_once('../private/config.php');
-$markets = Market::fetchAllMarkets();
+<!DOCTYPE html>
+<html lang="en">
 
-if (!$markets) {
-  die("No markets found.");
-}
+<head>
+  <meta charset="utf-8">
+  <title>WNC Farmers Market - Markets</title>
+  <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="js/farmers-market.js" defer></script>
+</head>
 
-// Fetch policies once
-$policies = Market::fetchMarketPolicies();
+<body>
+  <?php
+  require_once('../private/config.php');
+  $markets = Market::fetchAllMarkets();
 
-include_once HEADER_FILE;
-?>
+  if (!$markets) {
+    die("No markets found.");
+  }
 
-<main id="markets">
-  <h1>Market Directory</h1>
-  <div>
-    <?php foreach ($markets as $market): ?>
-      <?= Market::renderCollapsibleMarketCard($market, $policies) ?>
-    <?php endforeach; ?>
-  </div>
-</main>
+  // Fetch policies once
+  $policies = Market::fetchMarketPolicies();
 
-<?php include_once FOOTER_FILE; ?>
+  include_once HEADER_FILE;
+  ?>
+
+  <main id="markets">
+    <h1>Market Directory</h1>
+    <div>
+      <?php foreach ($markets as $market): ?>
+        <?= Market::renderCollapsibleMarketCard($market, $policies) ?>
+      <?php endforeach; ?>
+    </div>
+  </main>
+
+  <?php include_once FOOTER_FILE; ?>
+</body>
+
+</html>

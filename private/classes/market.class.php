@@ -139,9 +139,10 @@ class Market extends DatabaseObject
   }
 
   /**
-   * Renders a collapsible market card.
-   * The header always shows the market name,
-   * and the content (all details after the market name) is hidden by default.
+   * Renders a collapsible market card using a checkbox hack.
+   *
+   * The header always shows the market name, and clicking the header
+   * toggles a hidden checkbox that reveals/hides the content via CSS.
    *
    * @param array $market    The market data.
    * @param array|null $policies Optional policies related to the market.
@@ -149,32 +150,41 @@ class Market extends DatabaseObject
    */
   public static function renderCollapsibleMarketCard(array $market, ?array $policies = null): string
   {
+    // Use the market 'id' or a fallback if it does not exist.
+    $uniqueID = isset($market['id']) ? htmlspecialchars($market['id']) : uniqid();
+
     ob_start();
   ?>
     <div class="collapsible-card">
-      <div class="collapsible-header">
-        <h2><?= htmlspecialchars($market['market_name']) ?></h2>
-      </div>
+      <!-- Hidden checkbox to control the toggling -->
+      <input type="checkbox" id="toggle-market-<?= $uniqueID ?>" class="toggle-collapsible" hidden>
+
+      <!-- Label that acts as the clickable header -->
+      <label for="toggle-market-<?= $uniqueID ?>" class="collapsible-header">
+        <span><?= htmlspecialchars($market['market_name']) ?></span>
+      </label>
+
+      <!-- The content area that will be expanded/collapsed -->
       <div class="collapsible-content">
-        <div class="collapsible-content-inner">
+        <div class="market-info">
           <p><strong>Location:</strong> <?= htmlspecialchars($market['city']) ?>, <?= htmlspecialchars($market['state_name']) ?> <?= htmlspecialchars($market['zip_code']) ?></p>
           <p><strong>Parking Info:</strong> <?= htmlspecialchars($market['parking_info']) ?></p>
-          <?php if (!empty($market['market_open']) && !empty($market['market_close'])) : ?>
+          <?php if (!empty($market['market_open']) && !empty($market['market_close'])): ?>
             <p><strong>Market Hours:</strong> <?= date("g:i A", strtotime($market['market_open'])) ?> - <?= date("g:i A", strtotime($market['market_close'])) ?></p>
           <?php endif; ?>
-          <?php if (!empty($market['market_days'])) : ?>
+          <?php if (!empty($market['market_days'])): ?>
             <p><strong>Market Days:</strong> <?= htmlspecialchars($market['market_days']) ?></p>
           <?php endif; ?>
-          <?php if (!empty($market['market_season'])) : ?>
+          <?php if (!empty($market['market_season'])): ?>
             <p><strong>Market Season:</strong> <?= htmlspecialchars($market['market_season']) ?></p>
           <?php endif; ?>
-          <?php if (!empty($market['last_market_date'])) : ?>
+          <?php if (!empty($market['last_market_date'])): ?>
             <p><strong>Last Market Date:</strong> <?= date('F j, Y', strtotime($market['last_market_date'])) ?></p>
           <?php endif; ?>
-          <?php if (!empty($policies)) : ?>
+          <?php if (!empty($policies)): ?>
             <h3>Market Policies</h3>
             <ul>
-              <?php foreach ($policies as $policy) : ?>
+              <?php foreach ($policies as $policy): ?>
                 <li>
                   <strong><?= htmlspecialchars($policy['policy_name']) ?>:</strong>
                   <?= nl2br(htmlspecialchars($policy['policy_description'])) ?>
@@ -185,7 +195,6 @@ class Market extends DatabaseObject
         </div>
       </div>
     </div>
-
 <?php
     return ob_get_clean();
   }
