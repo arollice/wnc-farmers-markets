@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - About</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
@@ -15,6 +15,7 @@
   include_once('../private/config.php');
   include_once HEADER_FILE;
   ?>
+
   <main>
     <section id="intro">
       <h2>About Us</h2>
@@ -103,7 +104,6 @@
         <a href="https://www.localharvest.org/" target="_blank">National Farmers Market Directory - Vendor Surveys & Market Impact Reports</a>
         (For more detailed statistics, you might also consult research summaries available on local food organization websites.)
       </p>
-
       <p>
         <small>While these sources provide a solid foundation, the exact figures can vary depending on the <strong>region</strong> and
           <strong>specific study</strong>. These statistics are representative based on findings from reputable organizations such
@@ -113,9 +113,7 @@
     </section>
   </main>
 
-  <?php
-  include_once FOOTER_FILE;
-  ?>
+  <?php include_once FOOTER_FILE; ?>
 </body>
 
 </html>

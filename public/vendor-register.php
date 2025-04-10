@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Vendor Registration</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
 </head>
 
 <body>
@@ -29,8 +29,7 @@
     <h2>Vendor Registration</h2>
 
     <p>Register your business to be listed in the WNC Farmers Market.</p>
-
-    <!-- Display inline error message if one exists -->
+    <!-- Error message if one exists -->
     <?php if (!empty($regError)): ?>
       <div class="register_error"><?= $regError ?></div>
     <?php endif; ?>

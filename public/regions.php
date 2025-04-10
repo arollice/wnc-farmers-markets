@@ -4,11 +4,12 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Regions</title>
+  <script src="js/farmers-market.js" defer></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
+  <script src="js/leaflet-map.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
-  <script src="js/leaflet-map.js" defer></script>
 </head>
 
 <body>
@@ -48,9 +49,7 @@
     </noscript>
   </main>
 
-  <?php
-  include_once FOOTER_FILE;
-  ?>
+  <?php include_once FOOTER_FILE; ?>
 </body>
 
 </html>

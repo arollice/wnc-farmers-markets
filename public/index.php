@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Home</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 
   <?php
   include_once('../private/config.php');
@@ -57,9 +57,9 @@
         <button type="submit">Search</button>
       </form>
 
-
       <?php
-      $search_term = isset($_GET['search_term']) ? trim($_GET['search_term']) : '';
+      $search_term = isset($_GET['search_term']) ? trim(Utils::sanitize($_GET['search_term'])) : '';
+
 
       $vendors = [];
       $items = [];
@@ -79,7 +79,7 @@
       }
       ?>
 
-      <!-- Show Spell Check Suggestion -->
+      <!-- Spell Check Suggestion -->
       <?php if ($suggested_term && strtolower($suggested_term) !== strtolower($search_term)) : ?>
         <p>Did you mean:
           <a href="index.php?search_term=<?= urlencode($suggested_term) ?>#results">
@@ -92,7 +92,6 @@
       <div id="results">
         <?php if ($search_term): ?>
           <h3>Search Results for: <?= htmlspecialchars($search_term) ?></h3>
-
           <?php if (!empty($items)) : ?>
             <ul>
               <?php foreach ($items as $item_id => $item_name) : ?>

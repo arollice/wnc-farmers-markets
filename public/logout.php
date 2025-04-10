@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Logout</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
@@ -35,7 +35,8 @@
   ?>
 
   <main class="logout-message">
-    <p><?= $_SESSION['success_message'] ?></p>
+    <p><?= htmlspecialchars($_SESSION['success_message']) ?></p>
+
     <p><a href="index.php">Return to Home</a></p>
   </main>
 

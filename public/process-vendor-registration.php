@@ -3,6 +3,7 @@ include_once('../private/config.php');
 include_once('../private/validation.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $_POST = Utils::sanitize($_POST);
 
   $vendor_name        = trim($_POST['vendor_name'] ?? '');
   $vendor_website     = trim($_POST['vendor_website'] ?? '');

@@ -4,11 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Vendor Dashboard</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
-  <script src="js/leaflet-map.js" defer></script>
 </head>
 
 <body>
@@ -54,10 +53,10 @@
   $all_markets = Market::fetchAllMarkets();
   $currencies   = Currency::fetchAllCurrencies();
 
-
   $pdo = DatabaseObject::get_database();
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_POST = Utils::sanitize($_POST);
 
     if (isset($_POST['add_market_btn'])) {
 
@@ -70,10 +69,9 @@
       header("Location: vendor-dashboard.php");
       exit;
     } elseif (isset($_POST['remove_market_btn'])) {
+
       // Process removing a market using the Vendor class method.
       $market_to_remove = intval($_POST['remove_market'] ?? 0);
-      // Debug output (optional)
-      echo "<pre>DEBUG: remove_market_btn pressed. Market to remove: $market_to_remove</pre>";
       if (validateMarketId($market_to_remove) && $vendor->removeMarket($market_to_remove)) {
         Utils::setFlashMessage('success', "Market removed successfully.");
       } else {
@@ -84,7 +82,6 @@
     } elseif (isset($_POST['add_item_btn'])) {
       // Process Adding an Item
       $item_name = trim($_POST['item_name']);
-      echo "<pre>DEBUG: add_item_btn pressed. Item name: $item_name</pre>";
       if (empty($item_name)) {
         Utils::setFlashMessage('error', "Please enter an item name.");
         header("Location: vendor-dashboard.php");
@@ -114,7 +111,6 @@
       $stmt = $pdo->prepare("SELECT item_id FROM item WHERE LOWER(item_name) = LOWER(?)");
       $stmt->execute([$item_name]);
       $existing_item = $stmt->fetch(PDO::FETCH_ASSOC);
-      echo "<pre>DEBUG: Existing item check result: " . print_r($existing_item, true) . "</pre>";
 
       if ($existing_item) {
         $item_id = $existing_item['item_id'];
@@ -124,7 +120,6 @@
           $item_id = $pdo->lastInsertId();
         } else {
           Utils::setFlashMessage('error', "Error adding new item.");
-          echo "<pre>DEBUG: Error inserting new item: $item_name</pre>";
           header("Location: vendor-dashboard.php");
           exit;
         }
@@ -133,7 +128,7 @@
       $stmt = $pdo->prepare("SELECT COUNT(*) FROM vendor_item WHERE vendor_id = ? AND item_id = ?");
       $stmt->execute([$vendor_id, $item_id]);
       $count = $stmt->fetchColumn();
-      echo "<pre>DEBUG: Number of existing vendor_item links: $count</pre>";
+
       if ($count == 0) {
         $stmt = $pdo->prepare("INSERT INTO vendor_item (vendor_id, item_id) VALUES (?, ?)");
         if ($stmt->execute([$vendor_id, $item_id])) {
@@ -149,7 +144,7 @@
     } elseif (isset($_POST['remove_item_btn'])) {
 
       $item_id = intval($_POST['item_id'] ?? 0);
-      echo "<pre>DEBUG: remove_item_btn pressed. Item ID: $item_id</pre>";
+
       if ($item_id <= 0) {
         Utils::setFlashMessage('error', "Invalid item ID.");
         header("Location: vendor-dashboard.php");
@@ -178,7 +173,6 @@
       // Set maximum file size (e.g., 100KB)
       $maxFileSize = 100 * 1024; // 100KB in bytes
 
-      // Validate the uploaded vendor logo file
       if (!Utils::validateFileSize($_FILES['vendor_logo'], $maxFileSize)) {
         Utils::setFlashMessage('error', "The uploaded logo exceeds the maximum allowed size of 100KB.");
         header("Location: vendor-dashboard.php");
@@ -186,7 +180,6 @@
       }
 
       $errors = [];
-      echo "<pre>DEBUG: update_vendor pressed. POST data:\n" . print_r($_POST, true) . "</pre>";
 
       $result = $vendor->updateDetails($_POST, $_FILES);
 
@@ -221,7 +214,6 @@
       } else {
         Utils::setFlashMessage('error', implode("<br>", $errors));
       }
-      echo "<pre>DEBUG: update_vendor processed. Errors: " . print_r($errors, true) . "</pre>";
       header("Location: vendor-dashboard.php");
       exit;
     }
@@ -266,7 +258,7 @@
           $currentMarketIds[] = $market['market_id'];
         }
       }
-      // Build array of available markets (those not already added)
+      // Build array of markets to add
       $available_markets = [];
       foreach ($all_markets as $market) {
         if (!in_array($market['market_id'], $currentMarketIds)) {
@@ -337,7 +329,6 @@
 
     <section id="accepted-payments">
       <h3>Accepted Payment Methods</h3>
-
       <form action="vendor-dashboard.php" method="POST">
         <fieldset>
           <legend>Modify Payment Methods</legend>

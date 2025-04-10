@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Market Details</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
@@ -76,7 +76,7 @@
       <p>No vendors are currently listed for this market.</p>
     <?php endif; ?>
 
-    <!-- Display Market Policies at the Bottom -->
+    <!-- Market Policies -->
     <?php if (!empty($policies)) : ?>
       <section class="market-policies">
         <h2>Market Policies</h2>
@@ -89,17 +89,13 @@
     <?php endif; ?>
 
     <?php
+    $backLink = 'index.php';
 
-    $backLink = 'default_page.php';  // Change to your desired fallback (e.g., 'vendors.php' or 'regions.php')
-
-    // Check if the breadcrumbs array exists and has at least 2 items.
     if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
-      // Get the second-to-last entry (the previous page)
       $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
     }
     ?>
     <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
-
   </main>
 
   <?php include_once FOOTER_FILE; ?>

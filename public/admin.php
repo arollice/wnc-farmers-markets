@@ -4,16 +4,18 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Admin Home</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
   <?php
   include_once('../private/config.php');
+  include_once('../private/validation.php');
 
+  // Check if admin is logged in.
   if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
     exit;
@@ -21,13 +23,19 @@
 
   $pdo = DatabaseObject::get_database();
 
-  // Process POST actions.
+  // Process POST requests
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_POST = Utils::sanitize($_POST);
     $action = $_POST['action'] ?? '';
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
     $admin_id = intval($_POST['admin_id'] ?? 0);
 
-    // Approve Vendor Action.
+    // Process admin-related actions
+    if ($admin_id > 0 && in_array($action, ['edit_admin', 'delete_admin'])) {
+      UserAccount::processAdminAction($_POST);
+    }
+
+    // Approve Vendor
     if ($vendor_id > 0 && $action === 'approve') {
       $vendor = Vendor::find_by_id($vendor_id);
       if ($vendor) {
@@ -45,52 +53,13 @@
       exit;
     }
 
-    // Edit Admin Action.
-    if ($admin_id > 0 && $action === 'edit_admin') {
-      $admin = UserAccount::find_by_id($admin_id);
-      if ($admin) {
-        $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
-        // (Optional) Add any validation for $username and $email here.
-        $admin->username = $username;
-        $admin->email = $email;
-        if ($admin->save()) {
-          // Using admin username in the message.
-          Utils::setFlashMessage('success', "Admin '{$admin->username}' updated successfully.");
-        } else {
-          Utils::setFlashMessage('error', "Error updating admin '{$admin->username}'.");
-        }
-      } else {
-        Utils::setFlashMessage('error', "Admin not found.");
-      }
-      header("Location: admin.php#admin-account-management");
-
-      exit;
-    }
-
-    // Delete Vendor Action.
+    // Delete Vendor
     if ($vendor_id > 0 && $action === 'delete') {
       $vendor = Vendor::find_by_id($vendor_id);
       if ($vendor && $vendor->delete()) {
         Utils::setFlashMessage('success', "Vendor '{$vendor->vendor_name}' deleted.");
       } else {
         Utils::setFlashMessage('error', "Error deleting vendor.");
-      }
-      header("Location: admin.php");
-      exit;
-    }
-
-    // Delete Admin Action.
-    if ($admin_id > 0 && $action === 'delete_admin') {
-      if ($admin_id == $_SESSION['user_id']) {
-        Utils::setFlashMessage('error', "You cannot delete your own admin account.");
-      } else {
-        $admin = UserAccount::find_by_id($admin_id);
-        if ($admin && $admin->delete()) {
-          Utils::setFlashMessage('success', "Admin '{$admin->username}' deleted.");
-        } else {
-          Utils::setFlashMessage('error', "Error deleting admin.");
-        }
       }
       header("Location: admin.php");
       exit;
@@ -116,7 +85,6 @@
     <hr>
 
     <?php Utils::displayFlashMessages(); ?>
-
     <section id="admin-account-management">
       <h3>Admin Accounts Management</h3>
       <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
@@ -139,7 +107,6 @@
           <tbody>
             <?php foreach ($admins as $admin): ?>
               <?php if ($admin['user_id'] === $edit_admin_id): ?>
-                <!-- Editable Row -->
                 <form method="post">
                   <tr>
                     <td>
@@ -157,13 +124,11 @@
                       <button type="submit">Save</button>
                     </td>
                     <td>
-                      <!-- Cancel link reloads without the edit GET parameter -->
                       <a href="admin.php">Cancel</a>
                     </td>
                   </tr>
                 </form>
               <?php else: ?>
-                <!-- Read-Only Row -->
                 <tr>
                   <td><?= htmlspecialchars($admin['user_id']); ?></td>
                   <td><?= htmlspecialchars($admin['username']); ?></td>

@@ -84,7 +84,7 @@ input[type='text']:focus {
   content: '';
   background-image: url('../img/sean-nufer-farmers-market.webp');
   background-size: cover;
-  background-position: center; /* Centers the image */
+  background-position: center;
   background-repeat: no-repeat;
   height: 100%;
   left: 0;
@@ -810,12 +810,39 @@ td {
   list-style-type: none;
 }
 
+#page-not-found {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 1rem auto;
+  padding: 1rem;
+  text-align: center;
+}
+
+#page-not-found > h1 {
+  margin: 1rem 0;
+}
+
+#page-not-found > img {
+  width: 200px;
+  height: auto;
+}
+
+#page-not-found > p {
+  font-style: italic;
+}
+
+#page-not-found > p > a {
+  color: var(--dark-green);
+}
+
 @media (max-width: 800px) {
-  #featured-vendors {
+  /*#featured-vendors {
     align-items: center;
+    display: flex;
     flex-direction: column;
     overflow-x: hidden;
-  }
+  } */
 
   #search {
     flex-direction: column;

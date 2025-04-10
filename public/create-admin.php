@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Create Admin</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
@@ -16,7 +16,6 @@
 
   $sticky = $_SESSION['sticky'] ?? [];
 
-  // Only allow admin users to access this page.
   if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');
     exit;
@@ -24,6 +23,7 @@
 
   // Process form submission.
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $_POST = Utils::sanitize($_POST);
     $adminName = $_POST['admin_name'] ?? '';
     $adminEmail = $_POST['admin_email'] ?? '';
     $adminPassword = $_POST['admin_password'] ?? '';
@@ -31,14 +31,13 @@
 
     // Check if passwords match.
     if ($adminPassword !== $adminPasswordConfirm) {
-      // Store submitted values in session so they persist on reload.
       $_SESSION['sticky'] = $_POST;
       Utils::setFlashMessage('error', "Passwords do not match.");
       header("Location: create-admin.php");
       exit;
     }
 
-    // Pre-check for duplicate username.
+    // Check for duplicate username.
     $existingAdmin = UserAccount::find_by_username($adminName);
     if ($existingAdmin) {
       $_SESSION['sticky'] = $_POST;
@@ -47,7 +46,7 @@
       exit;
     }
 
-    // Pre-check for duplicate email.
+    // Check for duplicate email.
     $existingEmail = UserAccount::find_by_email($adminEmail);
     if ($existingEmail) {
       $_SESSION['sticky'] = $_POST;
@@ -65,7 +64,6 @@
     ];
 
     try {
-      // Use the UserAccount class's register() method.
       $new_admin = UserAccount::register($data);
       if ($new_admin) {
         Utils::setFlashMessage('success', "Admin account created successfully.");

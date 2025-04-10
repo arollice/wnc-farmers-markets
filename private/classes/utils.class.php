@@ -79,4 +79,25 @@ class Utils
     // If no file is uploaded, consider it valid.
     return true;
   }
+
+  /**
+   * Recursively sanitize an array by stripping HTML and PHP tags.
+   *
+   * @param mixed $data The input data (array or string).
+   * @param string $allowed_tags Optional list of allowed tags.
+   * @return mixed The sanitized data.
+   */
+  public static function sanitize($data, $allowed_tags = '')
+  {
+    if (is_array($data)) {
+      $sanitized = [];
+      foreach ($data as $key => $value) {
+        $sanitized[$key] = self::sanitize($value, $allowed_tags);
+      }
+      return $sanitized;
+    } elseif (is_string($data)) {
+      return strip_tags($data, $allowed_tags);
+    }
+    return $data;
+  }
 }

@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Vendors</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
 </head>
 
 <body>
@@ -16,7 +16,6 @@
 
   $vendors = Vendor::findAllWithFilters(['approved' => true]);
 
-  // Sort vendors alphabetically by vendor name
   usort($vendors, function ($a, $b) {
     return strcasecmp($a['vendor_name'], $b['vendor_name']);
   });
@@ -31,6 +30,7 @@
 
   <main>
     <h1>Vendor Directory</h1>
+
     <p>Meet the growers, artisans, and food crafters bringing fresh, local goods to your table!</p>
     <section class="vendor-directory">
       <?php if (empty($vendors)) : ?>
@@ -40,7 +40,6 @@
           <?php foreach ($vendors as $vendor) : ?>
             <li class="vendor-item">
               <a href="<?= PUBLIC_PATH ?>/vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>&source=vendors.php">
-
                 <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo">
                 <h3><?= htmlspecialchars($vendor['vendor_name']) ?></h3>
               </a>
@@ -49,12 +48,9 @@
         </ul>
       <?php endif; ?>
     </section>
-
   </main>
 
-  <?php
-  include_once FOOTER_FILE;
-  ?>
+  <?php include_once FOOTER_FILE; ?>
 </body>
 
 </html>

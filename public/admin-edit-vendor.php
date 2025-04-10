@@ -4,10 +4,10 @@
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Admin Edit Vendor</title>
+  <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="js/farmers-market.js" defer></script>
 </head>
 
 <body>
@@ -16,113 +16,51 @@
   include_once('../private/validation.php');
 
   $pdo = DatabaseObject::get_database();
-
   $currencies = Currency::fetchAllCurrencies();
 
-  // Process form submissions.
+  // Determine vendor ID and sanitize inputs
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve vendor_id from POST for every action.
+    $_POST = Utils::sanitize($_POST);
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
-    if (!validateVendorId($vendor_id)) {
-      Utils::setFlashMessage('error', "Invalid vendor ID.");
-      header("Location: admin.php");
-      exit;
-    }
-
-    // Fetch vendor data and build the vendor object.
-    $vendorData = Vendor::findVendorById($vendor_id);
-    if (!$vendorData) {
-      Utils::setFlashMessage('error', "Vendor not found.");
-      header("Location: admin.php");
-      exit;
-    }
-    $vendor = new Vendor();
-    foreach ($vendorData as $key => $value) {
-      $vendor->$key = $value;
-    }
-
-    // Build currentCurrencies array (if needed by some actions)
-    $currentCurrencies = [];
-    $acceptedCurrencies = $vendor->get_accepted_currencies();
-    if (!empty($acceptedCurrencies)) {
-      foreach ($acceptedCurrencies as $currency) {
-        $currentCurrencies[] = (int)$currency->currency_id;
-      }
-    }
-
-    // Now determine which action to process.
-    if (isset($_POST['update_vendor'])) {
-      // Process vendor detail update.
-      $maxFileSize = 100 * 1024; // 100KB
-      if (!Utils::validateFileSize($_FILES['vendor_logo'], $maxFileSize)) {
-        Utils::setFlashMessage('error', "The uploaded logo exceeds the maximum allowed size of 100KB.");
-        header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id);
-        exit;
-      }
-      $result = $vendor->updateDetails($_POST, $_FILES);
-      if ($result['success']) {
-        Utils::setFlashMessage('success', "Vendor updated successfully.");
-      } else {
-        Utils::setFlashMessage('error', implode("<br>", $result['errors']));
-      }
-      header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id);
-      exit;
-    } elseif (isset($_POST['add_market_btn'])) {
-      $market_to_add = intval($_POST['add_market'] ?? 0);
-      if (validateMarketId($market_to_add)) {
-        if ($vendor->addMarket($market_to_add)) {
-          Utils::setFlashMessage('success', "Market added successfully.");
-        } else {
-          Utils::setFlashMessage('error', "Vendor is already attending that market or an error occurred.");
-        }
-      }
-      header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id);
-      exit;
-    } elseif (isset($_POST['remove_market_btn'])) {
-      $market_to_remove = intval($_POST['remove_market'] ?? 0);
-      if (validateMarketId($market_to_remove)) {
-        if ($vendor->removeMarket($market_to_remove)) {
-          Utils::setFlashMessage('success', "Market removed successfully.");
-        } else {
-          Utils::setFlashMessage('error', "An error occurred while removing the market.");
-        }
-      }
-      header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id);
-      exit;
-    } elseif (isset($_POST['update_payments'])) {
-      // Process updating accepted payment methods.
-      $selectedPayments = $_POST['accepted_payments'] ?? [];
-      if ($vendor->associatePayments($selectedPayments)) {
-        Utils::setFlashMessage('success', "Payment methods updated successfully.");
-      } else {
-        Utils::setFlashMessage('error', "Error updating payment methods.");
-      }
-      header("Location: admin-edit-vendor.php?vendor_id=" . $vendor_id . "#accepted-payments");
-      exit;
-    }
+  } else {
+    $vendor_id = intval($_GET['vendor_id'] ?? 0);
   }
 
-  // For GET requests, retrieve vendor data.
-  $vendor_id = intval($_GET['vendor_id'] ?? 0);
   if (!validateVendorId($vendor_id)) {
     Utils::setFlashMessage('error', "Invalid vendor ID.");
     header("Location: admin.php");
     exit;
   }
 
+  // Retrieve vendor data
   $vendorData = Vendor::findVendorById($vendor_id);
   if (!$vendorData) {
     Utils::setFlashMessage('error', "Vendor not found.");
     header("Location: admin.php");
     exit;
   }
-
-  // Convert vendor data (array) to Vendor object.
   $vendor = new Vendor();
   foreach ($vendorData as $key => $value) {
     $vendor->$key = $value;
   }
 
+  // Process POST requests 
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['update_vendor'])) {
+      UserAccount::updateVendor($vendor, $_POST, $_FILES, $vendor_id);
+    } elseif (isset($_POST['add_market_btn'])) {
+      $market_to_add = intval($_POST['add_market'] ?? 0);
+      UserAccount::addMarket($vendor, $vendor_id, $market_to_add);
+    } elseif (isset($_POST['remove_market_btn'])) {
+      $market_to_remove = intval($_POST['remove_market'] ?? 0);
+      UserAccount::removeMarket($vendor, $vendor_id, $market_to_remove);
+    } elseif (isset($_POST['update_payments'])) {
+      $selectedPayments = $_POST['accepted_payments'] ?? [];
+      UserAccount::updatePayments($vendor, $vendor_id, $selectedPayments);
+    }
+  }
+
+  // Build the current currencies array
   $currentCurrencies = [];
   $acceptedCurrencies = $vendor->get_accepted_currencies();
   if (!empty($acceptedCurrencies)) {
@@ -142,7 +80,6 @@
     </header>
 
     <?php Utils::displayFlashMessages(); ?>
-
     <!-- Main Vendor Update Form -->
     <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
@@ -173,7 +110,6 @@
 
     <!-- Markets Section -->
     <?php
-    // Fetch vendor markets once.
     $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
     ?>
     <h3>Markets Vendor is Attending</h3>
@@ -189,7 +125,7 @@
     }
     ?>
 
-    <!-- Form to Add a Market -->
+    <!-- Add a Market -->
     <?php
     $all_markets = Market::fetchAllMarkets();
     $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
@@ -200,7 +136,7 @@
       }
     }
 
-    // Build array of available markets (those not already added)
+    // Build array of markets to add
     $available_markets = [];
     foreach ($all_markets as $market) {
       if (!in_array($market['market_id'], $currentMarketIds)) {
@@ -208,6 +144,7 @@
       }
     }
     ?>
+
     <form action="admin-edit-vendor.php" method="POST">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="add_market">Add a Market:</label>
@@ -221,13 +158,13 @@
           }
         }
         ?>
+
       </select>
       <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
     </form>
-
     <br>
 
-    <!-- Form to Remove a Market -->
+    <!-- Remove a Market -->
     <form action="admin-edit-vendor.php" method="POST">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="remove_market">Remove a Market:</label>
@@ -243,11 +180,10 @@
       <button type="submit" name="remove_market_btn">Remove Market</button>
     </form>
 
-    <!-- Section for Accepted Payment Methods -->
+    <!-- Accepted Payment Methods -->
     <section id="accepted-payment-methods">
       <h3>Accepted Payment Methods for <?= htmlspecialchars($vendor->vendor_name); ?></h3>
       <form action="admin-edit-vendor.php" method="POST">
-        <!-- Hidden field to pass vendor_id -->
         <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
         <fieldset>
           <legend>Modify Payment Methods</legend>
