@@ -106,6 +106,14 @@ header.dashboard-header {
   margin: 0 2rem 2rem 0;
 }
 
+header.dashboard-header > h1 {
+  flex: 1;
+}
+
+header.dashboard-header > p {
+  flex: 2;
+}
+
 header.dashboard-header a {
   font-weight: bold;
 }
@@ -378,9 +386,9 @@ aside div {
   align-items: center;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
-  gap: 4rem;
-  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 2rem;
+  justify-content: center;
   margin: 0.5rem auto;
   padding: 0 1rem;
 }
@@ -417,6 +425,7 @@ aside div {
   color: var(--white);
   display: flex;
   flex-direction: column;
+  font-size: 0.9rem;
   inset: 0;
   justify-content: center;
   margin: 0;
@@ -473,11 +482,11 @@ aside div {
 
 /**** Market Page *****/
 #markets {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  display: flex;
   gap: 1rem;
+  flex-direction: column;
+  justify-content: center;
   max-width: 600px;
   margin: 0 auto;
   padding: 1rem 0;
@@ -565,8 +574,8 @@ div.collapsible-card > label > span {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 1rem;
   list-style: none;
-  padding: 1rem;
   margin: 0;
+  padding: 1rem;
 }
 
 .vendor-item {
@@ -766,6 +775,7 @@ th {
 td {
   border: 1px solid var(--border-color);
   padding: 0 0.5rem;
+  text-align: center;
 }
 
 .logout-message {
@@ -804,18 +814,6 @@ td {
   text-align: center;
 }
 
-.table-admin-id,
-.table-vendor-id {
-  text-align: center;
-}
-
-#admin-account-management {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  justify-content: space-between;
-}
-
 .register_error > li {
   color: #ff0000;
   list-style-type: none;
@@ -835,8 +833,8 @@ td {
 }
 
 #page-not-found > img {
-  width: 200px;
   height: auto;
+  width: 200px;
 }
 
 #page-not-found > p {
@@ -847,9 +845,33 @@ td {
   color: var(--dark-green);
 }
 
+@media (max-width: 1200px) {
+  .vendor-card-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2rem;
+    justify-items: space-around;
+    margin: 0.5rem auto;
+    max-width: 700px;
+    padding: 0 1rem;
+  }
+
+  .vendor-card {
+    display: block;
+    margin: 0 auto;
+    max-width: 275px;
+    width: 100%;
+  }
+
+  #featured-vendors h2 {
+    margin: 0 auto;
+  }
+}
+
 @media (max-width: 800px) {
   #search {
     flex-direction: column;
+    grid-template-columns: none;
     margin: 0;
   }
 
@@ -859,16 +881,9 @@ td {
     padding: 0;
   }
 
-  #search {
-    grid-template-columns: none;
-  }
-
-  #search > div {
-    align-items: center;
-    flex-direction: row;
-    justify-content: space-between;
-    margin: 0;
-    padding: 0;
+  #search > section + div {
+    display: flex;
+    flex-direction: column;
   }
 
   #search > div p {
@@ -878,8 +893,8 @@ td {
   }
 
   #search > div img {
+    margin: 0 1rem;
     order: 2;
-    margin: 0;
   }
 
   #map-container {
@@ -891,9 +906,13 @@ td {
   #markets {
     grid-template-columns: 1fr;
   }
+
+  div.collapsible-card > label > span {
+    font-size: 1.5rem;
+  }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 650px) {
   #reusable-header {
     align-items: flex-start;
     display: flex;
@@ -902,11 +921,11 @@ td {
   }
 
   #reusable-header::before {
-    content: '';
     background-image: url('../img/sean-nufer-farmers-market-mobile.webp');
     background-size: cover;
-    background-position: center; /* Centers the image */
+    background-position: center;
     background-repeat: no-repeat;
+    content: '';
     height: 100%;
     left: 0;
     opacity: 0.3;
@@ -935,13 +954,18 @@ td {
   }
 
   #login {
+    align-items: flex-start;
     display: flex;
     flex-direction: column-reverse;
-    justify-content: space-around;
+  }
+
+  #login p {
+    margin: 0 1.5rem;
+    padding: 1rem 0;
   }
 
   #login > a {
-    margin: 1rem;
+    margin: 1.5rem;
   }
 
   #menu-toggle-label,
@@ -968,8 +992,8 @@ td {
 
   #nav-menu ul {
     flex-direction: column;
-    padding: 0;
     margin: 0;
+    padding: 0;
   }
 
   #nav-menu ul li {
@@ -978,15 +1002,73 @@ td {
   }
 
   #nav-menu a {
-    display: block;
     color: var(--text-color);
+    display: block;
     padding: 0.25rem;
     text-decoration: none;
+  }
+
+  .vendor-card-list {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    justify-content: center;
+    margin: 0.5rem auto;
+    max-width: 250px;
+    padding: 0 1rem;
+  }
+
+  .vendor-overlay {
+    font-size: 0.8rem;
+  }
+  #markets {
+    max-width: 400px;
   }
 }
 
 @media (max-width: 500px) {
   #search > section > form > button {
-    margin-left: 1.5rem;
+    margin-left: 1.75rem;
+  }
+
+  #search > section > form,
+  #search > div {
+    margin: 0;
+    padding: 0;
+  }
+
+  .vendor-overlay {
+    font-size: 0.75rem;
+  }
+
+  .toggle-collapsible:checked + .collapsible-header + .collapsible-content {
+    max-height: 605px;
+  }
+
+  div.collapsible-card > label > span {
+    font-size: 1.25rem;
+  }
+
+  #map-container {
+    max-width: 90%;
+    margin: 0 auto;
+    width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  #search_term {
+    width: 250px;
+  }
+
+  #markets {
+    max-width: 85%;
+  }
+
+  #login,
+  main {
+    margin: 0;
+    padding: 0;
   }
 }

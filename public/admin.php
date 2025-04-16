@@ -85,7 +85,7 @@
     <hr>
 
     <?php Utils::displayFlashMessages(); ?>
-    <section id="admin-account-management">
+    <section>
       <h3>Admin Accounts Management</h3>
       <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>
       <?php
@@ -94,7 +94,7 @@
       $admins = $stmt->fetchAll(PDO::FETCH_ASSOC);
       if ($admins):
       ?>
-        <table>
+        <table id="admin-accounts">
           <thead>
             <tr>
               <th>Admin ID</th>
@@ -165,11 +165,10 @@
     <section>
       <h3>Vendor Management</h3>
       <?php if ($vendors): ?>
-        <table>
+        <table id="vendor-accounts">
           <tr>
             <th>Vendor ID</th>
             <th>Name</th>
-            <th>Website</th>
             <th>Description</th>
             <th>Status</th>
             <th>View</th>
@@ -180,7 +179,6 @@
             <tr>
               <td class="table-vendor-id"><?= htmlspecialchars($vendor['vendor_id']); ?></td>
               <td><?= htmlspecialchars($vendor['vendor_name']); ?></td>
-              <td><?= htmlspecialchars($vendor['vendor_website']); ?></td>
               <td><?= htmlspecialchars($vendor['vendor_description']); ?></td>
               <td class="<?= $vendor['status'] === 'approved' ? 'approved-cell' : '' ?>">
                 <?php if ($vendor['status'] === 'pending'): ?>
