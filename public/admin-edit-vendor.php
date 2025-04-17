@@ -1,3 +1,7 @@
+<?php
+include_once('../private/config.php');
+include_once('../private/validation.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,9 +16,6 @@
 
 <body>
   <?php
-  include_once('../private/config.php');
-  include_once('../private/validation.php');
-
   $pdo = DatabaseObject::get_database();
   $currencies = Currency::fetchAllCurrencies();
 

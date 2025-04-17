@@ -1,3 +1,6 @@
+<?php
+include_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,7 +15,6 @@
 
 <body>
   <?php
-  require_once('../private/config.php');
   $markets = Market::fetchAllMarkets();
 
   if (!$markets) {

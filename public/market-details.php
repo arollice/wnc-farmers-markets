@@ -1,3 +1,6 @@
+<?php
+include_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +15,6 @@
 
 <body>
   <?php
-  require_once('../private/config.php');
-
   $breadcrumbs = isset($_SESSION['breadcrumbs']) ? $_SESSION['breadcrumbs'] : [];
 
   $breadcrumbTrail = array_slice($breadcrumbs, -2);

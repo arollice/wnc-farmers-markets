@@ -1,3 +1,6 @@
+<?php
+include_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +15,6 @@
 
 <body>
   <?php
-  include_once('../private/config.php');
-
   $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'User';
 
   // Unset all session variables.

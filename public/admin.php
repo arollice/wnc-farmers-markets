@@ -1,3 +1,7 @@
+<?php
+include_once('../private/config.php');
+include_once('../private/validation.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,9 +16,6 @@
 
 <body>
   <?php
-  include_once('../private/config.php');
-  include_once('../private/validation.php');
-
   // Check if admin is logged in.
   if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     header('Location: login.php');

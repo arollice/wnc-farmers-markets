@@ -1,3 +1,6 @@
+<?php
+include_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,7 +13,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <?php
-  include_once('../private/config.php');
   $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
   Utils::displayFlashMessages();
 

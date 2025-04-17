@@ -1,3 +1,6 @@
+<?php
+require_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +15,6 @@
 
 <body>
   <?php
-  include_once('../private/config.php');
-
   $vendors = Vendor::findAllWithFilters(['approved' => true]);
 
   usort($vendors, function ($a, $b) {

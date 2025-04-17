@@ -1,3 +1,7 @@
+<?php
+include_once __DIR__ . '/../private/config.php';
+include_once __DIR__ . '/../private/validation.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,9 +16,6 @@
 
 <body>
   <?php
-  include_once __DIR__ . '/../private/config.php';
-  include_once __DIR__ . '/../private/validation.php';
-
   $error = '';
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {

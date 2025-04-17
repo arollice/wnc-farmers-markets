@@ -1,3 +1,7 @@
+<?php
+include_once('../private/config.php');
+include_once HEADER_FILE;
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -11,11 +15,6 @@
 </head>
 
 <body>
-  <?php
-  include_once('../private/config.php');
-  include_once HEADER_FILE;
-  ?>
-
   <main>
     <section id="intro">
       <h2>About Us</h2>

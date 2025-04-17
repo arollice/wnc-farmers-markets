@@ -1,3 +1,5 @@
+<?php require_once('../private/config.php');
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,8 +14,6 @@
 
 <body>
   <?php
-  include_once('../private/config.php');
-
   $currencies = Currency::fetchAllCurrencies();
 
   $sticky = $_SESSION['sticky'] ?? [];
