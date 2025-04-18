@@ -192,7 +192,7 @@ nav a {
   position: relative;
 }
 
-/* The pseudo-element for the underline */
+/* The pseudo-element for the underline 
 nav a::after {
   background-color: var(--green);
   bottom: -3px;
@@ -204,7 +204,7 @@ nav a::after {
   transform-origin: bottom right;
   transition: transform 0.3s ease-in-out;
   width: 100%;
-}
+} */
 
 nav a:hover::after {
   transform: scaleX(1);
@@ -913,6 +913,11 @@ td {
 }
 
 @media (max-width: 650px) {
+  #reusable-header::before {
+    content: '';
+    background-image: url('../img/sean-nufer-farmers-market-mobile.webp');
+  }
+
   #reusable-header {
     align-items: flex-start;
     display: flex;
@@ -1009,14 +1014,21 @@ td {
   }
 
   .vendor-overlay {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
+
   #markets {
     max-width: 400px;
   }
 }
 
 @media (max-width: 500px) {
+  .breadcrumb-trail a,
+  .breadcrumb-trail li + li:before {
+    font-size: 1rem;
+    margin: 0;
+  }
+
   #search > section > form > button {
     margin-left: 1.75rem;
   }
@@ -1029,10 +1041,6 @@ td {
 
   #menu-toggle-checkbox:checked ~ #nav-menu {
     width: 35vw;
-  }
-
-  .vendor-overlay {
-    font-size: 0.75rem;
   }
 
   .toggle-collapsible:checked + .collapsible-header + .collapsible-content {
@@ -1051,6 +1059,11 @@ td {
 }
 
 @media (max-width: 400px) {
+  #reusable-header::before {
+    content: '';
+    background-image: url('../img/sean-nufer-farmers-market-mobile2.webp');
+  }
+
   #search_term {
     width: 250px;
   }
@@ -1067,5 +1080,14 @@ td {
   main {
     margin: 0;
     padding: 0;
+  }
+
+  .vendor-overlay {
+    background: rgba(0, 0, 0, 0.9);
+  }
+
+  .vendor-overlay .view-more,
+  .vendor-overly p {
+    font-weight: bold;
   }
 }

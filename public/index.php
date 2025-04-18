@@ -9,7 +9,6 @@ include_once('../private/config.php');
   <title>WNC Farmers Market - Home</title>
   <script src="js/farmers-market.js" defer></script>
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <?php
