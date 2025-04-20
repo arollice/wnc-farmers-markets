@@ -9,6 +9,8 @@ header("HTTP/1.0 404 Not Found");
   <meta charset="utf-8">
   <title>WNC Farmers Market - Page Not Found</title>
   <script src="js/farmers-market.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>

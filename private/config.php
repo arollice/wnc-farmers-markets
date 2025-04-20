@@ -1,4 +1,5 @@
 <?php
+ob_start();
 // Define base paths for file includes
 define('PRIVATE_PATH', __DIR__);
 define('PROJECT_ROOT', dirname(PRIVATE_PATH));

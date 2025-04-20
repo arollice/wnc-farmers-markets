@@ -8,22 +8,18 @@ include_once('../private/config.php');
   <meta charset="utf-8">
   <title>WNC Farmers Market - Home</title>
   <script src="js/farmers-market.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <?php
-  $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
-  Utils::displayFlashMessages();
-
-  // For example, load featured vendors.
-  $all_featured_vendors = Vendor::findAllWithFilters(['approved' => true]);
-  $featured_vendors = array_slice($all_featured_vendors, 0, 4);
-  ?>
 </head>
 
 <body>
-  <?php include_once HEADER_FILE; ?>
-
+  <?php include_once HEADER_FILE;
+  // Load featured vendors.
+  $all_featured_vendors = Vendor::findAllWithFilters(['approved' => true]);
+  $featured_vendors = array_slice($all_featured_vendors, 0, 4);
+  ?>
   <main>
     <h2>WNC Farmers Markets Collective</h2>
     <p>Welcome to WNC Farmers Markets, your go-to resource for discovering fresh, local goods across Western North Carolina. Our platform connects communities with regional farmers, artisans, and small businesses, making it easy to find markets, vendors, and seasonal produce near you. Whether you're a shopper looking for farm-fresh ingredients or a vendor wanting to reach a wider audience, we're here to support and celebrate the vibrant local food scene.</p>

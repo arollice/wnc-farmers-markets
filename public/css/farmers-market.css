@@ -868,7 +868,13 @@ td {
   }
 }
 
-@media (max-width: 800px) {
+@media (max-width: 815px) {
+  .breadcrumb-trail a,
+  .breadcrumb-trail li + li:before {
+    font-size: 1rem;
+    margin: 0;
+  }
+
   #search {
     flex-direction: column;
     grid-template-columns: none;
@@ -928,7 +934,9 @@ td {
   }
 
   #reusable-header > p {
+    margin: 0 auto;
     order: 1;
+    text-align: center;
   }
 
   #reusable-header > a {
@@ -1020,15 +1028,14 @@ td {
   #markets {
     max-width: 400px;
   }
+
+  .logout-message {
+    max-width: 85%;
+    padding: 0;
+  }
 }
 
 @media (max-width: 500px) {
-  .breadcrumb-trail a,
-  .breadcrumb-trail li + li:before {
-    font-size: 1rem;
-    margin: 0;
-  }
-
   #search > section > form > button {
     margin-left: 1.75rem;
   }

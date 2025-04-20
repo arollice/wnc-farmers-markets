@@ -9,6 +9,8 @@ include_once __DIR__ . '/../private/validation.php';
   <meta charset="utf-8">
   <title>WNC Farmers Market - Login</title>
   <script src="js/farmers-market.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>

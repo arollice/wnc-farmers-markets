@@ -9,6 +9,8 @@ include_once HEADER_FILE;
   <meta charset="utf-8">
   <title>WNC Farmers Market - About</title>
   <script src="js/farmers-market.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
@@ -17,7 +19,7 @@ include_once HEADER_FILE;
   <main>
     <section id="intro">
       <h2>About Us</h2>
-      <h3>Connecting Communities with Local Farmers & Artisans</h3>
+
       <p>
         WNC Farmers Markets is your guide to fresh, local, and sustainable shopping. Our mission is to connect communities
         with the people who grow, craft, and create.

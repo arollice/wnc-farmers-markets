@@ -10,6 +10,8 @@ include_once('../private/config.php');
   <script src="js/farmers-market.js" defer></script>
   <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
   <script src="js/leaflet-map.js" defer></script>
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
   <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
