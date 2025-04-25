@@ -1,0 +1,268 @@
+<?php
+require_once('../private/config.php');
+require_once('../private/validation.php');
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+  header('Location: login.php');
+  exit;
+}
+
+// turn on errors for now
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
+
+// Fetch lookups
+$regions = Region::fetchAllWithCoords();
+$states  = State::fetchAllStates();
+$seasons = Season::fetchAll();
+
+// Prepare empty objects for form
+$market = new Market();
+$errors = [];
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // 1) Sanitize
+  $_POST = Utils::sanitize($_POST);
+
+  // 2) Hydrate Market
+  $market->market_name  = trim($_POST['market_name']  ?? '');
+  $market->region_id    = (int)$_POST['region_id']    ?? 0;
+  $market->city         = trim($_POST['city']         ?? '');
+  $market->state_id     = (int)$_POST['state_id']     ?? 0;
+  $market->zip_code     = trim($_POST['zip_code']     ?? '');
+  $market->parking_info = trim($_POST['parking_info'] ?? '');
+  $market->market_open  = $_POST['market_open']       ?? '';
+  $market->market_close = $_POST['market_close']      ?? '';
+
+  // 3) Validate
+  if ($market->market_name === '') {
+    $errors['market_name'] = 'Name can\'t be blank.';
+  }
+  if ($market->region_id < 1) {
+    $errors['region_id'] = 'Please select a region.';
+  }
+  if ($market->city === '') {
+    $errors['city'] = 'City can\'t be blank.';
+  }
+  if ($market->state_id < 1) {
+    $errors['state_id'] = 'Please select a state.';
+  }
+  if (!preg_match('/^\d{5}$/', $market->zip_code)) {
+    $errors['zip_code'] = 'ZIP must be 5 digits.';
+  }
+
+  // Check if we're adding a new region or selecting an existing one
+  $adding_new_region = isset($_POST['region_id']) && $_POST['region_id'] === '__new__';
+
+  if (!$adding_new_region && $market->region_id < 1) {
+    $errors['region_id'] = 'Please select a region.';
+  } else if ($adding_new_region) {
+    // Validate new region fields
+    $new_region_name = trim($_POST['new_region_name'] ?? '');
+    $new_region_lat = trim($_POST['new_region_lat'] ?? '');
+    $new_region_lng = trim($_POST['new_region_lng'] ?? '');
+
+    if (empty($new_region_name)) {
+      $errors['new_region_name'] = 'New region name can\'t be blank.';
+    }
+    if (empty($new_region_lat) || !is_numeric($new_region_lat)) {
+      $errors['new_region_lat'] = 'Valid latitude is required.';
+    }
+    if (empty($new_region_lng) || !is_numeric($new_region_lng)) {
+      $errors['new_region_lng'] = 'Valid longitude is required.';
+    }
+
+    // If new region is valid, create it
+    if (!isset($errors['new_region_name']) && !isset($errors['new_region_lat']) && !isset($errors['new_region_lng'])) {
+      // Create the new region and get its ID
+      try {
+        // Assuming you have a Region class with a create method
+        $region = Region::createNewRegion($new_region_name, $new_region_lat, $new_region_lng);
+        $market->region_id = $region->region_id;
+      } catch (Exception $e) {
+        $errors['region_save'] = 'Could not create new region: ' . $e->getMessage();
+      }
+    }
+  }
+
+  // 4) On success, save Market + schedule
+  if (empty($errors)) {
+    if ($market->save()) {
+      // schedule fields from form
+      $days      = $_POST['market_days']        ?? [];
+      $season_id = (int)$_POST['season_id']     ?? 0;
+      $last_day  = $_POST['last_day_of_season'] ?? '';
+      MarketSchedule::updateForMarket(
+        $market->market_id,
+        $days,
+        $season_id,
+        $last_day
+      );
+      header('Location: admin-manage-markets.php');
+      exit;
+    } else {
+      $errors['save'] = 'Database error; could not create market.';
+    }
+  }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <title>WNC Farmers Market - Admin Add New Market</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
+  <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
+  <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
+  <!-- script tag below does not have defer attribute since module has defer like behavior-->
+  <script type="module" src="js/farmers-market.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<body>
+  <?php include_once HEADER_FILE; ?>
+
+  <main class="container">
+    <h2>Add New Market</h2>
+
+    <?php if ($errors): ?>
+      <div class="error-summary">
+        <p>Please fix the following errors:</p>
+        <ul>
+          <?php foreach ($errors as $msg): ?>
+            <li><?= htmlspecialchars($msg) ?></li>
+          <?php endforeach; ?>
+        </ul>
+      </div>
+    <?php endif; ?>
+
+    <form action="admin-new-market.php" method="post" novalidate>
+      <!-- Market Name -->
+      <div class="form-group">
+        <label for="market_name">Market Name</label>
+        <input id="market_name" name="market_name" type="text"
+          value="<?= htmlspecialchars($market->market_name) ?>">
+      </div>
+
+      <!-- Region (also drives the map) -->
+      <label for="region_id">Region</label>
+      <select id="region_id" name="region_id" required>
+        <option value="">— Select Region —</option>
+        <!-- Existing regions -->
+        <?php foreach ($regions as $r): ?>
+          <option
+            data-lat="<?= htmlspecialchars($r['latitude']) ?>"
+            data-lng="<?= htmlspecialchars($r['longitude']) ?>"
+            value="<?= $r['region_id'] ?>"
+            <?= $r['region_id'] == $market->region_id ? 'selected' : '' ?>>
+            <?= htmlspecialchars($r['region_name']) ?>
+          </option>
+        <?php endforeach; ?>
+        <!-- “Add new” trigger -->
+        <option value="__new__"
+          <?= (($_POST['region_id'] ?? '') === '__new__') ? 'selected' : '' ?>>
+          + Add a new region
+        </option>
+      </select>
+
+      <!-- Hidden inputs for a new region -->
+      <div id="new-region-fields" style="display:none; margin-top:.5rem;">
+        <label for="new_region_name">New Region Name</label>
+        <input id="new_region_name" name="new_region_name" type="text"
+          value="<?= htmlspecialchars($_POST['new_region_name'] ?? '') ?>">
+        <label for="new_region_lat">Latitude</label>
+        <input id="new_region_lat" name="new_region_lat" type="text"
+          value="<?= htmlspecialchars($_POST['new_region_lat'] ?? '') ?>">
+        <label for="new_region_lng">Longitude</label>
+        <input id="new_region_lng" name="new_region_lng" type="text"
+          value="<?= htmlspecialchars($_POST['new_region_lng'] ?? '') ?>">
+      </div>
+
+      <!-- City / State / ZIP -->
+      <div class="form-group">
+        <label for="city">City</label>
+        <input id="city" name="city" type="text"
+          value="<?= htmlspecialchars($market->city) ?>">
+      </div>
+      <div class="form-group">
+        <label for="state_id">State</label>
+        <select id="state_id" name="state_id" required>
+          <option value="">— Select State —</option>
+          <?php foreach ($states as $s): ?>
+            <option value="<?= $s['state_id'] ?>"
+              <?= $s['state_id'] == $market->state_id ? 'selected' : '' ?>>
+              <?= htmlspecialchars($s['state_name']) ?>
+            </option>
+          <?php endforeach; ?>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="zip_code">ZIP Code</label>
+        <input id="zip_code" name="zip_code" type="text"
+          value="<?= htmlspecialchars($market->zip_code) ?>">
+      </div>
+
+      <!-- Parking & Hours -->
+      <div class="form-group">
+        <label for="parking_info">Parking Info</label>
+        <textarea id="parking_info" name="parking_info"><?= htmlspecialchars($market->parking_info) ?></textarea>
+      </div>
+      <div class="form-group">
+        <label for="market_open">Opens At</label>
+        <input id="market_open" name="market_open" type="time"
+          value="<?= htmlspecialchars($market->market_open) ?>">
+      </div>
+      <div class="form-group">
+        <label for="market_close">Closes At</label>
+        <input id="market_close" name="market_close" type="time"
+          value="<?= htmlspecialchars($market->market_close) ?>">
+      </div>
+
+      <!-- Leaflet map preview -->
+      <div id="preview-map" style="height:300px; margin:1rem;"></div>
+
+      <!-- Schedule: Days checkboxes -->
+      <fieldset class="form-group">
+        <legend>Market Days</legend>
+        <?php foreach (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
+          <label style="margin-right:1rem;">
+            <input type="checkbox" name="market_days[]" value="<?= $day ?>">
+            <?= $day ?>
+          </label>
+        <?php endforeach; ?>
+      </fieldset>
+
+      <!-- Schedule: Season & Last Day -->
+      <div class="form-group">
+        <label for="season_id">Season</label>
+        <select id="season_id" name="season_id">
+          <option value="">— Select Season —</option>
+          <?php foreach ($seasons as $sn): ?>
+            <option value="<?= $sn->season_id ?>"
+              <?= (int)($_POST['season_id'] ?? '') === $sn->season_id ? 'selected' : '' ?>>
+              <?= htmlspecialchars($sn->season_name) ?>
+            </option>
+          <?php endforeach; ?>
+
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="last_day_of_season">Last Day of Season</label>
+        <input id="last_day_of_season" name="last_day_of_season" type="date">
+      </div>
+
+      <button type="submit">Create Market</button>
+      <a href="admin-manage-markets.php" class="button secondary">Cancel</a>
+
+    </form>
+
+  </main>
+
+  <?php include_once FOOTER_FILE; ?>
+</body>
+
+</html>

@@ -31,4 +31,77 @@ class Region extends DatabaseObject
     $stmt->execute();
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
+
+  public static function fetchAllWithCoords(): array
+  {
+    $db  = self::get_database();
+    $sql = "SELECT region_id, region_name, latitude, longitude
+            FROM " . static::$table_name . "
+            ORDER BY region_name ASC";
+    $stmt = $db->query($sql);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+  public static function createNewRegion($region_name, $latitude, $longitude)
+  {
+    $db = self::get_database();
+
+    // Validate inputs
+    $region_name = trim($region_name);
+    $latitude = (float)$latitude;
+    $longitude = (float)$longitude;
+
+    if (empty($region_name)) {
+      throw new Exception("Region name cannot be empty");
+    }
+
+    if (!is_numeric($latitude) || $latitude < -90 || $latitude > 90) {
+      throw new Exception("Invalid latitude value");
+    }
+
+    if (!is_numeric($longitude) || $longitude < -180 || $longitude > 180) {
+      throw new Exception("Invalid longitude value");
+    }
+
+    try {
+      // Start transaction
+      $db->beginTransaction();
+
+      // Insert the new region
+      $sql = "INSERT INTO region (region_name, latitude, longitude) 
+                VALUES (:region_name, :latitude, :longitude)";
+
+      $stmt = $db->prepare($sql);
+      $stmt->bindParam(':region_name', $region_name, PDO::PARAM_STR);
+      $stmt->bindParam(':latitude', $latitude, PDO::PARAM_STR);
+      $stmt->bindParam(':longitude', $longitude, PDO::PARAM_STR);
+
+      $stmt->execute();
+
+      // Get the newly created region ID
+      $region_id = $db->lastInsertId();
+
+      if (!$region_id) {
+        throw new Exception("Failed to get new region ID");
+      }
+
+      // Commit the transaction
+      $db->commit();
+
+      // Create and return a new Region object
+      $region = new Region();
+      $region->region_id = $region_id;
+      $region->region_name = $region_name;
+      $region->latitude = $latitude;
+      $region->longitude = $longitude;
+
+      return $region;
+    } catch (PDOException $e) {
+      // Roll back transaction on error
+      if ($db->inTransaction()) {
+        $db->rollBack();
+      }
+      throw new Exception("Database error: " . $e->getMessage());
+    }
+  }
 }

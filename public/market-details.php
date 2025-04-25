@@ -52,33 +52,33 @@ include_once('../private/config.php');
       </ul>
     </nav>
 
-    <h1><?= htmlspecialchars($market['market_name']) ?> - Market Details</h1>
+    <h1><?= htmlspecialchars($market['market_name']) ?> - Details</h1>
 
-    <div id="single-market-card">
+    <section id="single-market-card">
       <?= Market::renderMarketCard($market) ?>
-    </div>
+    </section>
 
-    <!-- Vendors Attending This Market -->
-    <h2>Attending Vendors</h2>
+    <section>
+      <h2>Attending Vendors</h2>
 
-    <?php if (!empty($vendors)) : ?>
-      <ul class="attending-vendors">
-        <?php foreach ($vendors as $vendor) : ?>
-          <li>
-            <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
-              <?= htmlspecialchars($vendor['vendor_name']) ?>
-            </a>
-            <?php if (!empty($vendor['vendor_website'])) : ?>
-              - <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">Website</a>
-            <?php endif; ?>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else : ?>
-      <p>No vendors are currently listed for this market.</p>
-    <?php endif; ?>
+      <?php if (!empty($vendors)) : ?>
+        <ul class="attending-vendors">
+          <?php foreach ($vendors as $vendor) : ?>
+            <li>
+              <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
+                <?= htmlspecialchars($vendor['vendor_name']) ?>
+              </a>
+              <?php if (!empty($vendor['vendor_website'])) : ?>
+                - <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">Website</a>
+              <?php endif; ?>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else : ?>
+        <p>No vendors are currently listed for this market.</p>
+      <?php endif; ?>
+    </section>
 
-    <!-- Market Policies -->
     <?php if (!empty($policies)) : ?>
       <section class="market-policies">
         <h2>Market Policies</h2>
@@ -97,7 +97,7 @@ include_once('../private/config.php');
       $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
     }
     ?>
-    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+    <a href="<?= htmlspecialchars($backLink) ?>" id="back-link">&larr; Back</a>
   </main>
 
   <?php include_once FOOTER_FILE; ?>

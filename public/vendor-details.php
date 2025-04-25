@@ -42,7 +42,7 @@ require_once('../private/config.php');
   include_once HEADER_FILE;
   ?>
 
-  <main>
+  <main id="detail-page">
     <nav class="breadcrumb-trail" aria-label="Breadcrumb">
       <ul>
         <?php foreach ($breadcrumbTrail as $crumb): ?>
@@ -57,7 +57,7 @@ require_once('../private/config.php');
 
     <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
 
-    <div id="vendor-details">
+    <section id="vendor-details">
       <?php if (!empty($vendor['vendor_logo'])): ?>
         <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
       <?php else: ?>
@@ -76,50 +76,53 @@ require_once('../private/config.php');
           No website available.
         <?php endif; ?>
       </p>
-    </div>
+    </section>
 
-    <!-- Items Sold -->
-    <h2>Items Sold</h2>
+    <section>
+      <h2>Items Sold</h2>
 
-    <?php if (!empty($items)): ?>
-      <ul>
-        <?php foreach ($items as $item): ?>
-          <li><?= htmlspecialchars($item['item_name']) ?></li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>No items listed for this vendor.</p>
-    <?php endif; ?>
+      <?php if (!empty($items)): ?>
+        <ul>
+          <?php foreach ($items as $item): ?>
+            <li><?= htmlspecialchars($item['item_name']) ?></li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else: ?>
+        <p>No items listed for this vendor.</p>
+      <?php endif; ?>
+    </section>
 
-    <!-- Accepted Payment Methods -->
-    <h2>Accepted Payment Methods</h2>
+    <section>
+      <h2>Accepted Payment Methods</h2>
 
-    <?php if (!empty($payment_methods)): ?>
-      <ul>
-        <?php foreach ($payment_methods as $method): ?>
-          <li><?= htmlspecialchars($method) ?></li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>No payment methods listed for this vendor.</p>
-    <?php endif; ?>
+      <?php if (!empty($payment_methods)): ?>
+        <ul>
+          <?php foreach ($payment_methods as $method): ?>
+            <li><?= htmlspecialchars($method) ?></li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else: ?>
+        <p>No payment methods listed for this vendor.</p>
+      <?php endif; ?>
+    </section>
 
-    <!-- Markets Attending by the Vendor -->
-    <h2>Markets Attending</h2>
+    <section>
+      <h2>Markets Attending</h2>
 
-    <?php if (!empty($vendorMarkets)): ?>
-      <ul class="attending-vendors">
-        <?php foreach ($vendorMarkets as $market): ?>
-          <li>
-            <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
-              <?= htmlspecialchars($market['market_name']) ?>
-            </a>
-          </li>
-        <?php endforeach; ?>
-      </ul>
-    <?php else: ?>
-      <p>This vendor is not attending any markets.</p>
-    <?php endif; ?>
+      <?php if (!empty($vendorMarkets)): ?>
+        <ul class="attending-vendors">
+          <?php foreach ($vendorMarkets as $market): ?>
+            <li>
+              <a href="market-details.php?id=<?= htmlspecialchars($market['market_id']) ?>">
+                <?= htmlspecialchars($market['market_name']) ?>
+              </a>
+            </li>
+          <?php endforeach; ?>
+        </ul>
+      <?php else: ?>
+        <p>This vendor is not attending any markets.</p>
+      <?php endif; ?>
+    </section>
 
     <?php
     $backLink = 'index.php';
@@ -128,7 +131,7 @@ require_once('../private/config.php');
       $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
     }
     ?>
-    <a href="<?= htmlspecialchars($backLink) ?>">Back</a>
+    <a href="<?= htmlspecialchars($backLink) ?>" id="back-link">&larr; Back</a>
   </main>
 
   <?php include_once FOOTER_FILE; ?>

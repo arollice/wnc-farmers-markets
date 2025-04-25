@@ -58,13 +58,16 @@ class Market extends DatabaseObject
   public static function fetchMarketDetails($market_id)
   {
     $sql = "SELECT 
-            m.market_name, 
-            m.city, 
-            s.state_name, 
-            m.zip_code, 
-            m.parking_info,
-            m.market_open,
-            m.market_close,
+              m.market_id,
+              m.market_name,
+              m.city,
+              m.region_id,
+              m.state_id,
+              s.state_name,
+              m.zip_code,
+              m.parking_info,
+              m.market_open,
+              m.market_close,
             GROUP_CONCAT(DISTINCT se.season_name ORDER BY se.season_name ASC SEPARATOR ', ') AS market_season,
             MAX(ms.last_day_of_season) AS last_market_date,
             GROUP_CONCAT(DISTINCT ms.market_day ORDER BY ms.market_day ASC SEPARATOR ', ') AS market_days
@@ -199,7 +202,6 @@ class Market extends DatabaseObject
     return ob_get_clean();
   }
 
-
   public static function getVendorIdsForMarket($market_id)
   {
     if (!isset(self::$database)) {
@@ -210,5 +212,18 @@ class Market extends DatabaseObject
     $stmt = self::$database->prepare($sql);
     $stmt->execute([$market_id]);
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
+  }
+
+  /*** Delete a market by market ID. ****/
+  public static function deleteMarket($market_id)
+  {
+    $id = (int)$market_id;
+    if ($id < 1) {
+      return false;
+    }
+    $sql  = "DELETE FROM " . static::$table_name
+      . " WHERE " . static::$primary_key . " = ?";
+    $stmt = self::$database->prepare($sql);
+    return $stmt->execute([$id]);
   }
 }

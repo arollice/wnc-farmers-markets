@@ -192,20 +192,6 @@ nav a {
   position: relative;
 }
 
-/* The pseudo-element for the underline 
-nav a::after {
-  background-color: var(--green);
-  bottom: -3px;
-  content: '';
-  height: 2px;
-  left: 0;
-  position: absolute;
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.3s ease-in-out;
-  width: 100%;
-} */
-
 nav a:hover::after {
   transform: scaleX(1);
   transform-origin: bottom left;
@@ -217,7 +203,7 @@ nav a.active::after {
 }
 
 .breadcrumb-trail {
-  margin: 0.25rem;
+  margin: 1rem 0.25rem;
   padding: 0 0.25rem;
 }
 
@@ -630,6 +616,12 @@ div.collapsible-card > label > span {
   margin: 0.5rem;
 }
 
+#back-link {
+  align-items: flex-end;
+  font-weight: bold;
+  margin-right: 2rem;
+}
+
 /**** About Page *****/
 #intro,
 #wnc-farming-traditions {
@@ -843,6 +835,73 @@ td {
 
 #page-not-found > p > a {
   color: var(--dark-green);
+}
+
+#back-link {
+  align-self: flex-end;
+  margin: 1rem;
+}
+
+/*** Admin Dash ***/
+.admin-choices {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin: 2rem 0;
+}
+.admin-card {
+  flex: 1 1 200px;
+  padding: 1.5rem;
+  text-align: center;
+  background-color: rgba(59, 180, 84, 0.5);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.admin-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+main > .market-list {
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-size: 1.5rem;
+  gap: 1rem;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 2rem auto;
+}
+
+.market-list li {
+  transition: transform 0.2s ease-in-out;
+}
+
+.market-list a {
+  transition: color 0.2s ease-in-out;
+}
+
+.market-list a:hover {
+  color: var(--dark-green);
+}
+
+.market-list li:hover {
+  transform: translateY(-3px);
+}
+
+/**** Admin edit Market ****/
+#new-location-fields {
+  display: none;
+  margin-top: 1rem;
+}
+
+#radio-new-location:checked ~ #new-location-fields {
+  display: block;
 }
 
 @media (max-width: 1200px) {
@@ -1096,5 +1155,9 @@ td {
   .vendor-overlay .view-more,
   .vendor-overly p {
     font-weight: bold;
+  }
+
+  #back-link {
+    margin-right: 1rem;
   }
 }

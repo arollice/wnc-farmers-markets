@@ -131,13 +131,12 @@ class UserAccount extends DatabaseObject
     $admin = self::find_by_id($admin_id);
     if (!$admin) {
       Utils::setFlashMessage('error', "Admin not found.");
-      header("Location: admin.php");
+      header("Location: admin-manage-admins.php");
       exit;
     }
 
     switch ($action) {
       case 'edit_admin':
-        // Retrieve and trim the updated details.
         $username = trim($data['username'] ?? '');
         $email = trim($data['email'] ?? '');
         if ($admin->updateAdminDetails($username, $email)) {
@@ -161,7 +160,7 @@ class UserAccount extends DatabaseObject
         Utils::setFlashMessage('error', "Invalid admin action.");
         break;
     }
-    header("Location: admin.php#admin-account-management");
+    header("Location: admin-manage-admins.php");
     exit;
   }
 

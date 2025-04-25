@@ -78,7 +78,7 @@ include_once('../private/validation.php');
     <header class="dashboard-header">
       <h2>Edit Vendor: <?= htmlspecialchars($vendor->vendor_name); ?></h2>
 
-      <p><a href="admin.php">Back to Admin Dashboard</a></p>
+      <p><a href="admin.php">&larr; Back to Admin Dashboard</a></p>
     </header>
 
     <?php Utils::displayFlashMessages(); ?>
@@ -95,7 +95,7 @@ include_once('../private/validation.php');
       <label for="vendor_description">Description:</label>
       <textarea name="vendor_description" id="vendor_description" rows="4" cols="50"><?= htmlspecialchars($vendor->vendor_description); ?></textarea><br>
 
-      <!-- Optional: Logo Update -->
+      <!-- Logo Update -->
       <?php if (!empty($vendor->vendor_logo)): ?>
         <p>Current Logo:</p>
         <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150" id="admin-edit-logo"><br>
