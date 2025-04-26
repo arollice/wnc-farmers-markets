@@ -1,6 +1,5 @@
 'use strict';
 
-if (document.getElementById('map')) {
 document.addEventListener("DOMContentLoaded", function () {
   // Remove the "no-js" class from the map container, if present
   var mapContainer = document.getElementById('map-container');
@@ -32,6 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
           marker.on('tooltipopen', function(e) {
             // Set tooltip text color to black
             e.tooltip._container.style.color = '#333';
+            // Also set the close button's color if it exists
             var closeBtn = e.tooltip._container.querySelector('.leaflet-popup-close-button');
             if (closeBtn) {
               closeBtn.style.color = '#333';
@@ -90,30 +90,3 @@ document.addEventListener("DOMContentLoaded", function () {
       );
   }
 });
-}
-
-//Admin add market preview map
-export function createMap(containerId, center = [35.6, -82.5], zoom = 10) {
-  console.log(`Creating map in container: ${containerId}`);
-  try {
-    const map = L.map(containerId).setView(center, zoom);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-    console.log("Map created successfully");
-    return map;
-  } catch (e) {
-    console.error("Error creating map:", e);
-    throw e;
-  }
-}
-
-export function addDraggableMarker(map, position = [35.6, -82.5], onDragEnd) {
-  console.log(`Adding marker at position: ${position}`);
-  const marker = L.marker(position, { draggable: true }).addTo(map);
-  marker.on('dragend', e => {
-    const { lat, lng } = e.target.getLatLng();
-    if (typeof onDragEnd === 'function') onDragEnd({ lat, lng });
-  });
-  return marker;
-}

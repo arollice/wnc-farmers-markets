@@ -72,15 +72,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $errors['new_region_lng'] = 'Valid longitude is required.';
     }
 
-    // If new region is valid, create it
+    // If new region is valid, create it or use existing
     if (!isset($errors['new_region_name']) && !isset($errors['new_region_lat']) && !isset($errors['new_region_lng'])) {
-      // Create the new region and get its ID
       try {
-        // Assuming you have a Region class with a create method
-        $region = Region::createNewRegion($new_region_name, $new_region_lat, $new_region_lng);
-        $market->region_id = $region->region_id;
+        error_log("Checking if region '{$new_region_name}' exists");
+
+        // First check if region already exists
+        $existing_region = Region::findByName($new_region_name);
+        if ($existing_region) {
+          // Use existing region instead of creating a new one
+          $market->region_id = $existing_region->region_id;
+          error_log("Using existing region with ID: {$existing_region->region_id}");
+        } else {
+          // Create new region
+          error_log("Creating new region '{$new_region_name}'");
+          $region = Region::createNewRegion($new_region_name, $new_region_lat, $new_region_lng);
+          error_log("Region created with ID: {$region->region_id}");
+          $market->region_id = $region->region_id;
+        }
       } catch (Exception $e) {
-        $errors['region_save'] = 'Could not create new region: ' . $e->getMessage();
+        error_log("Region handling error: " . $e->getMessage());
+        $errors['region_save'] = 'Could not create/find region: ' . $e->getMessage();
       }
     }
   }
@@ -113,13 +125,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
   <meta charset="utf-8">
   <title>WNC Farmers Market - Admin Add New Market</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css">
   <link rel="icon" type="image/svg+xml" href="img/wnc-favicon.svg">
   <link rel="icon" type="image/png" sizes="32x32" href="img/wnc-favicon32.png">
   <link rel="stylesheet" type="text/css" href="css/farmers-market.css">
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js" defer></script>
-  <!-- script tag below does not have defer attribute since module has defer like behavior-->
-  <script type="module" src="js/farmers-market.js"></script>
+  <script src="js/farmers-market.js" defer></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
@@ -221,9 +230,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input id="market_close" name="market_close" type="time"
           value="<?= htmlspecialchars($market->market_close) ?>">
       </div>
-
-      <!-- Leaflet map preview -->
-      <div id="preview-map" style="height:300px; margin:1rem;"></div>
 
       <!-- Schedule: Days checkboxes -->
       <fieldset class="form-group">

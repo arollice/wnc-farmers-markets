@@ -45,11 +45,13 @@ class Region extends DatabaseObject
   public static function createNewRegion($region_name, $latitude, $longitude)
   {
     $db = self::get_database();
+    $transaction_started = false;
 
     // Validate inputs
     $region_name = trim($region_name);
     $latitude = (float)$latitude;
     $longitude = (float)$longitude;
+
 
     if (empty($region_name)) {
       throw new Exception("Region name cannot be empty");
@@ -103,5 +105,25 @@ class Region extends DatabaseObject
       }
       throw new Exception("Database error: " . $e->getMessage());
     }
+  }
+
+  public static function findByName($region_name)
+  {
+    $db = self::get_database();
+    $sql = "SELECT * FROM region WHERE region_name = :region_name LIMIT 1";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':region_name', $region_name, PDO::PARAM_STR);
+    $stmt->execute();
+
+    if ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
+      $region = new Region();
+      $region->region_id = $row['region_id'];
+      $region->region_name = $row['region_name'];
+      $region->latitude = $row['latitude'];
+      $region->longitude = $row['longitude'];
+      return $region;
+    }
+
+    return null;
   }
 }
