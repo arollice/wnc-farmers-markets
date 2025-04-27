@@ -7,113 +7,93 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   exit;
 }
 
-// turn on errors for now
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
+$stickyDays = $_POST['market_days'] ?? [];
 
 // Fetch lookups
 $regions = Region::fetchAllWithCoords();
 $states  = State::fetchAllStates();
 $seasons = Season::fetchAll();
 
-// Prepare empty objects for form
-$market = new Market();
 $errors = [];
+$market = new Market();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  // 1) Sanitize
   $_POST = Utils::sanitize($_POST);
 
-  // 2) Hydrate Market
-  $market->market_name  = trim($_POST['market_name']  ?? '');
-  $market->region_id    = (int)$_POST['region_id']    ?? 0;
-  $market->city         = trim($_POST['city']         ?? '');
-  $market->state_id     = (int)$_POST['state_id']     ?? 0;
-  $market->zip_code     = trim($_POST['zip_code']     ?? '');
-  $market->parking_info = trim($_POST['parking_info'] ?? '');
-  $market->market_open  = $_POST['market_open']       ?? '';
-  $market->market_close = $_POST['market_close']      ?? '';
+  if ($_POST['region_id'] === '__new__') {
+    // pull new‐region inputs
+    $newName = trim($_POST['new_region_name'] ?? '');
+    $newLat  = trim($_POST['new_region_lat']  ?? '');
+    $newLng  = trim($_POST['new_region_lng']  ?? '');
 
-  // 3) Validate
+    // validate them
+    if ($newName === '') {
+      $errors['new_region_name'] = 'Name can’t be blank.';
+    }
+    if (!is_numeric($newLat)) {
+      $errors['new_region_lat']  = 'Valid latitude is required.';
+    }
+    if (!is_numeric($newLng)) {
+      $errors['new_region_lng']  = 'Valid longitude is required.';
+    }
+
+    if (!isset(
+      $errors['new_region_name'],
+      $errors['new_region_lat'],
+      $errors['new_region_lng']
+    )) {
+      $region = Region::findByName($newName)
+        ?: Region::createNewRegion($newName, $newLat, $newLng);
+      $region_id = $region->region_id;
+    }
+  } else {
+    $region_id = (int)$_POST['region_id'];
+  }
+
+  // Hydrate your Market object with final $region_id
+  $market = new Market();
+  $market->market_name  = trim($_POST['market_name'] ?? '');
+  $market->region_id    = $region_id   ?? 0;
+  $market->city         = trim($_POST['city']        ?? '');
+  $market->state_id     = (int)($_POST['state_id']  ?? 0);
+  $market->zip_code     = trim($_POST['zip_code']    ?? '');
+  $market->parking_info = trim($_POST['parking_info'] ?? '');
+  $market->market_open  = $_POST['market_open']      ?? '';
+  $market->market_close = $_POST['market_close']     ?? '';
+
+  // Validate market fields
   if ($market->market_name === '') {
-    $errors['market_name'] = 'Name can\'t be blank.';
+    $errors['market_name'] = 'Name can’t be blank.';
   }
   if ($market->region_id < 1) {
-    $errors['region_id'] = 'Please select a region.';
+    $errors['region_id']   = 'Please select a region.';
   }
   if ($market->city === '') {
-    $errors['city'] = 'City can\'t be blank.';
+    $errors['city']        = 'City can’t be blank.';
   }
   if ($market->state_id < 1) {
-    $errors['state_id'] = 'Please select a state.';
+    $errors['state_id']    = 'Please select a state.';
   }
   if (!preg_match('/^\d{5}$/', $market->zip_code)) {
     $errors['zip_code'] = 'ZIP must be 5 digits.';
   }
 
-  // Check if we're adding a new region or selecting an existing one
-  $adding_new_region = isset($_POST['region_id']) && $_POST['region_id'] === '__new__';
-
-  if (!$adding_new_region && $market->region_id < 1) {
-    $errors['region_id'] = 'Please select a region.';
-  } else if ($adding_new_region) {
-    // Validate new region fields
-    $new_region_name = trim($_POST['new_region_name'] ?? '');
-    $new_region_lat = trim($_POST['new_region_lat'] ?? '');
-    $new_region_lng = trim($_POST['new_region_lng'] ?? '');
-
-    if (empty($new_region_name)) {
-      $errors['new_region_name'] = 'New region name can\'t be blank.';
-    }
-    if (empty($new_region_lat) || !is_numeric($new_region_lat)) {
-      $errors['new_region_lat'] = 'Valid latitude is required.';
-    }
-    if (empty($new_region_lng) || !is_numeric($new_region_lng)) {
-      $errors['new_region_lng'] = 'Valid longitude is required.';
-    }
-
-    // If new region is valid, create it or use existing
-    if (!isset($errors['new_region_name']) && !isset($errors['new_region_lat']) && !isset($errors['new_region_lng'])) {
-      try {
-        error_log("Checking if region '{$new_region_name}' exists");
-
-        // First check if region already exists
-        $existing_region = Region::findByName($new_region_name);
-        if ($existing_region) {
-          // Use existing region instead of creating a new one
-          $market->region_id = $existing_region->region_id;
-          error_log("Using existing region with ID: {$existing_region->region_id}");
-        } else {
-          // Create new region
-          error_log("Creating new region '{$new_region_name}'");
-          $region = Region::createNewRegion($new_region_name, $new_region_lat, $new_region_lng);
-          error_log("Region created with ID: {$region->region_id}");
-          $market->region_id = $region->region_id;
-        }
-      } catch (Exception $e) {
-        error_log("Region handling error: " . $e->getMessage());
-        $errors['region_save'] = 'Could not create/find region: ' . $e->getMessage();
-      }
-    }
-  }
-
-  // 4) On success, save Market + schedule
   if (empty($errors)) {
-    if ($market->save()) {
-      // schedule fields from form
-      $days      = $_POST['market_days']        ?? [];
-      $season_id = (int)$_POST['season_id']     ?? 0;
-      $last_day  = $_POST['last_day_of_season'] ?? '';
+    $pdo->beginTransaction();
+    try {
+      $market->save();
       MarketSchedule::updateForMarket(
         $market->market_id,
-        $days,
-        $season_id,
-        $last_day
+        $_POST['market_days']        ?? [],
+        (int)($_POST['season_id']    ?? 0),
+        $_POST['last_day_of_season'] ?? null
       );
+      $pdo->commit();
       header('Location: admin-manage-markets.php');
       exit;
-    } else {
-      $errors['save'] = 'Database error; could not create market.';
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      $errors['save'] = $e->getMessage();
     }
   }
 }
@@ -157,7 +137,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           value="<?= htmlspecialchars($market->market_name) ?>">
       </div>
 
-      <!-- Region (also drives the map) -->
+      <!-- Region -->
       <label for="region_id">Region</label>
       <select id="region_id" name="region_id" required>
         <option value="">— Select Region —</option>
@@ -235,8 +215,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <fieldset class="form-group">
         <legend>Market Days</legend>
         <?php foreach (['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as $day): ?>
-          <label style="margin-right:1rem;">
-            <input type="checkbox" name="market_days[]" value="<?= $day ?>">
+          <label>
+            <input
+              type="checkbox"
+              name="market_days[]"
+              value="<?= $day ?>"
+              <?= in_array($day, $stickyDays) ? 'checked' : '' ?>>
             <?= $day ?>
           </label>
         <?php endforeach; ?>
@@ -258,7 +242,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
       <div class="form-group">
         <label for="last_day_of_season">Last Day of Season</label>
-        <input id="last_day_of_season" name="last_day_of_season" type="date">
+        <input id="last_day_of_season"
+          name="last_day_of_season"
+          type="date"
+          value="<?= htmlspecialchars($_POST['last_day_of_season'] ?? '') ?>">
+
       </div>
 
       <button type="submit">Create Market</button>

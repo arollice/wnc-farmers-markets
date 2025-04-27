@@ -42,10 +42,26 @@ class Region extends DatabaseObject
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 
+  // private/classes/region.class.php
+  public static function fetchAllWithCoordsAndMarket(): array
+  {
+    $sql = "
+    SELECT r.region_id,
+           r.region_name,
+           r.latitude,
+           r.longitude,
+           m.market_id
+      FROM region AS r
+ LEFT JOIN market AS m USING(region_id)
+  ORDER BY r.region_name
+  ";
+    return self::$database->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+
   public static function createNewRegion($region_name, $latitude, $longitude)
   {
     $db = self::get_database();
-    $transaction_started = false;
 
     // Validate inputs
     $region_name = trim($region_name);

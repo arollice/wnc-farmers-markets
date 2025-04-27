@@ -214,16 +214,67 @@ class Market extends DatabaseObject
     return $stmt->fetchAll(PDO::FETCH_COLUMN);
   }
 
-  /*** Delete a market by market ID. ****/
+  public static function fetchByRegionId(int $region_id): array
+  {
+    $sql = "
+      SELECT 
+        m.market_id,
+        m.market_name,
+        m.city,
+        m.state_id,
+        s.state_name,
+        m.zip_code,
+        m.parking_info,
+        m.market_open,
+        m.market_close,
+        GROUP_CONCAT(DISTINCT se.season_name ORDER BY se.season_name ASC SEPARATOR ', ') AS market_season,
+        MAX(ms.last_day_of_season) AS last_market_date,
+        GROUP_CONCAT(DISTINCT ms.market_day ORDER BY ms.market_day ASC SEPARATOR ', ') AS market_days
+      FROM market AS m
+      LEFT JOIN state AS s      ON m.state_id      = s.state_id
+      LEFT JOIN market_schedule AS ms ON m.market_id   = ms.market_id
+      LEFT JOIN season AS se     ON ms.season_id     = se.season_id
+      WHERE m.region_id = :region_id
+      GROUP BY m.market_id
+      ORDER BY m.market_name
+    ";
+
+    $stmt = self::$database->prepare($sql);
+    $stmt->bindParam(':region_id', $region_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+  }
+
+
+  /*** Delete a market by market ID ***/
   public static function deleteMarket($market_id)
   {
     $id = (int)$market_id;
     if ($id < 1) {
       return false;
     }
-    $sql  = "DELETE FROM " . static::$table_name
-      . " WHERE " . static::$primary_key . " = ?";
-    $stmt = self::$database->prepare($sql);
-    return $stmt->execute([$id]);
+
+    $db = self::$database;
+
+    try {
+      $db->beginTransaction();
+
+      $sql1 = "DELETE FROM market_schedule WHERE market_id = ?";
+      $stmt1 = $db->prepare($sql1);
+      $stmt1->execute([$id]);
+
+      $sql2 = "DELETE FROM " . static::$table_name .
+        " WHERE " . static::$primary_key . " = ? LIMIT 1";
+      $stmt2 = $db->prepare($sql2);
+      $stmt2->execute([$id]);
+
+      $db->commit();
+
+      return ($stmt2->rowCount() === 1);
+    } catch (Exception $e) {
+      $db->rollBack();
+
+      return false;
+    }
   }
 }

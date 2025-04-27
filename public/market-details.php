@@ -1,6 +1,7 @@
 <?php
 include_once('../private/config.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,8 +28,8 @@ include_once('../private/config.php');
   $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
 
   $market_id = intval($_GET['id']);
-  $market = Market::fetchMarketDetails($market_id); // Fetch market details
-  $policies = Market::fetchMarketPolicies(); // Fetch selected policies
+  $market = Market::fetchMarketDetails($market_id);
+  $policies = Market::fetchMarketPolicies();
   $vendors = Vendor::findVendorsByMarket($market_id, ['approved' => true]);
 
 
