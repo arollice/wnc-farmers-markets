@@ -18,6 +18,9 @@ $errors = [];
 $market = new Market();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+  error_log("POST data: " . print_r($_POST, true));
+
   $_POST = Utils::sanitize($_POST);
 
   if ($_POST['region_id'] === '__new__') {
@@ -28,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // validate them
     if ($newName === '') {
-      $errors['new_region_name'] = 'Name can’t be blank.';
+      $errors['new_region_name'] = 'Name can\'t be blank.';
     }
     if (!is_numeric($newLat)) {
       $errors['new_region_lat']  = 'Valid latitude is required.';

@@ -1,6 +1,6 @@
 <?php
 include_once('../private/config.php');
-include_once('../private/validation.php');
+//include_once('../private/validation.php');
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
@@ -36,14 +36,34 @@ error_reporting(E_ALL);
   }
 
   // DELETE 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_market'])) {
-    if (Market::deleteMarket($market_id)) {
-      Utils::setFlashMessage('success', 'Market deleted successfully.');
-    } else {
-      Utils::setFlashMessage('error', 'Error deleting market.');
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // 1) Handle deletion
+    if (isset($_POST['delete_market'])) {
+      // fetch the market to know its region
+      $m = Market::fetchMarketDetails($market_id);
+      if (!$m) {
+        Utils::setFlashMessage('error', 'Market not found.');
+        header('Location: admin-manage-markets.php');
+        exit;
+      }
+      $region_id = $m['region_id'];
+
+      // delete market & schedule
+      if (Market::deleteMarket($market_id)) {
+        // if no other markets remain in that region, delete the region
+        $remaining = Market::fetchByRegionId($region_id);
+        if (empty($remaining)) {
+          Region::deleteRegion($region_id);
+        }
+        Utils::setFlashMessage('success', 'Market (and empty region) deleted.');
+      } else {
+        Utils::setFlashMessage('error', 'Error deleting market.');
+      }
+
+      header('Location: admin-manage-markets.php');
+      exit;
     }
-    header('Location: admin-manage-markets.php');
-    exit;
   }
 
   // UPDATE

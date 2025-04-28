@@ -123,6 +123,16 @@ class Region extends DatabaseObject
     }
   }
 
+  public static function deleteRegion(int $region_id): bool
+  {
+    $db = self::get_database();
+    $sql = "DELETE FROM " . static::$table_name . " 
+            WHERE " . static::$primary_key . " = :rid LIMIT 1";
+    $stmt = $db->prepare($sql);
+    $stmt->bindValue(':rid', $region_id, PDO::PARAM_INT);
+    return $stmt->execute();
+  }
+
   public static function findByName($region_name)
   {
     $db = self::get_database();
