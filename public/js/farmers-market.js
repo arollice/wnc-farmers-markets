@@ -3,12 +3,10 @@
 
 
 document.addEventListener('DOMContentLoaded', function() {
- // Select all collapsible cards
  const cards = document.querySelectorAll('.collapsible-card');
   cards.forEach(card => {
    const header = card.querySelector('.collapsible-header');
    header.addEventListener('click', function() {
-     // Toggle the expanded class for this card
      card.classList.toggle('expanded');
    });
  });
@@ -16,7 +14,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 //Admin Market - New Region js
-
 document.addEventListener('DOMContentLoaded', function() {
   const regionSelect   = document.getElementById('region_id');
   const newRegionGroup = document.getElementById('new-region-fields');

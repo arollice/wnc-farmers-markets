@@ -54,14 +54,12 @@ include_once('../private/config.php');
     </nav>
 
     <h1><?= htmlspecialchars($market['market_name']) ?> - Details</h1>
-
     <section id="single-market-card">
       <?= Market::renderMarketCard($market) ?>
     </section>
 
     <section>
       <h2>Attending Vendors</h2>
-
       <?php if (!empty($vendors)) : ?>
         <ul class="attending-vendors">
           <?php foreach ($vendors as $vendor) : ?>

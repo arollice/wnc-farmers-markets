@@ -2,6 +2,7 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -226,15 +227,14 @@ include_once('../private/validation.php');
   <main>
     <header class="dashboard-header">
       <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
+
       <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
       <a href="logout.php">Logout</a>
     </header>
-
     <?php
     Utils::displayFlashMessages();
     Utils::displaySpellSuggestion();
     ?>
-
     <section id="current-markets">
       <h3>Markets You Are Attending</h3>
       <?php
@@ -348,11 +348,8 @@ include_once('../private/validation.php');
       </form>
     </section>
 
-
     <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="update_vendor" value="1">
-      <hr>
-
       <section id="update-details">
         <h3>Update Vendor Details</h3>
         <label for="vendor_name">Vendor Name:</label>
@@ -362,7 +359,6 @@ include_once('../private/validation.php');
         <label for="vendor_description">Business Description (max 255 characters):</label>
         <textarea name="vendor_description" id="vendor_description" rows="4" cols="50" required><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
       </section>
-      <hr>
 
       <section id="upload-logo">
         <h3>Upload Vendor Logo</h3>
@@ -378,7 +374,6 @@ include_once('../private/validation.php');
         <label for="vendor_logo">Select New Logo (optional):</label>
         <input type="file" id="vendor_logo" name="vendor_logo" accept="image/*">
       </section>
-      <hr>
 
       <section id="change-password">
         <h3>Change Password</h3>
@@ -390,7 +385,6 @@ include_once('../private/validation.php');
         <label for="confirm_password">Confirm New Password:</label>
         <input type="password" name="confirm_password" id="confirm_password"><br>
       </section>
-      <hr>
       <button type="submit" name="update_vendor" id="update-vendor">Save Changes</button>
     </form>
   </main>

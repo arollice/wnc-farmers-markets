@@ -1,7 +1,7 @@
 <?php
 include_once('../private/config.php');
-include_once HEADER_FILE;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -16,10 +16,10 @@ include_once HEADER_FILE;
 </head>
 
 <body>
+  <?php include_once HEADER_FILE; ?>
   <main>
     <section id="intro">
       <h2>About Us</h2>
-
       <p>
         WNC Farmers Markets is your guide to fresh, local, and sustainable shopping. Our mission is to connect communities
         with the people who grow, craft, and create.
@@ -55,8 +55,7 @@ include_once HEADER_FILE;
     </section>
 
     <section id="why-markets-matter">
-      <h3><em>Why Farmers Markets Matter</em></h3>
-
+      <h2><em>Why Farmers Markets Matter</em></h2>
       <h3>Boosting Local Economies</h3>
       <p>
         Research conducted by the <strong>American Farmland Trust</strong> and local economic studies has found that dollars spent at
@@ -69,7 +68,6 @@ include_once HEADER_FILE;
         <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) - "How Local Food Systems Can Strengthen Rural Economies"</a>
         (This source discusses the economic benefits of local food systems and includes multipliers related to farmers market spending.)
       </p>
-
       <h3>Local Retention Rates</h3>
       <p>
         Studies report that for every <strong>$100 spent at a local farmers market</strong>, approximately <strong>62% stays in the local economy</strong>,
@@ -80,7 +78,6 @@ include_once HEADER_FILE;
         <a href="https://www.ers.usda.gov/topics/food-markets-prices/local-foods" target="_blank">USDA Economic Research Service (ERS) - Local Food Systems</a>
         (While the USDA ERS reports offer comprehensive data on market dynamics, check the latest reports for the most current figures.)
       </p>
-
       <h3>Supporting Small Farms & Businesses</h3>
       <p>
         Farmers markets allow small-scale farmers and artisans to sell directly to consumers, eliminating intermediaries and
@@ -92,7 +89,6 @@ include_once HEADER_FILE;
         <a href="https://www.farmland.org/" target="_blank">American Farmland Trust (2007) - "How Local Food Systems Can Strengthen Rural Economies"</a>
         (See the section discussing the benefits for small producers.)
       </p>
-
       <h3>Vendor Demographics</h3>
       <p>
         Data from the <strong>National Farmers Market Directory</strong> and surveys of farmers market vendors have consistently

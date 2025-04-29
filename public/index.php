@@ -1,6 +1,7 @@
 <?php
 include_once('../private/config.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -45,7 +46,6 @@ include_once('../private/config.php');
     <section>
       <h2>Looking for something specific?</h2>
       <p>See who sells what you're looking for!</p>
-
       <!-- Search Form -->
       <form method="GET" action="index.php#results">
         <label for="search_term">Search for items:</label>
@@ -111,11 +111,13 @@ include_once('../private/config.php');
           <?php endif; ?>
         <?php endif; ?>
       </div>
+
     </section>
     <div>
       <p>Supporting Local, one market at a time.</p>
       <img src="img/smiley.svg" width="50" height="50" alt="A retro smiley face.">
     </div>
+
   </section>
 
   <?php include_once FOOTER_FILE; ?>

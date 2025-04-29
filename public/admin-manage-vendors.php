@@ -66,12 +66,10 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   <main>
     <header class="dashboard-header">
       <h2>Manage Vendors</h2>
-
       <p><a href="admin.php">&larr; Back to Dashboard</a></p>
     </header>
     <hr>
     <?php Utils::displayFlashMessages(); ?>
-
     <section>
       <h3>Vendor Accounts</h3>
       <?php

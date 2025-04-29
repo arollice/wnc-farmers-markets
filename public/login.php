@@ -2,6 +2,7 @@
 include_once __DIR__ . '/../private/config.php';
 include_once __DIR__ . '/../private/validation.php';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -62,10 +63,9 @@ include_once __DIR__ . '/../private/validation.php';
     <h2>Login</h2>
     <?php
     if (!empty($error)) {
-      echo "<p style='color:red;'>" . htmlspecialchars($error) . "</p>";
+      echo '<p class="register-error">' . htmlspecialchars($error) . '</p>';
     }
     ?>
-
     <form method="POST">
       <label for="username">Username:</label>
       <input type="text" id="username" name="username" required>

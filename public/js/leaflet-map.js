@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", async function () {
         .addTo(map)
         .bindTooltip(r.region_name, { direction: 'top' });
 
-      // Tooltip styling
       marker.on('tooltipopen', e => {
         e.tooltip._container.style.color = '#333';
         const btn = e.tooltip._container.querySelector('.leaflet-popup-close-button');

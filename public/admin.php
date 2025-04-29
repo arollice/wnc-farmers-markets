@@ -6,8 +6,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   header('Location: login.php');
   exit;
 }
-
-include_once HEADER_FILE;
 ?>
 
 <!DOCTYPE html>
@@ -24,6 +22,7 @@ include_once HEADER_FILE;
 </head>
 
 <body>
+  <?php include_once HEADER_FILE; ?>
   <main class="admin-chooser">
     <header class="dashboard-header">
       <h2>Admin Dashboard</h2>
@@ -36,12 +35,10 @@ include_once HEADER_FILE;
         <h3>Manage Admins</h3>
         <p>Add, edit, or remove administrator accounts.</p>
       </a>
-
       <a href="admin-manage-vendors.php" class="admin-card">
         <h3>Manage Vendors</h3>
         <p>Approve, edit, or delete vendor profiles.</p>
       </a>
-
       <a href="admin-manage-markets.php" class="admin-card">
         <h3>Manage Markets</h3>
         <p>Modify market information</p>

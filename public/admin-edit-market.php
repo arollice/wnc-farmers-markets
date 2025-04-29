@@ -2,9 +2,6 @@
 include_once('../private/config.php');
 //include_once('../private/validation.php');
 
-ini_set('display_errors', '1');
-ini_set('display_startup_errors', '1');
-error_reporting(E_ALL);
 ?>
 
 <!DOCTYPE html>
@@ -27,7 +24,6 @@ error_reporting(E_ALL);
     exit;
   }
 
-  // Get & validate market_id
   $market_id = intval($_GET['market_id'] ?? 0);
   if ($market_id < 1) {
     Utils::setFlashMessage('error', 'Invalid market.');
@@ -38,9 +34,8 @@ error_reporting(E_ALL);
   // DELETE 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    // 1) Handle deletion
     if (isset($_POST['delete_market'])) {
-      // fetch the market to know its region
+      // fetch the market with region
       $m = Market::fetchMarketDetails($market_id);
       if (!$m) {
         Utils::setFlashMessage('error', 'Market not found.');
@@ -49,9 +44,8 @@ error_reporting(E_ALL);
       }
       $region_id = $m['region_id'];
 
-      // delete market & schedule
       if (Market::deleteMarket($market_id)) {
-        // if no other markets remain in that region, delete the region
+        // if no other markets remain in region, delete the region
         $remaining = Market::fetchByRegionId($region_id);
         if (empty($remaining)) {
           Region::deleteRegion($region_id);
@@ -99,7 +93,6 @@ error_reporting(E_ALL);
     }
   }
 
-
   $market   = Market::fetchMarketDetails($market_id);
   $seasons  = Season::fetchAll();
   $schedules     = MarketSchedule::findAllByMarketId($market_id);
@@ -112,44 +105,41 @@ error_reporting(E_ALL);
   <main>
     <header class="dashboard-header">
       <h2>Edit Market</h2>
+
       <p><a href="admin-manage-markets.php">&larr; Back to Markets</a></p>
     </header>
     <?php Utils::displayFlashMessages(); ?>
-
     <!-- Market fields -->
     <form method="post">
-      <label>
+      <label for="market_name">
         Name<br>
-        <input type="text" name="market_name"
+        <input type="text" name="market_name" id="market_name"
           value="<?= htmlspecialchars($market['market_name']); ?>"
           required>
       </label>
-
-      <label>
+      <label for="parking_info">
         Parking Info<br>
-        <textarea name="parking_info" rows="3"><?= htmlspecialchars($market['parking_info']); ?></textarea>
+        <textarea name="parking_info" id="parking_info" rows="3"><?= htmlspecialchars($market['parking_info']); ?></textarea>
       </label>
-
-      <label>
+      <label for="market_open">
         Opens At<br>
-        <input type="time" name="market_open"
+        <input type="time" name="market_open" id="market_open"
           value="<?= $market['market_open']
                     ? date('H:i', strtotime($market['market_open'])) : '' ?>">
       </label>
-
-      <label>
+      <label for="market_close">
         Closes At<br>
-        <input type="time" name="market_close"
+        <input type="time" name="market_close" id="market_close"
           value="<?= $market['market_close']
                     ? date('H:i', strtotime($market['market_close'])) : '' ?>">
       </label>
-
-      <label>Market Days<br>
+      <fieldset class="market-days">
+        <legend>Market Days</legend>
         <?php
         $daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
         foreach ($daysOfWeek as $day):
         ?>
-          <label style="display:inline-block;margin-right:1rem;">
+          <label class="market-day">
             <input
               type="checkbox"
               name="market_days[]"
@@ -158,11 +148,10 @@ error_reporting(E_ALL);
             <?= $day ?>
           </label>
         <?php endforeach; ?>
-      </label>
-
-      <label>
+      </fieldset>
+      <label for="season_id">
         Season<br>
-        <select name="season_id" required>
+        <select name="season_id" id="season_id" required>
           <option value="">— Select season —</option>
           <?php foreach ($seasons as $sn): ?>
             <option value="<?= $sn->season_id ?>"
@@ -172,25 +161,21 @@ error_reporting(E_ALL);
           <?php endforeach; ?>
         </select>
       </label>
-
-      <label>
+      <label for="last_day_of_season">
         Last Day of Season<br>
-        <input type="date" name="last_day_of_season"
+        <input type="date" name="last_day_of_season" id="last_day_of_season"
           value="<?= $currentSched
                     ? date('Y-m-d', strtotime($currentSched->last_day_of_season))
                     : '' ?>">
       </label>
-
       <button type="submit">Save Changes</button>
     </form>
-
     <!-- Delete market -->
     <form method="post"
       onsubmit="return confirm('Delete this market?');">
       <input type="hidden" name="delete_market" value="1">
       <button type="submit" class="button danger">Delete Market</button>
     </form>
-
   </main>
 
   <?php include_once FOOTER_FILE; ?>

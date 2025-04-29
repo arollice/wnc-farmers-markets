@@ -1,6 +1,7 @@
 <?php
 include_once('../private/config.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -38,7 +39,6 @@ include_once('../private/config.php');
 
   <main class="logout-message">
     <p><?= htmlspecialchars($_SESSION['success_message']) ?></p>
-
     <p><a href="index.php">Return to Home</a></p>
   </main>
 

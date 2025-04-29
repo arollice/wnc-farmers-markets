@@ -1,6 +1,7 @@
 <?php
 require_once('../private/config.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,7 +33,6 @@ require_once('../private/config.php');
 
   <main>
     <h1>Vendor Directory</h1>
-
     <p>Meet the growers, artisans, and food crafters bringing fresh, local goods to your table!</p>
     <section class="vendor-directory">
       <?php if (empty($vendors)) : ?>

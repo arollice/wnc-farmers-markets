@@ -2,6 +2,7 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -33,14 +34,12 @@ include_once('../private/validation.php');
   <main>
     <header class="dashboard-header">
       <h2>Manage Markets</h2>
-
       <a href="admin-new-market.php" class="button button--primary">
         + Add New Market
       </a>
       <p><a href="admin.php">&larr; Back to Dashboard</a></p>
     </header>
     <?php Utils::displayFlashMessages(); ?>
-
     <ul class="market-list">
       <?php foreach ($markets as $market): ?>
         <li>

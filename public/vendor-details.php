@@ -1,6 +1,7 @@
 <?php
 require_once('../private/config.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -54,16 +55,13 @@ require_once('../private/config.php');
         <?php endforeach; ?>
       </ul>
     </nav>
-
     <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
-
     <section id="vendor-details">
       <?php if (!empty($vendor['vendor_logo'])): ?>
         <img src="<?= htmlspecialchars($vendor['vendor_logo']) ?>" alt="<?= htmlspecialchars($vendor['vendor_name']) ?> Logo" class="vendor-logo">
       <?php else: ?>
         <p>No logo available for this vendor.</p>
       <?php endif; ?>
-
       <p><strong>Description:</strong>
         <?= !empty($vendor['vendor_description']) ? htmlspecialchars($vendor['vendor_description']) : 'No description available.' ?>
       </p>
@@ -80,7 +78,6 @@ require_once('../private/config.php');
 
     <section>
       <h2>Items Sold</h2>
-
       <?php if (!empty($items)): ?>
         <ul>
           <?php foreach ($items as $item): ?>
@@ -94,7 +91,6 @@ require_once('../private/config.php');
 
     <section>
       <h2>Accepted Payment Methods</h2>
-
       <?php if (!empty($payment_methods)): ?>
         <ul>
           <?php foreach ($payment_methods as $method): ?>
@@ -108,7 +104,6 @@ require_once('../private/config.php');
 
     <section>
       <h2>Markets Attending</h2>
-
       <?php if (!empty($vendorMarkets)): ?>
         <ul class="attending-vendors">
           <?php foreach ($vendorMarkets as $market): ?>

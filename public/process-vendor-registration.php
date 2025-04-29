@@ -25,7 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password_confirm
   );
 
-  // Duplicate Check: Ensure the username and email are not already in use.
+  // Duplicate Check
   $pdo = DatabaseObject::get_database();
   if (empty($errors)) {
     $stmt = $pdo->prepare("SELECT username, email FROM user_account WHERE username = ? OR email = ?");
@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     'vendor_description' => $vendor_description,
     'status'             => 'pending'
   ];
+
   $vendor = Vendor::register($vendorData);
   if (!$vendor) {
     Utils::setFlashMessage('error', "Vendor registration failed. Please try again.");
@@ -74,11 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   // Register the user account.
   $userAccountData = [
     'username'  => $username,
-    'password'  => $password, // Raw password; will be hashed in UserAccount::register()
+    'password'  => $password, // Raw password hashed in UserAccount::register()
     'email'     => $email,
     'role'      => 'vendor',
     'vendor_id' => $vendor->vendor_id
   ];
+
   $userAccount = UserAccount::register($userAccountData);
   if (!$userAccount) {
     Utils::setFlashMessage('error', "User account creation failed. Please try again.");
@@ -100,9 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $_SESSION['username']  = $userAccount->username;
   $_SESSION['role']      = $userAccount->role;
 
-  // Set a success flash message and redirect to the vendor dashboard.
   Utils::setFlashMessage('success', "Registration successful! Welcome to your dashboard.");
   header("Location: vendor-dashboard.php?vendor_id=" . $vendor->vendor_id);
+
   exit;
 } else {
   echo "<p>Invalid request method.</p>";

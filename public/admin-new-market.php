@@ -66,13 +66,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   // Validate market fields
   if ($market->market_name === '') {
-    $errors['market_name'] = 'Name can’t be blank.';
+    $errors['market_name'] = 'Name can\'t be blank.';
   }
   if ($market->region_id < 1) {
     $errors['region_id']   = 'Please select a region.';
   }
   if ($market->city === '') {
-    $errors['city']        = 'City can’t be blank.';
+    $errors['city']        = 'City can\'t be blank.';
   }
   if ($market->state_id < 1) {
     $errors['state_id']    = 'Please select a state.';
@@ -120,9 +120,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <main class="container">
     <h2>Add New Market</h2>
-
     <?php if ($errors): ?>
-      <div class="error-summary">
+      <div class="register-error">
         <p>Please fix the following errors:</p>
         <ul>
           <?php foreach ($errors as $msg): ?>
@@ -180,6 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input id="city" name="city" type="text"
           value="<?= htmlspecialchars($market->city) ?>">
       </div>
+
       <div class="form-group">
         <label for="state_id">State</label>
         <select id="state_id" name="state_id" required>
@@ -192,6 +192,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <?php endforeach; ?>
         </select>
       </div>
+
       <div class="form-group">
         <label for="zip_code">ZIP Code</label>
         <input id="zip_code" name="zip_code" type="text"
@@ -203,11 +204,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="parking_info">Parking Info</label>
         <textarea id="parking_info" name="parking_info"><?= htmlspecialchars($market->parking_info) ?></textarea>
       </div>
+
       <div class="form-group">
         <label for="market_open">Opens At</label>
         <input id="market_open" name="market_open" type="time"
           value="<?= htmlspecialchars($market->market_open) ?>">
       </div>
+
       <div class="form-group">
         <label for="market_close">Closes At</label>
         <input id="market_close" name="market_close" type="time"
@@ -254,9 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
       <button type="submit">Create Market</button>
       <a href="admin-manage-markets.php" class="button secondary">Cancel</a>
-
     </form>
-
   </main>
 
   <?php include_once FOOTER_FILE; ?>

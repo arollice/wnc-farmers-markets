@@ -47,12 +47,10 @@ include_once('../private/validation.php');
   <main>
     <header class="dashboard-header">
       <h2>Manage Admins</h2>
-
       <p><a href="admin.php">&larr; Back to Dashboard</a></p>
     </header>
     <hr>
     <?php Utils::displayFlashMessages(); ?>
-
     <section>
       <h3>Admin Accounts</h3>
       <p><a href="create-admin.php" class="add-admin-link">+ Add Admin</a></p>

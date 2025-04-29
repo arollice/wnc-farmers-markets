@@ -37,13 +37,13 @@ WNC Farmers Markets is a community-driven directory and map-based portal for dis
 - **User authentication:** secure login for admins and vendors.
 
 ## Demo
-![Homepage](homepage.png)
+![Homepage](assets/homepage.png)
 _Homepage showing featured vendors._
 
-![Map view](map-view.png)
+![Map view](assets/map-view.png)
 _Interactive Leaflet map with clickable market markers._
 
-![Admin dashboard](admin-dash.png)
+![Admin dashboard](assets/admin-dash.png)
 _Admin panel for managing markets, vendors, and admins._
 
 ## Getting Started
