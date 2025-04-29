@@ -1,7 +1,6 @@
 <?php
 include_once('../private/config.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 

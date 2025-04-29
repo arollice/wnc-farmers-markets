@@ -2,7 +2,6 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -81,6 +80,7 @@ include_once('../private/validation.php');
       <p><a href="admin.php">&larr; Back to Admin Dashboard</a></p>
     </header>
     <?php Utils::displayFlashMessages(); ?>
+
     <!-- Main Vendor Update Form -->
     <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
@@ -89,20 +89,23 @@ include_once('../private/validation.php');
       <label for="vendor_website">Website:</label>
       <input type="url" name="vendor_website" id="vendor_website" value="<?= htmlspecialchars($vendor->vendor_website); ?>"><br>
       <label for="vendor_description">Description:</label>
-      <textarea name="vendor_description" id="vendor_description" rows="4" cols="50"><?= htmlspecialchars($vendor->vendor_description); ?></textarea><br>
+      <textarea name="vendor_description" id="vendor_description" rows="4" cols="50"><?= htmlspecialchars($vendor->vendor_description); ?></textarea>
+      <br>
+
       <!-- Logo Update -->
       <?php if (!empty($vendor->vendor_logo)): ?>
         <p>Current Logo:</p>
         <img src="<?= htmlspecialchars($vendor->vendor_logo); ?>" alt="Vendor Logo" width="150" id="admin-edit-logo"><br>
         <label for="delete_logo">
           <input type="checkbox" name="delete_logo" id="delete_logo" value="1"> Delete current logo
-        </label><br>
+        </label>
+        <br>
       <?php endif; ?>
       <label for="vendor_logo">Select New Logo (optional):</label>
       <input type="file" name="vendor_logo" id="vendor_logo" accept="image/*"><br>
       <button type="submit" name="update_vendor">Save Changes</button>
     </form>
-    <hr>
+
     <!-- Markets Section -->
     <?php
     $vendorMarkets = Vendor::findMarketsByVendor($vendor_id);
@@ -119,6 +122,7 @@ include_once('../private/validation.php');
       echo "<p>Vendor is not attending any markets.</p>";
     }
     ?>
+
     <!-- Add a Market -->
     <?php
     $all_markets = Market::fetchAllMarkets();
@@ -154,7 +158,7 @@ include_once('../private/validation.php');
       </select>
       <button type="submit" name="add_market_btn" <?php if (empty($available_markets)) echo 'disabled'; ?>>Add Market</button>
     </form>
-    <br>
+
     <!-- Remove a Market -->
     <form action="admin-edit-vendor.php" method="POST">
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
@@ -170,6 +174,7 @@ include_once('../private/validation.php');
       </select>
       <button type="submit" name="remove_market_btn">Remove Market</button>
     </form>
+
     <!-- Accepted Payment Methods -->
     <section id="accepted-payment-methods">
       <h3>Accepted Payment Methods for <?= htmlspecialchars($vendor->vendor_name); ?></h3>

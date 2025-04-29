@@ -1,6 +1,5 @@
 <?php require_once('../private/config.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,8 +31,10 @@
     <p>Register your business to be listed in the WNC Farmers Market.</p>
     <!-- Error message if one exists -->
     <?php if (!empty($regError)): ?>
-      <div class="register_error"><?= $regError ?></div>
+      <div class="register_error"><?= $regError ?>
+      </div>
     <?php endif; ?>
+
     <form action="<?= PUBLIC_PATH ?>/process-vendor-registration.php" method="POST">
       <label for="vendor_name">Business Name:</label>
       <input type="text" id="vendor_name" name="vendor_name" required

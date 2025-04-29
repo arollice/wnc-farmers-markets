@@ -2,7 +2,6 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 

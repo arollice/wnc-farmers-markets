@@ -2,7 +2,6 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -227,7 +226,6 @@ include_once('../private/validation.php');
   <main>
     <header class="dashboard-header">
       <h2>Welcome, <?= htmlspecialchars($_SESSION['username']); ?>!</h2>
-
       <p>Account Status: <strong><?= htmlspecialchars($status); ?></strong></p>
       <a href="logout.php">Logout</a>
     </header>
@@ -235,6 +233,7 @@ include_once('../private/validation.php');
     Utils::displayFlashMessages();
     Utils::displaySpellSuggestion();
     ?>
+
     <section id="current-markets">
       <h3>Markets You Are Attending</h3>
       <?php

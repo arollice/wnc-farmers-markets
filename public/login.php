@@ -2,7 +2,6 @@
 include_once __DIR__ . '/../private/config.php';
 include_once __DIR__ . '/../private/validation.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 

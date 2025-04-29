@@ -1,7 +1,6 @@
 <?php
 require_once('../private/config.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -55,6 +54,7 @@ require_once('../private/config.php');
         <?php endforeach; ?>
       </ul>
     </nav>
+
     <h2><?= htmlspecialchars($vendor['vendor_name']) ?></h2>
     <section id="vendor-details">
       <?php if (!empty($vendor['vendor_logo'])): ?>

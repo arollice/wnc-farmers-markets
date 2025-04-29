@@ -7,7 +7,6 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   exit;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -68,8 +67,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
       <h2>Manage Vendors</h2>
       <p><a href="admin.php">&larr; Back to Dashboard</a></p>
     </header>
-    <hr>
     <?php Utils::displayFlashMessages(); ?>
+
     <section>
       <h3>Vendor Accounts</h3>
       <?php

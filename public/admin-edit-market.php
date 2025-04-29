@@ -1,9 +1,6 @@
 <?php
 include_once('../private/config.php');
-//include_once('../private/validation.php');
-
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -105,10 +102,10 @@ include_once('../private/config.php');
   <main>
     <header class="dashboard-header">
       <h2>Edit Market</h2>
-
       <p><a href="admin-manage-markets.php">&larr; Back to Markets</a></p>
     </header>
     <?php Utils::displayFlashMessages(); ?>
+
     <!-- Market fields -->
     <form method="post">
       <label for="market_name">
@@ -170,6 +167,7 @@ include_once('../private/config.php');
       </label>
       <button type="submit">Save Changes</button>
     </form>
+
     <!-- Delete market -->
     <form method="post"
       onsubmit="return confirm('Delete this market?');">

@@ -2,7 +2,6 @@
 include_once('../private/config.php');
 include_once('../private/validation.php');
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -100,6 +99,7 @@ include_once('../private/validation.php');
       <?php unset($_SESSION['register_error']); ?>
     <?php endif; ?>
     <?php Utils::displayFlashMessages(); ?>
+
     <form action="create-admin.php" method="post">
       <label for="admin_name">Username:</label>
       <input type="text" id="admin_name" name="admin_name" required

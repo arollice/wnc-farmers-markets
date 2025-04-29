@@ -50,4 +50,5 @@ $currentUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
       </li>
     </ul>
   </nav>
+  <a href="login.php">Login here</a>
 </header>
