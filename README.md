@@ -37,13 +37,13 @@ WNC Farmers Markets is a community-driven directory and map-based portal for dis
 - **User authentication:** secure login for admins and vendors.
 
 ## Demo
-![Homepage](assets/homepage.png)
+![Homepage](readme-docs/homepage.png)
 _Homepage showing featured vendors._
 
-![Map view](assets/map-view.png)
+![Map view](readme-docs/map-view.png)
 _Interactive Leaflet map with clickable market markers._
 
-![Admin dashboard](assets/admin-dash.png)
+![Admin dashboard](readme-docs/admin-dash.png)
 _Admin panel for managing markets, vendors, and admins._
 
 ## Getting Started
@@ -459,8 +459,8 @@ https://github.com/arollice
 - ChatGPT for guidance
 - Claude for troubleshooting
 - Hero Image: Sean Nufer via Unsplash: https://unsplash.com/@metalpsychologist?utm_content=creditCopyText&utm_medium=referral&utm_source=unsplash
-- Logo: Adobe Stock Free SVG
--Google Fonts: Inter, Bagel Fat One
+- Logo: Adobe Stock Free Download 
+- Google Fonts: Inter, Bagel Fat One
 
 
 
