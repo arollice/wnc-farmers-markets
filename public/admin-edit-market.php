@@ -1,5 +1,83 @@
 <?php
 include_once('../private/config.php');
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+  header('Location: login.php');
+  exit;
+}
+
+$market_id = intval($_GET['market_id'] ?? 0);
+if ($market_id < 1) {
+  Utils::setFlashMessage('error', 'Invalid market.');
+  header('Location: admin-manage-markets.php');
+  exit;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  // CSRF CHECK 
+  if (!Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+    Utils::setFlashMessage('error', 'Invalid form submission.');
+    header("Location: admin-edit-market.php?market_id={$market_id}");
+    exit;
+  }
+
+  if (isset($_POST['delete_market'])) {
+    // DELETE logic
+    $m = Market::fetchMarketDetails($market_id);
+    if (! $m) {
+      Utils::setFlashMessage('error', 'Market not found.');
+      header('Location: admin-manage-markets.php');
+      exit;
+    }
+    $region_id = $m['region_id'];
+
+    if (Market::deleteMarket($market_id)) {
+      $remaining = Market::fetchByRegionId($region_id);
+      if (empty($remaining)) {
+        Region::deleteRegion($region_id);
+      }
+      Utils::setFlashMessage('success', 'Market (and empty region) deleted.');
+    } else {
+      Utils::setFlashMessage('error', 'Error deleting market.');
+    }
+    header('Location: admin-manage-markets.php');
+    exit;
+  } else {
+    // UPDATE logic
+    $_POST = Utils::sanitize($_POST);
+
+    $m = Market::find_by_id($market_id);
+    if (! $m) {
+      Utils::setFlashMessage('error', 'Market not found.');
+      header('Location: admin-manage-markets.php');
+      exit;
+    }
+
+    $m->market_name  = $_POST['market_name'];
+    $m->parking_info = $_POST['parking_info'];
+    $m->market_open  = $_POST['market_open'];
+    $m->market_close = $_POST['market_close'];
+
+    if ($m->save()) {
+      $days      = $_POST['market_days']        ?? [];
+      $season_id = (int)$_POST['season_id'];
+      $last_day  = $_POST['last_day_of_season'] ?? '';
+      MarketSchedule::updateForMarket($market_id, $days, $season_id, $last_day);
+
+      Utils::setFlashMessage('success', 'Market and schedule updated.');
+      header("Location: admin-edit-market.php?market_id={$market_id}");
+      exit;
+    } else {
+      Utils::setFlashMessage('error', 'There was a problem saving the market.');
+    }
+  }
+}
+
+$market   = Market::fetchMarketDetails($market_id);
+$seasons  = Season::fetchAll();
+$schedules     = MarketSchedule::findAllByMarketId($market_id);
+$selectedDays  = array_column($schedules, 'market_day');
+$currentSched  = $schedules[0] ?? null;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,86 +94,6 @@ include_once('../private/config.php');
 
 <body>
   <?php
-  if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    header('Location: login.php');
-    exit;
-  }
-
-  $market_id = intval($_GET['market_id'] ?? 0);
-  if ($market_id < 1) {
-    Utils::setFlashMessage('error', 'Invalid market.');
-    header('Location: admin-manage-markets.php');
-    exit;
-  }
-
-  // DELETE 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    if (isset($_POST['delete_market'])) {
-      // fetch the market with region
-      $m = Market::fetchMarketDetails($market_id);
-      if (!$m) {
-        Utils::setFlashMessage('error', 'Market not found.');
-        header('Location: admin-manage-markets.php');
-        exit;
-      }
-      $region_id = $m['region_id'];
-
-      if (Market::deleteMarket($market_id)) {
-        // if no other markets remain in region, delete the region
-        $remaining = Market::fetchByRegionId($region_id);
-        if (empty($remaining)) {
-          Region::deleteRegion($region_id);
-        }
-        Utils::setFlashMessage('success', 'Market (and empty region) deleted.');
-      } else {
-        Utils::setFlashMessage('error', 'Error deleting market.');
-      }
-
-      header('Location: admin-manage-markets.php');
-      exit;
-    }
-  }
-
-  // UPDATE
-  if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['delete_market'])) {
-
-    $_POST = Utils::sanitize($_POST);
-
-    // Load existing market
-    $m = Market::find_by_id($market_id);
-    if (!$m) {
-      Utils::setFlashMessage('error', 'Market not found.');
-      header('Location: admin-manage-markets.php');
-      exit;
-    }
-
-    // Overwrite only the editable fields
-    $m->market_name  = $_POST['market_name'];
-    $m->parking_info = $_POST['parking_info'];
-    $m->market_open  = $_POST['market_open'];
-    $m->market_close = $_POST['market_close'];
-
-    if ($m->save()) {
-      $days      = $_POST['market_days'] ?? [];
-      $season_id = (int)$_POST['season_id'];
-      $last_day  = $_POST['last_day_of_season']  ?? '';
-      MarketSchedule::updateForMarket($market_id, $days, $season_id, $last_day);
-
-      Utils::setFlashMessage('success', 'Market and schedule updated.');
-      header("Location: admin-edit-market.php?market_id={$market_id}");
-      exit;
-    } else {
-      Utils::setFlashMessage('error', 'There was a problem saving the market.');
-    }
-  }
-
-  $market   = Market::fetchMarketDetails($market_id);
-  $seasons  = Season::fetchAll();
-  $schedules     = MarketSchedule::findAllByMarketId($market_id);
-  $selectedDays  = array_column($schedules, 'market_day');
-  $currentSched  = $schedules[0] ?? null;
-
   include_once HEADER_FILE;
   ?>
 
@@ -108,6 +106,11 @@ include_once('../private/config.php');
 
     <!-- Market fields -->
     <form method="post">
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+
       <label for="market_name">
         Name<br>
         <input type="text" name="market_name" id="market_name"
@@ -169,8 +172,11 @@ include_once('../private/config.php');
     </form>
 
     <!-- Delete market -->
-    <form method="post"
-      onsubmit="return confirm('Delete this market?');">
+    <form method="post">
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
       <input type="hidden" name="delete_market" value="1">
       <button type="submit" class="button danger">Delete Market</button>
     </form>

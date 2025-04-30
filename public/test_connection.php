@@ -23,5 +23,5 @@ try {
   echo "Error: " . $e->getMessage();
 }
 
-
+echo "👋 PHP is working and errors are visible.";
 //phpinfo();

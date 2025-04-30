@@ -75,7 +75,7 @@ include_once('../private/validation.php');
       } else {
         Utils::setFlashMessage('error', "Error creating admin account.");
         header("Location: create-admin.php");
-        exit;
+        exit; //stops the entire script after sending the redirect header
       }
     } catch (PDOException $e) {
       // Check for duplicate entry error code.
@@ -87,6 +87,16 @@ include_once('../private/validation.php');
       header("Location: create-admin.php");
       exit;
     }
+    /*
+    Note:
+    - Use exit() here because this code is at the top level of the script:
+      after sending a Location header, exit() immediately halts execution and ensures
+      no further output or logic runs (avoiding headers-already-sent issues).
+
+    - If this logic lived inside a function, consider using return to hand back
+      success/failure to the caller, and let the caller perform the header() + exit.
+      That approach improves testability and separates concerns.
+*/
   }
 
   include_once HEADER_FILE;

@@ -100,4 +100,111 @@ class Utils
     }
     return $data;
   }
+
+  /**
+   * Generates a random CAPTCHA image, stores the code in $_SESSION['captcha_code'],
+   * sends the PNG headers/output, and exits.
+   *
+   * @param int  $width   Width of the image in px
+   * @param int  $height  Height of the image in px
+   * @param int  $length  Number of characters in the CAPTCHA code
+   * @param int  $fontSize  Font size (GD units) for the text
+   * @param string $fontPath  Full path to a .ttf font on your server
+   * @return void  — this method will exit after sending the image
+   */
+  public static function generateCaptchaImage(
+    int $width     = 120,
+    int $height    = 40,
+    int $length    = 6,
+    int $fontSize  = 18,
+    string $fontPath = PRIVATE_PATH . '/fonts/Roboto-Regular.ttf'
+
+  ): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+      session_start();
+    }
+
+    if (!is_readable($fontPath)) {
+      throw new \RuntimeException("CAPTCHA font not found or unreadable at: $fontPath");
+    }
+
+    // Generate & store code
+    $chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    $code = '';
+    for ($i = 0; $i < $length; $i++) {
+      $code .= $chars[random_int(0, strlen($chars) - 1)];
+    }
+    $_SESSION['captcha_code'] = $code;
+
+    // Create image canvas
+    $img = imagecreatetruecolor($width, $height);
+    $bg = imagecolorallocate($img, 255, 255, 255);
+    $fg = imagecolorallocate($img, 50, 100, 180);
+    $noise = imagecolorallocate($img, 200, 200, 200);
+
+    imagefilledrectangle($img, 0, 0, $width, $height, $bg);
+
+    // Add noise
+    for ($i = 0; $i < ($width * $height) / 3; $i++) {
+      imagesetpixel($img, random_int(0, $width), random_int(0, $height), $noise);
+    }
+
+    // Draw the code
+    $x = 10;
+    $y = ($height + $fontSize) / 2;
+    foreach (str_split($code) as $letter) {
+      imagettftext(
+        $img,
+        $fontSize,
+        random_int(-10, 10),
+        $x,
+        $y,
+        $fg,
+        $fontPath,
+        $letter
+      );
+      $x += $fontSize * 0.9;
+    }
+
+    // Output and clean up
+    header('Content-Type: image/png');
+    imagepng($img);
+    imagedestroy($img);
+  }
+
+  /**
+   * Checks a user-supplied CAPTCHA code against the one in session.
+   * Unsets the stored code so it can’t be reused.
+   *
+   * @param string|null $userInput  The $_POST['captcha_code'] value
+   * @return bool  True if match (case-insensitive), false otherwise
+   */
+  public static function checkCaptcha(?string $userInput): bool
+  {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+      session_start();
+    }
+    $stored = $_SESSION['captcha_code'] ?? '';
+    unset($_SESSION['captcha_code']);
+    return $stored !== '' && strcasecmp($stored, trim($userInput)) === 0;
+  }
+
+  /**
+   * Validate a CSRF token from a POST against the one in session.
+   *
+   * @param string|null $token The raw $_POST['csrf_token'] value
+   * @return bool True if valid, false otherwise
+   */
+  public static function validateCsrf(?string $token): bool
+  {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
+      session_start();
+    }
+
+    $stored = $_SESSION['csrf_token'] ?? '';
+    // Use hash_equals for timing-safe comparison
+    return is_string($token)
+      && is_string($stored)
+      && hash_equals($stored, $token);
+  }
 }

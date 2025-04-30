@@ -1,6 +1,69 @@
 <?php
 include_once('../private/config.php');
 include_once('../private/validation.php');
+
+$currencies = Currency::fetchAllCurrencies();
+
+if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+  header('Location: login.php');
+  exit;
+}
+
+// Determine vendor ID and sanitize inputs
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $_POST = Utils::sanitize($_POST);
+  $vendor_id = intval($_POST['vendor_id'] ?? 0);
+} else {
+  $vendor_id = intval($_GET['vendor_id'] ?? 0);
+}
+
+if (!validateVendorId($vendor_id)) {
+  Utils::setFlashMessage('error', "Invalid vendor ID.");
+  header("Location: admin.php");
+  exit;
+}
+
+// Retrieve vendor data
+$vendorData = Vendor::findVendorById($vendor_id);
+if (!$vendorData) {
+  Utils::setFlashMessage('error', "Vendor not found.");
+  header("Location: admin.php");
+  exit;
+}
+$vendor = new Vendor();
+foreach ($vendorData as $key => $value) {
+  $vendor->$key = $value;
+}
+
+// Build the current currencies array
+$currentCurrencies = [];
+$acceptedCurrencies = $vendor->get_accepted_currencies();
+foreach ($acceptedCurrencies as $currency) {
+  $currentCurrencies[] = (int)$currency->currency_id;
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+  // CSRF
+  if (!Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+    Utils::setFlashMessage('error', 'Invalid form submission.');
+    header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+    exit;
+  }
+
+  if (isset($_POST['update_vendor'])) {
+    UserAccount::updateVendor($vendor, $_POST, $_FILES, $vendor_id);
+  } elseif (isset($_POST['add_market_btn'])) {
+    UserAccount::addMarket($vendor, $vendor_id, intval($_POST['add_market'] ?? 0));
+  } elseif (isset($_POST['remove_market_btn'])) {
+    UserAccount::removeMarket($vendor, $vendor_id, intval($_POST['remove_market'] ?? 0));
+  } elseif (isset($_POST['update_payments'])) {
+    UserAccount::updatePayments($vendor, $vendor_id, $_POST['accepted_payments'] ?? []);
+  }
+
+  header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+  exit;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,60 +80,6 @@ include_once('../private/validation.php');
 
 <body>
   <?php
-  $pdo = DatabaseObject::get_database();
-  $currencies = Currency::fetchAllCurrencies();
-
-  // Determine vendor ID and sanitize inputs
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $_POST = Utils::sanitize($_POST);
-    $vendor_id = intval($_POST['vendor_id'] ?? 0);
-  } else {
-    $vendor_id = intval($_GET['vendor_id'] ?? 0);
-  }
-
-  if (!validateVendorId($vendor_id)) {
-    Utils::setFlashMessage('error', "Invalid vendor ID.");
-    header("Location: admin.php");
-    exit;
-  }
-
-  // Retrieve vendor data
-  $vendorData = Vendor::findVendorById($vendor_id);
-  if (!$vendorData) {
-    Utils::setFlashMessage('error', "Vendor not found.");
-    header("Location: admin.php");
-    exit;
-  }
-  $vendor = new Vendor();
-  foreach ($vendorData as $key => $value) {
-    $vendor->$key = $value;
-  }
-
-  // Process POST requests 
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['update_vendor'])) {
-      UserAccount::updateVendor($vendor, $_POST, $_FILES, $vendor_id);
-    } elseif (isset($_POST['add_market_btn'])) {
-      $market_to_add = intval($_POST['add_market'] ?? 0);
-      UserAccount::addMarket($vendor, $vendor_id, $market_to_add);
-    } elseif (isset($_POST['remove_market_btn'])) {
-      $market_to_remove = intval($_POST['remove_market'] ?? 0);
-      UserAccount::removeMarket($vendor, $vendor_id, $market_to_remove);
-    } elseif (isset($_POST['update_payments'])) {
-      $selectedPayments = $_POST['accepted_payments'] ?? [];
-      UserAccount::updatePayments($vendor, $vendor_id, $selectedPayments);
-    }
-  }
-
-  // Build the current currencies array
-  $currentCurrencies = [];
-  $acceptedCurrencies = $vendor->get_accepted_currencies();
-  if (!empty($acceptedCurrencies)) {
-    foreach ($acceptedCurrencies as $currency) {
-      $currentCurrencies[] = (int)$currency->currency_id;
-    }
-  }
-
   include HEADER_FILE;
   ?>
 
@@ -83,6 +92,12 @@ include_once('../private/validation.php');
 
     <!-- Main Vendor Update Form -->
     <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
+      <!-- CSRF token -->
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="vendor_name">Vendor Name:</label>
       <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
@@ -143,6 +158,12 @@ include_once('../private/validation.php');
     }
     ?>
     <form action="admin-edit-vendor.php" method="POST">
+      <!-- CSRF token -->
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="add_market">Add a Market:</label>
       <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
@@ -161,6 +182,12 @@ include_once('../private/validation.php');
 
     <!-- Remove a Market -->
     <form action="admin-edit-vendor.php" method="POST">
+      <!-- CSRF token -->
+      <input
+        type="hidden"
+        name="csrf_token"
+        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="remove_market">Remove a Market:</label>
       <select name="remove_market" id="remove_market">
@@ -179,6 +206,12 @@ include_once('../private/validation.php');
     <section id="accepted-payment-methods">
       <h3>Accepted Payment Methods for <?= htmlspecialchars($vendor->vendor_name); ?></h3>
       <form action="admin-edit-vendor.php" method="POST">
+        <!-- CSRF token -->
+        <input
+          type="hidden"
+          name="csrf_token"
+          value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+
         <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
         <fieldset>
           <legend>Modify Payment Methods</legend>

@@ -1,5 +1,4 @@
 <?php
-// sessionmanager.php
 require_once __DIR__ . '/dbsessionhandler.class.php';;
 
 class SessionManager
@@ -15,6 +14,14 @@ class SessionManager
     $this->handler = new DBSessionHandler($this->pdo, $this->table);
     session_set_save_handler($this->handler, true);
     session_start();
+    $this->ensureCsrfToken();
+  }
+
+  protected function ensureCsrfToken(): void
+  {
+    if (empty($_SESSION['csrf_token'])) {
+      $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+    }
   }
 
   // Optionally, add helper methods for your sessions.
