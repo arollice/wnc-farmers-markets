@@ -36,6 +36,7 @@
     <?php endif; ?>
 
     <form action="<?= PUBLIC_PATH ?>/process-vendor-registration.php" method="POST">
+      <?= Utils::csrfInputTag() ?>
       <label for="vendor_name">Business Name:</label>
       <input type="text" id="vendor_name" name="vendor_name" required
         value="<?= htmlspecialchars($sticky['vendor_name'] ?? '') ?>">

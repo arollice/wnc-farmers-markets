@@ -58,6 +58,13 @@ include_once('../private/validation.php');
   $pdo = DatabaseObject::get_database();
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    // CSRF
+    if (! Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+      Utils::setFlashMessage('error', 'Invalid form submission.');
+      header('Location: vendor-dashboard.php');
+      exit;
+    }
     $_POST = Utils::sanitize($_POST);
 
     if (isset($_POST['add_market_btn'])) {
@@ -269,6 +276,7 @@ include_once('../private/validation.php');
       ?>
 
       <form action="vendor-dashboard.php" method="POST">
+        <?= Utils::csrfInputTag() ?>
         <label for="add_market">Add a Market:</label>
         <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
           <?php
@@ -286,6 +294,7 @@ include_once('../private/validation.php');
       <br>
 
       <form action="vendor-dashboard.php" method="POST">
+        <?= Utils::csrfInputTag() ?>
         <label for="remove_market">Remove a Market:</label>
         <select name="remove_market" id="remove_market">
           <?php
@@ -306,6 +315,7 @@ include_once('../private/validation.php');
       $vendorItems = Item::findItemsByVendor($vendor_id);
       if (!empty($vendorItems)) {
         echo '<form action="vendor-dashboard.php" method="POST">';
+        echo Utils::csrfInputTag();
         echo '<select name="item_id">';
         foreach ($vendorItems as $item) {
           echo '<option value="' . htmlspecialchars($item['item_id']) . '">' . htmlspecialchars($item['item_name']) . '</option>';
@@ -322,6 +332,7 @@ include_once('../private/validation.php');
     <section id="vendor-items">
       <h3>Add Items for Sale</h3>
       <form action="vendor-dashboard.php" method="POST">
+        <?= Utils::csrfInputTag() ?>
         <label for="item_name">Item Name:</label>
         <input type="text" name="item_name" id="item_name" required>
         <button type="submit" name="add_item_btn">Add Item</button>
@@ -331,6 +342,7 @@ include_once('../private/validation.php');
     <section id="accepted-payments">
       <h3>Accepted Payment Methods</h3>
       <form action="vendor-dashboard.php" method="POST">
+        <?= Utils::csrfInputTag() ?>
         <fieldset>
           <legend>Modify Payment Methods</legend>
           <?php foreach ($currencies as $currency):
@@ -348,6 +360,7 @@ include_once('../private/validation.php');
     </section>
 
     <form action="vendor-dashboard.php" method="POST" enctype="multipart/form-data">
+      <?= Utils::csrfInputTag() ?>
       <input type="hidden" name="update_vendor" value="1">
       <section id="update-details">
         <h3>Update Vendor Details</h3>

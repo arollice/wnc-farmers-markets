@@ -64,7 +64,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 }
 
-include HEADER_FILE;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,6 +79,7 @@ include HEADER_FILE;
 </head>
 
 <body>
+  <?php include HEADER_FILE; ?>
   <main>
     <h2>Login</h2>
 

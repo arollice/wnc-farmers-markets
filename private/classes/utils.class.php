@@ -207,4 +207,11 @@ class Utils
       && is_string($stored)
       && hash_equals($stored, $token);
   }
+
+  public static function csrfInputTag(): string
+  {
+    return '<input type="hidden" name="csrf_token" value="'
+      . htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES)
+      . '">';
+  }
 }

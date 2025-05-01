@@ -3,6 +3,13 @@ include_once('../private/config.php');
 include_once('../private/validation.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+  // CSRF 
+  if (! Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+    Utils::setFlashMessage('error', 'Invalid form submission.');
+    header("Location: vendor-register.php");
+    exit;
+  }
   $_POST = Utils::sanitize($_POST);
 
   $vendor_name        = trim($_POST['vendor_name'] ?? '');

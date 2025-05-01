@@ -25,6 +25,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   $pdo = DatabaseObject::get_database();
 
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    //CSRF
+    $token = $_POST['csrf_token'] ?? null;
+    if (! Utils::validateCsrf($token)) {
+      Utils::setFlashMessage('error', 'Invalid CSRF token.');
+      header('Location: admin-manage-vendors.php');
+      exit;
+    }
+
     $_POST     = Utils::sanitize($_POST);
     $action    = $_POST['action']     ?? '';
     $vendor_id = intval($_POST['vendor_id'] ?? 0);
@@ -97,6 +105,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 <td class="<?= $vendor['status'] === 'approved' ? 'approved-cell' : '' ?>">
                   <?php if ($vendor['status'] === 'pending'): ?>
                     <form method="post">
+                      <?= Utils::csrfInputTag() ?>
                       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id'], ENT_QUOTES) ?>">
                       <input type="hidden" name="action" value="approve">
                       <button type="submit">Approve</button>
@@ -109,6 +118,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
                 <td><a href="admin-edit-vendor.php?vendor_id=<?= htmlspecialchars($vendor['vendor_id'], ENT_QUOTES) ?>">Edit</a></td>
                 <td>
                   <form method="post" onsubmit="return confirm('Delete this vendor?');">
+                    <?= Utils::csrfInputTag() ?>
                     <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor['vendor_id'], ENT_QUOTES) ?>">
                     <input type="hidden" name="action" value="delete">
                     <button type="submit">Delete</button>

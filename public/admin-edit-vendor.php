@@ -92,12 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Main Vendor Update Form -->
     <form action="admin-edit-vendor.php" method="POST" enctype="multipart/form-data">
-      <!-- CSRF token -->
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-
+      <?= Utils::csrfInputTag() ?>
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="vendor_name">Vendor Name:</label>
       <input type="text" name="vendor_name" id="vendor_name" value="<?= htmlspecialchars($vendor->vendor_name); ?>" required><br>
@@ -158,12 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ?>
     <form action="admin-edit-vendor.php" method="POST">
-      <!-- CSRF token -->
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-
+      <?= Utils::csrfInputTag() ?>
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="add_market">Add a Market:</label>
       <select name="add_market" id="add_market" <?php if (empty($available_markets)) echo 'disabled'; ?>>
@@ -182,12 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Remove a Market -->
     <form action="admin-edit-vendor.php" method="POST">
-      <!-- CSRF token -->
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-
+      <?= Utils::csrfInputTag() ?>
       <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
       <label for="remove_market">Remove a Market:</label>
       <select name="remove_market" id="remove_market">
@@ -206,12 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <section id="accepted-payment-methods">
       <h3>Accepted Payment Methods for <?= htmlspecialchars($vendor->vendor_name); ?></h3>
       <form action="admin-edit-vendor.php" method="POST">
-        <!-- CSRF token -->
-        <input
-          type="hidden"
-          name="csrf_token"
-          value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-
+        <?= Utils::csrfInputTag() ?>
         <input type="hidden" name="vendor_id" value="<?= htmlspecialchars($vendor_id); ?>">
         <fieldset>
           <legend>Modify Payment Methods</legend>

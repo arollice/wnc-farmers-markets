@@ -26,6 +26,14 @@ include_once('../private/validation.php');
 
   // Process form submission.
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    //CSRF
+    if (!Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+      Utils::setFlashMessage('error', 'Invalid form submission.');
+      header('Location: create-admin.php');
+      exit;
+    }
+
     $_POST = Utils::sanitize($_POST);
     $adminName = $_POST['admin_name'] ?? '';
     $adminEmail = $_POST['admin_email'] ?? '';
@@ -111,6 +119,7 @@ include_once('../private/validation.php');
     <?php Utils::displayFlashMessages(); ?>
 
     <form action="create-admin.php" method="post">
+      <?= Utils::csrfInputTag() ?>
       <label for="admin_name">Username:</label>
       <input type="text" id="admin_name" name="admin_name" required
         value="<?= htmlspecialchars($sticky['admin_name'] ?? '') ?>">

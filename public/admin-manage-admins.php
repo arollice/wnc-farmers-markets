@@ -29,6 +29,13 @@ include_once('../private/validation.php');
 
   // Process POST requests
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $token = $_POST['csrf_token'] ?? null;
+    if (! Utils::validateCsrf($token)) {
+      Utils::setFlashMessage('error', 'Invalid CSRF token.');
+      header('Location: admin-manage-admins.php');
+      exit;
+    }
     $_POST = Utils::sanitize($_POST);
     $action = $_POST['action'] ?? '';
     $admin_id = intval($_POST['admin_id'] ?? 0);
@@ -73,47 +80,83 @@ include_once('../private/validation.php');
           <tbody>
             <?php foreach ($admins as $admin): ?>
               <?php if ($admin['user_id'] === $edit_admin_id): ?>
-                <form method="post">
-                  <tr>
-                    <td>
-                      <?= htmlspecialchars($admin['user_id']); ?>
-                      <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
-                    </td>
-                    <td>
-                      <input type="text" name="username" value="<?= htmlspecialchars($admin['username']); ?>">
-                    </td>
-                    <td>
-                      <input type="email" name="email" value="<?= htmlspecialchars($admin['email']); ?>">
-                    </td>
-                    <td>
-                      <input type="hidden" name="action" value="edit_admin">
-                      <button type="submit">Save</button>
-                    </td>
-                    <td>
-                      <a href="admin-manage-admins.php">Cancel</a>
-                    </td>
-                  </tr>
+                <?php
+                // unique form id per row
+                $fid = "edit-admin-form-{$admin['user_id']}";
+                ?>
+                <!-- Hidden form carrying CSRF token, admin_id & action -->
+                <form
+                  id="<?= $fid ?>"
+                  method="post"
+                  style="display:none;">
+                  <?= Utils::csrfInputTag() ?>
+                  <input
+                    type="hidden"
+                    name="admin_id"
+                    value="<?= htmlspecialchars($admin['user_id'], ENT_QUOTES) ?>">
+                  <input
+                    type="hidden"
+                    name="action"
+                    value="edit_admin">
                 </form>
+
+                <tr>
+                  <td><?= htmlspecialchars($admin['user_id'], ENT_QUOTES) ?></td>
+                  <td>
+                    <input
+                      form="<?= $fid ?>"
+                      type="text"
+                      name="username"
+                      value="<?= htmlspecialchars($admin['username'], ENT_QUOTES) ?>">
+                  </td>
+                  <td>
+                    <input
+                      form="<?= $fid ?>"
+                      type="email"
+                      name="email"
+                      value="<?= htmlspecialchars($admin['email'], ENT_QUOTES) ?>">
+                  </td>
+                  <td>
+                    <button
+                      form="<?= $fid ?>"
+                      type="submit">
+                      Save
+                    </button>
+                  </td>
+                  <td>
+                    <a href="admin-manage-admins.php">Cancel</a>
+                  </td>
+                </tr>
+
               <?php else: ?>
                 <tr>
-                  <td><?= htmlspecialchars($admin['user_id']); ?></td>
-                  <td><?= htmlspecialchars($admin['username']); ?></td>
-                  <td><?= htmlspecialchars($admin['email']); ?></td>
+                  <td><?= htmlspecialchars($admin['user_id'], ENT_QUOTES) ?></td>
+                  <td><?= htmlspecialchars($admin['username'], ENT_QUOTES) ?></td>
+                  <td><?= htmlspecialchars($admin['email'], ENT_QUOTES) ?></td>
                   <td>
                     <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
                       <del>Edit</del>
                     <?php else: ?>
-                      <a href="admin-manage-admins.php?edit=<?= htmlspecialchars($admin['user_id']); ?>">Edit</a>
-
+                      <a href="admin-manage-admins.php?edit=<?= htmlspecialchars($admin['user_id'], ENT_QUOTES) ?>">Edit</a>
                     <?php endif; ?>
                   </td>
                   <td>
                     <?php if ($admin['user_id'] == $_SESSION['user_id']): ?>
                       <button type="button" class="disabled-btn" disabled>Current Admin</button>
                     <?php else: ?>
-                      <form method="post" onsubmit="return confirm('Are you sure you want to delete this admin?');" style="display:inline;">
-                        <input type="hidden" name="admin_id" value="<?= htmlspecialchars($admin['user_id']); ?>">
-                        <input type="hidden" name="action" value="delete_admin">
+                      <form
+                        method="post"
+                        onsubmit="return confirm('Are you sure you want to delete this admin?');"
+                        style="display:inline;">
+                        <?= Utils::csrfInputTag() ?>
+                        <input
+                          type="hidden"
+                          name="admin_id"
+                          value="<?= htmlspecialchars($admin['user_id'], ENT_QUOTES) ?>">
+                        <input
+                          type="hidden"
+                          name="action"
+                          value="delete_admin">
                         <button type="submit">Delete</button>
                       </form>
                     <?php endif; ?>
@@ -122,6 +165,7 @@ include_once('../private/validation.php');
               <?php endif; ?>
             <?php endforeach; ?>
           </tbody>
+
         </table>
       <?php else: ?>
         <p>No admin accounts found.</p>

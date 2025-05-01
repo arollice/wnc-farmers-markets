@@ -18,6 +18,12 @@ $errors = [];
 $market = new Market();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  //CSRF
+  if (!Utils::validateCsrf($_POST['csrf_token'] ?? null)) {
+    Utils::setFlashMessage('error', 'Invalid form submission.');
+    header('Location: admin-new-market.php');
+    exit;
+  }
 
   error_log("POST data: " . print_r($_POST, true));
 
@@ -131,11 +137,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php endif; ?>
 
     <form action="admin-new-market.php" method="post" novalidate>
+      <?= Utils::csrfInputTag() ?>
       <!-- Market Name -->
       <div class="form-group">
         <label for="market_name">Market Name</label>
         <input id="market_name" name="market_name" type="text"
-          value="<?= htmlspecialchars($market->market_name) ?>">
+          value="<?= htmlspecialchars($market->market_name) ?>" required>
       </div>
 
       <!-- Region -->
@@ -176,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="form-group">
         <label for="city">City</label>
         <input id="city" name="city" type="text"
-          value="<?= htmlspecialchars($market->city) ?>">
+          value="<?= htmlspecialchars($market->city) ?>" required>
       </div>
 
       <div class="form-group">
@@ -195,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="form-group">
         <label for="zip_code">ZIP Code</label>
         <input id="zip_code" name="zip_code" type="text"
-          value="<?= htmlspecialchars($market->zip_code) ?>">
+          value="<?= htmlspecialchars($market->zip_code) ?>" required>
       </div>
 
       <!-- Parking & Hours -->

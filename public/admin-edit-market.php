@@ -106,11 +106,7 @@ $currentSched  = $schedules[0] ?? null;
 
     <!-- Market fields -->
     <form method="post">
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
-
+      <?= Utils::csrfInputTag() ?>
       <label for="market_name">
         Name<br>
         <input type="text" name="market_name" id="market_name"
@@ -173,10 +169,7 @@ $currentSched  = $schedules[0] ?? null;
 
     <!-- Delete market -->
     <form method="post">
-      <input
-        type="hidden"
-        name="csrf_token"
-        value="<?= htmlspecialchars($_SESSION['csrf_token'], ENT_QUOTES) ?>">
+      <?= Utils::csrfInputTag() ?>
       <input type="hidden" name="delete_market" value="1">
       <button type="submit" class="button danger">Delete Market</button>
     </form>
