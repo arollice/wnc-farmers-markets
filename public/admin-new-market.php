@@ -35,16 +35,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $newLat  = trim($_POST['new_region_lat']  ?? '');
     $newLng  = trim($_POST['new_region_lng']  ?? '');
 
-    // validate them
-    if ($newName === '') {
-      $errors['new_region_name'] = 'Name can\'t be blank.';
-    }
-    if (!is_numeric($newLat)) {
-      $errors['new_region_lat']  = 'Valid latitude is required.';
-    }
-    if (!is_numeric($newLng)) {
-      $errors['new_region_lng']  = 'Valid longitude is required.';
-    }
+    $errors = array_merge(
+      $errors,
+      validateNewRegion($newName, $newLat, $newLng)
+    );
 
     if (!isset(
       $errors['new_region_name'],
@@ -59,6 +53,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $region_id = (int)$_POST['region_id'];
   }
 
+  $errors = array_merge(
+    $errors,
+    validateMarketFields($_POST)
+  );
+
+  $errors = array_merge(
+    $errors,
+    validateSchedule(
+      $_POST['market_days'] ?? [],
+      $_POST['season_id']   ?? null,
+      $_POST['last_day_of_season'] ?? null
+    )
+  );
+
   // Hydrate your Market object with final $region_id
   $market = new Market();
   $market->market_name  = trim($_POST['market_name'] ?? '');
@@ -69,23 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $market->parking_info = trim($_POST['parking_info'] ?? '');
   $market->market_open  = $_POST['market_open']      ?? '';
   $market->market_close = $_POST['market_close']     ?? '';
-
-  // Validate market fields
-  if ($market->market_name === '') {
-    $errors['market_name'] = 'Name can\'t be blank.';
-  }
-  if ($market->region_id < 1) {
-    $errors['region_id']   = 'Please select a region.';
-  }
-  if ($market->city === '') {
-    $errors['city']        = 'City can\'t be blank.';
-  }
-  if ($market->state_id < 1) {
-    $errors['state_id']    = 'Please select a state.';
-  }
-  if (!preg_match('/^\d{5}$/', $market->zip_code)) {
-    $errors['zip_code'] = 'ZIP must be 5 digits.';
-  }
 
   if (empty($errors)) {
     $pdo->beginTransaction();

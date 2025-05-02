@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $password           = $_POST['vendor_password'] ?? '';
   $password_confirm   = $_POST['vendor_password_confirm'] ?? '';
 
-  $accepted_payments  = $_POST['accepted_payments'] ?? [];
+  $acceptedPayments  = $_POST['accepted_payments'] ?? [];
 
   $errors = validateVendorRegistrationFields(
     $vendor_name,
@@ -47,22 +47,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
   }
 
-  if (!empty($errors)) {
-    $_SESSION['sticky'] = [
-      'vendor_name'        => $vendor_name,
-      'vendor_username'    => $username,
-      'vendor_email'       => $email,
-      'vendor_website'     => $vendor_website,
-      'vendor_description' => $vendor_description,
-      'market_ids'         => $_POST['market_ids'] ?? [],
-      'accepted_payments'  => $accepted_payments,
-    ];
-    // Use a unique key for vendor registration errors
-    $_SESSION['register_error'] = '<ul class="register_error"><li>' . implode('</li><li>', $errors) . '</li></ul>';
+  $marketIds        = $_POST['market_ids']        ?? [];
 
+  $errors = array_merge(
+    $errors,
+    validateMarketSelection($marketIds),
+    validatePaymentSelection($acceptedPayments)
+  );
+
+  if (!empty($errors)) {
+    $_SESSION['errors'] = $errors;
+    $_SESSION['sticky'] = $_POST;
     header("Location: vendor-register.php");
     exit;
   }
+
 
   // Register the vendor.
   $vendorData = [
@@ -95,13 +94,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  $vendor->associatePayments($accepted_payments);
+  $vendor->associatePayments($acceptedPayments);
 
-  if (isset($_POST['market_ids']) && is_array($_POST['market_ids'])) {
-    $stmt = $pdo->prepare("INSERT INTO vendor_market (vendor_id, market_id) VALUES (?, ?)");
-    foreach ($_POST['market_ids'] as $market_id) {
-      $stmt->execute([$vendor->vendor_id, $market_id]);
-    }
+  $stmt = $pdo->prepare(
+    "INSERT INTO vendor_market (vendor_id, market_id) VALUES (?, ?)"
+  );
+  foreach ($marketIds as $mId) {
+    $stmt->execute([$vendor->vendor_id, $mId]);
   }
 
   // Set user session details.

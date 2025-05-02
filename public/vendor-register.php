@@ -1,4 +1,6 @@
-<?php require_once('../private/config.php');
+<?php
+require_once('../private/config.php');
+include_once('../private/validation.php');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -17,11 +19,9 @@
   <?php
   $currencies = Currency::fetchAllCurrencies();
 
-  $sticky = $_SESSION['sticky'] ?? [];
-  $regError = $_SESSION['register_error'] ?? '';
-
-  // Clear the error after retrieving
-  unset($_SESSION['register_error']);
+  $errors = $_SESSION['errors']   ?? [];
+  $sticky = $_SESSION['sticky']   ?? [];
+  unset($_SESSION['errors'], $_SESSION['sticky']);
 
   include_once HEADER_FILE;
   ?>
@@ -30,8 +30,14 @@
     <h2>Vendor Registration</h2>
     <p>Register your business to be listed in the WNC Farmers Market.</p>
     <!-- Error message if one exists -->
-    <?php if (!empty($regError)): ?>
-      <div class="register_error"><?= $regError ?>
+    <?php if (!empty($errors)): ?>
+      <div class="register-error">
+        <p>Please fix the following errors:</p>
+        <ul>
+          <?php foreach ($errors as $msg): ?>
+            <li><?= htmlspecialchars($msg) ?></li>
+          <?php endforeach; ?>
+        </ul>
       </div>
     <?php endif; ?>
 
