@@ -1,13 +1,18 @@
 <?php
 include_once('../private/config.php');
+include_once('../private/validation.php');
+
 
 if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
   header('Location: login.php');
   exit;
 }
 
+$pdo = DatabaseObject::get_database();
+
+
 $market_id = intval($_GET['market_id'] ?? 0);
-if ($market_id < 1) {
+if (! validateMarketId($market_id)) {
   Utils::setFlashMessage('error', 'Invalid market.');
   header('Location: admin-manage-markets.php');
   exit;
@@ -22,24 +27,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   }
 
   if (isset($_POST['delete_market'])) {
-    // DELETE logic
-    $m = Market::fetchMarketDetails($market_id);
-    if (! $m) {
-      Utils::setFlashMessage('error', 'Market not found.');
-      header('Location: admin-manage-markets.php');
-      exit;
-    }
-    $region_id = $m['region_id'];
+    $pdo->beginTransaction();
+    try {
+      // Fetch market details (and implicitly verify it exists)
+      $m = Market::fetchMarketDetails($market_id);
+      if (! $m) {
+        throw new Exception('Market not found.');
+      }
+      $region_id = $m['region_id'];
 
-    if (Market::deleteMarket($market_id)) {
+      // Delete the market
+      if (! Market::deleteMarket($market_id)) {
+        throw new Exception('Error deleting market.');
+      }
+
+      // If that wiped out its region, clean up the region too
       $remaining = Market::fetchByRegionId($region_id);
       if (empty($remaining)) {
         Region::deleteRegion($region_id);
       }
+
+      $pdo->commit();
       Utils::setFlashMessage('success', 'Market (and empty region) deleted.');
-    } else {
-      Utils::setFlashMessage('error', 'Error deleting market.');
+    } catch (Exception $e) {
+      $pdo->rollBack();
+      Utils::setFlashMessage('error', $e->getMessage());
     }
+
     header('Location: admin-manage-markets.php');
     exit;
   } else {

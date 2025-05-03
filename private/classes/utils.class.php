@@ -48,21 +48,32 @@ class Utils
     if (isset($_SESSION['spell_suggestion'])) {
       $original   = htmlspecialchars($_SESSION['spell_suggestion']['original']);
       $suggestion = htmlspecialchars($_SESSION['spell_suggestion']['suggestion']);
+
       echo "<div style='padding:10px; background:#fff3cd; color:#856404; border:1px solid #ffeeba; margin-bottom:10px;'>";
       echo "Did you mean <strong>$suggestion</strong> instead of <strong>$original</strong>? ";
-      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>
-                <input type='hidden' name='item_name' value='$original'>
-                <input type='hidden' name='confirm_spell' value='decline'>
-                <button type='submit' name='add_item_btn'>Ignore Suggestion</button>
-              </form>";
-      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>
-                <input type='hidden' name='item_name' value='$original'>
-                <input type='hidden' name='confirm_spell' value='accept'>
-                <button type='submit' name='add_item_btn'>Accept Suggestion</button>
-              </form>";
+
+      // Decline form
+      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline; margin-right:10px;'>";
+      echo Utils::csrfInputTag();
+      echo "<input type='hidden' name='add_item_btn'   value='1'>";
+      echo "<input type='hidden' name='item_name'      value='$original'>";
+      echo "<input type='hidden' name='confirm_spell'  value='decline'>";
+      echo "<button type='submit'>Ignore Suggestion</button>";
+      echo "</form>";
+
+      // Accept form
+      echo "<form action='vendor-dashboard.php' method='POST' style='display:inline;'>";
+      echo Utils::csrfInputTag();
+      echo "<input type='hidden' name='add_item_btn'   value='1'>";
+      echo "<input type='hidden' name='item_name'      value='$original'>";
+      echo "<input type='hidden' name='confirm_spell'  value='accept'>";
+      echo "<button type='submit'>Accept Suggestion</button>";
+      echo "</form>";
+
       echo "</div>";
     }
   }
+
 
   /**
    * Validates the file size of an uploaded file.

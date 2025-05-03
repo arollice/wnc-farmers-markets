@@ -40,6 +40,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     // Approve vendor
     if ($vendor_id > 0 && $action === 'approve') {
       $vendor = Vendor::find_by_id($vendor_id);
+      // Debug mode—dump how many rows match:
+      $stmt = $pdo->prepare("SELECT COUNT(*) FROM user_account WHERE vendor_id = ?");
+      $stmt->execute([$vendor_id]);
+      $count = $stmt->fetchColumn();
+      Utils::setFlashMessage('info', "Found $count user_account rows for vendor_id={$vendor_id}");
+
       if ($vendor) {
         $vendor->status = 'approved';
         if ($vendor->save()) {
@@ -56,12 +62,36 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
     // Delete vendor
     if ($vendor_id > 0 && $action === 'delete') {
-      $vendor = Vendor::find_by_id($vendor_id);
-      if ($vendor && $vendor->delete()) {
-        Utils::setFlashMessage('success', "Vendor '{$vendor->vendor_name}' deleted.");
-      } else {
-        Utils::setFlashMessage('error', "Error deleting vendor.");
+      $pdo->beginTransaction();
+      try {
+        // Clean up the many-to-many links for **this** vendor only
+        $stmt = $pdo->prepare("DELETE FROM vendor_item WHERE vendor_id = ?");
+        $stmt->execute([$vendor_id]);
+
+        $stmt = $pdo->prepare("DELETE FROM vendor_market WHERE vendor_id = ?");
+        $stmt->execute([$vendor_id]);
+
+        // If you have a payments‐link table (e.g. vendor_currency or vendor_payment):
+        $stmt = $pdo->prepare("DELETE FROM vendor_currency WHERE vendor_id = ?");
+        $stmt->execute([$vendor_id]);
+
+        // Delete the user_account row that points to this vendor
+        $stmt = $pdo->prepare("DELETE FROM user_account WHERE vendor_id = ?");
+        $stmt->execute([$vendor_id]);
+
+        // Last delete the vendor record itself
+        $vendor = Vendor::find_by_id($vendor_id);
+        if (! $vendor || ! $vendor->delete()) {
+          throw new Exception("Could not delete vendor record.");
+        }
+
+        $pdo->commit();
+        Utils::setFlashMessage('success', "Vendor and all related data have been deleted.");
+      } catch (Exception $e) {
+        $pdo->rollBack();
+        Utils::setFlashMessage('error', "Deletion failed: " . $e->getMessage());
       }
+
       header('Location: admin-manage-vendors.php');
       exit;
     }

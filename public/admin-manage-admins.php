@@ -27,9 +27,8 @@ include_once('../private/validation.php');
   // Edit mode for admin accounts 
   $edit_admin_id = isset($_GET['edit']) ? intval($_GET['edit']) : 0;
 
-  // Process POST requests
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    // CSRF & sanitize…
     $token = $_POST['csrf_token'] ?? null;
     if (! Utils::validateCsrf($token)) {
       Utils::setFlashMessage('error', 'Invalid CSRF token.');
@@ -37,16 +36,50 @@ include_once('../private/validation.php');
       exit;
     }
     $_POST = Utils::sanitize($_POST);
-    $action = $_POST['action'] ?? '';
+
+    $action   = $_POST['action']   ?? '';
     $admin_id = intval($_POST['admin_id'] ?? 0);
 
-    // Process admin-related actions
-    if ($admin_id > 0 && in_array($action, ['edit_admin', 'delete_admin'])) {
-      UserAccount::processAdminAction($_POST);
-      header('Location: admin-manage-admins.php');
-      exit;
+    if ($admin_id > 0) {
+
+      $stmt = $pdo->prepare("SELECT username FROM user_account WHERE user_id = ?");
+      $stmt->execute([$admin_id]);
+      $name = $stmt->fetchColumn() ?: "ID {$admin_id}";
+
+      if ($action === 'edit_admin') {
+        UserAccount::processAdminAction($_POST);
+        Utils::setFlashMessage('success', "Admin {$name} updated.");
+        header('Location: admin-manage-admins.php');
+        exit;
+      }
+
+      if ($action === 'delete_admin') {
+        // Delete inside a transaction
+        $pdo->beginTransaction();
+        try {
+
+          // Only delete admin‐role accounts:
+          $stmt = $pdo->prepare("
+            DELETE FROM user_account
+             WHERE user_id = ?
+               AND role    = 'admin'
+          ");
+          $stmt->execute([$admin_id]);
+          if ($stmt->rowCount() === 0) {
+            throw new Exception("No admin found or cannot delete non-admin.");
+          }
+          $pdo->commit();
+          Utils::setFlashMessage('success', "Admin #{$name} deleted.");
+        } catch (Exception $e) {
+          $pdo->rollBack();
+          Utils::setFlashMessage('error', "Deletion failed: " . $e->getMessage());
+        }
+        header('Location: admin-manage-admins.php');
+        exit;
+      }
     }
   }
+
 
   include_once HEADER_FILE;
   ?>

@@ -12,11 +12,23 @@ function validateVendorId($vendor_id)
   return validateId($vendor_id);
 }
 
-//Validates that the market ID is a positive integer.
+
+// Validates that the market ID is a positive integer & also checks if the market ID exists in the database.
+
 function validateMarketId($market_id)
 {
-  return validateId($market_id);
+  // integer check
+  if (!validateId($market_id)) {
+    return false;
+  }
+
+  // Verify it’s in the markets table
+  $pdo  = DatabaseObject::get_database();
+  $stmt = $pdo->prepare("SELECT COUNT(*) FROM market WHERE market_id = ?");
+  $stmt->execute([$market_id]);
+  return $stmt->fetchColumn() > 0;
 }
+
 
 //Validates login fields
 function validateLoginFields($username, $password)

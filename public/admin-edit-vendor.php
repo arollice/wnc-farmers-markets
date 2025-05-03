@@ -51,14 +51,108 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
   }
 
-  if (isset($_POST['update_vendor'])) {
-    UserAccount::updateVendor($vendor, $_POST, $_FILES, $vendor_id);
-  } elseif (isset($_POST['add_market_btn'])) {
-    UserAccount::addMarket($vendor, $vendor_id, intval($_POST['add_market'] ?? 0));
+  if (isset($_POST['add_market_btn'])) {
+    // sanitize & pull the market_id
+    $mId = intval($_POST['add_market'] ?? 0);
+
+    // basic validation
+    $errors = validateMarketId($mId)
+      ? []
+      : ["Invalid market selection."];
+
+    if (empty($errors)) {
+      // attempt to add
+      $added = $vendor->addMarket($mId);
+      if ($added) {
+        Utils::setFlashMessage('success', "Market added successfully.");
+      } else {
+        Utils::setFlashMessage('error', "That vendor is already in that market.");
+      }
+    } else {
+      Utils::setFlashMessage('error', $errors[0]);
+    }
+
+    header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+    exit;
   } elseif (isset($_POST['remove_market_btn'])) {
-    UserAccount::removeMarket($vendor, $vendor_id, intval($_POST['remove_market'] ?? 0));
-  } elseif (isset($_POST['update_payments'])) {
-    UserAccount::updatePayments($vendor, $vendor_id, $_POST['accepted_payments'] ?? []);
+    $mId = intval($_POST['remove_market'] ?? 0);
+
+    if (validateMarketId($mId) && $vendor->removeMarket($mId)) {
+      Utils::setFlashMessage('success', "Market removed successfully.");
+    } else {
+      Utils::setFlashMessage('error', "Invalid market or error removing.");
+    }
+
+    header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+    exit;
+  }
+
+  if (isset($_POST['update_vendor'])) {
+    $errors = [];
+
+    // Vendor name: required, ≤100 chars
+    $name = trim($_POST['vendor_name'] ?? '');
+    if ($name === '') {
+      $errors[] = "Vendor name can't be blank.";
+    } elseif (mb_strlen($name) > 100) {
+      $errors[] = "Vendor name must be under 100 characters.";
+    }
+
+    // Website URL: optional, but if present must be valid
+    $website = trim($_POST['vendor_website'] ?? '');
+    if ($website !== '' && ! filter_var($website, FILTER_VALIDATE_URL)) {
+      $errors[] = "Please enter a valid URL (http:// or https://).";
+    }
+
+    // Description: ≤255 chars
+    $desc = trim($_POST['vendor_description'] ?? '');
+    if (mb_strlen($desc) > 255) {
+      $errors[] = "Description must be at most 255 characters.";
+    }
+
+    // Logo upload: if file provided, check size & MIME
+    if (!empty($_FILES['vendor_logo']['name'])) {
+      $maxFileSize = 100 * 1024;
+      if (! Utils::validateFileSize($_FILES['vendor_logo'], $maxFileSize)) {
+        $errors[] = "The uploaded logo exceeds the maximum allowed size of 100KB.";
+      }
+      // optional: verify it’s actually an image
+      $info = @getimagesize($_FILES['vendor_logo']['tmp_name']);
+      if ($info === false) {
+        $errors[] = "The uploaded file must be a valid image.";
+      }
+    }
+
+    // Password change: only if any field is filled
+    $curr = $_POST['current_password'] ?? '';
+    $new  = $_POST['new_password']     ?? '';
+    $conf = $_POST['confirm_password'] ?? '';
+    if ($curr || $new || $conf) {
+      if ($curr === '' || $new === '' || $conf === '') {
+        $errors[] = "Fill in all password fields to change password.";
+      } elseif ($new !== $conf) {
+        $errors[] = "New password and confirmation do not match.";
+      } elseif (strlen($new) < 8) {
+        $errors[] = "New password must be at least 8 characters.";
+      } elseif (! password_verify($curr, $userAccount->userAccount->password_hash)) {
+        $errors[] = "Current password is incorrect.";
+      }
+    }
+
+    // If any validation errors, flash and bail out
+    if (!empty($errors)) {
+      foreach ($errors as $err) {
+        Utils::setFlashMessage('error', $err);
+      }
+      header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+      exit;
+    }
+
+    // All good — call your helper to actually persist
+    UserAccount::updateVendor($vendor, $_POST, $_FILES, $vendor_id);
+    Utils::setFlashMessage('success', "Vendor updated successfully.");
+    header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+    exit;
   }
 
   header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
