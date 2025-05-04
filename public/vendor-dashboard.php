@@ -47,7 +47,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: vendor-dashboard.php');
     exit;
   }
-  $_POST = Utils::sanitize($_POST);
+  // Pull out raw password fields so sanitize() won’t mangle them
+  $rawPasswords = [
+    'current_password' => $_POST['current_password'] ?? '',
+    'new_password'     => $_POST['new_password']     ?? '',
+    'confirm_password' => $_POST['confirm_password'] ?? '',
+  ];
+
+  // Sanitize everything else
+  $toSanitize = $_POST;
+  unset(
+    $toSanitize['current_password'],
+    $toSanitize['new_password'],
+    $toSanitize['confirm_password']
+  );
+  $sanitized = Utils::sanitize($toSanitize);
+
+  // Re-assemble $_POST: sanitized fields + raw passwords
+  $_POST = array_merge($sanitized, $rawPasswords);
 
   // Add market
   if (isset($_POST['add_market_btn'])) {
@@ -219,6 +236,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors = array_merge($errors, $result['errors']);
       }
     }
+
+    // Password update, if a new one was provided
+    if (empty($errors) && !empty($_POST['new_password'])) {
+      $newHash = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
+      $stmt = $pdo->prepare("
+      UPDATE user_account
+         SET password_hash = :hash
+       WHERE user_id       = :uid
+    ");
+      $stmt->execute([
+        ':hash' => $newHash,
+        ':uid'  => $_SESSION['user_id']
+      ]);
+    }
+
     // Flash result & redirect
     if (empty($errors)) {
       $msg = "Profile updated successfully.";

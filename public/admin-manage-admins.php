@@ -69,7 +69,7 @@ include_once('../private/validation.php');
             throw new Exception("No admin found or cannot delete non-admin.");
           }
           $pdo->commit();
-          Utils::setFlashMessage('success', "Admin #{$name} deleted.");
+          Utils::setFlashMessage('success', "Admin {$name} deleted.");
         } catch (Exception $e) {
           $pdo->rollBack();
           Utils::setFlashMessage('error', "Deletion failed: " . $e->getMessage());

@@ -85,6 +85,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
     exit;
+  } elseif (isset($_POST['update_payments'])) {
+
+    // sanitize & get the vendor
+    $_POST     = Utils::sanitize($_POST);
+    $vendor_id = intval($_POST['vendor_id'] ?? 0);
+    $vendor    = Vendor::find_by_id($vendor_id);
+
+    // grab the selected IDs (or empty array)
+    $selected = $_POST['accepted_payments'] ?? [];
+
+    // you can optionally validate with your helper
+    $errors = validatePaymentSelection($selected);
+    if (empty($errors)) {
+      if ($vendor->associatePayments($selected)) {
+        Utils::setFlashMessage('success', "Payment methods updated successfully.");
+      } else {
+        Utils::setFlashMessage('error', "Error updating payment methods.");
+      }
+    } else {
+      Utils::setFlashMessage('error', array_shift($errors));
+    }
+
+    header("Location: admin-edit-vendor.php?vendor_id={$vendor_id}");
+    exit;
   }
 
   if (isset($_POST['update_vendor'])) {

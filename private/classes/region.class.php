@@ -46,14 +46,9 @@ class Region extends DatabaseObject
   public static function fetchAllWithCoordsAndMarket(): array
   {
     $sql = "
-    SELECT r.region_id,
-           r.region_name,
-           r.latitude,
-           r.longitude,
-           m.market_id
-      FROM region AS r
- LEFT JOIN market AS m USING(region_id)
-  ORDER BY r.region_name
+    SELECT region_id, region_name, latitude, longitude
+    FROM region
+    ORDER BY region_name ASC
   ";
     return self::$database->query($sql)->fetchAll(PDO::FETCH_ASSOC);
   }

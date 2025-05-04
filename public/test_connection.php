@@ -6,7 +6,7 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 require_once '../private/config.php';
-require_once '../private/classes/databaseobject.class.php';
+//require_once '../private/classes/databaseobject.class.php';
 
 
 DatabaseObject::set_database($pdo);
@@ -23,5 +23,5 @@ try {
   echo "Error: " . $e->getMessage();
 }
 
-echo "👋 PHP is working and errors are visible.";
+echo "PHP is working and errors are visible.";
 //phpinfo();

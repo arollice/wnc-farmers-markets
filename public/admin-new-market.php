@@ -40,18 +40,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       validateNewRegion($newName, $newLat, $newLng)
     );
 
-    if (!isset(
-      $errors['new_region_name'],
-      $errors['new_region_lat'],
-      $errors['new_region_lng']
-    )) {
+
+    // If passed validation, create/fetch the region
+    if (
+      !isset(
+        $errors['new_region_name'],
+        $errors['new_region_lat'],
+        $errors['new_region_lng']
+      )
+    ) {
       $region = Region::findByName($newName)
         ?: Region::createNewRegion($newName, $newLat, $newLng);
       $region_id = $region->region_id;
     }
   } else {
+    // An existing region
     $region_id = (int)$_POST['region_id'];
   }
+
+  // 2) **Override** the POST value so validateMarketFields() sees a real int
+  $_POST['region_id'] = $region_id;
 
   $errors = array_merge(
     $errors,

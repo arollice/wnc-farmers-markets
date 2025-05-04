@@ -249,32 +249,47 @@ class Market extends DatabaseObject
   /*** Delete a market by market ID ***/
   public static function deleteMarket($market_id)
   {
-    $id = (int)$market_id;
-    if ($id < 1) {
-      return false;
-    }
-
     $db = self::$database;
+    $own = !$db->inTransaction();
+    if ($own) $db->beginTransaction();
 
     try {
-      $db->beginTransaction();
+      $id = (int)$market_id;
+      if ($id < 1) throw new Exception("Invalid ID");
 
-      $sql1 = "DELETE FROM market_schedule WHERE market_id = ?";
-      $stmt1 = $db->prepare($sql1);
+      $stmt1 = $db->prepare("DELETE FROM market_schedule WHERE market_id = ?");
       $stmt1->execute([$id]);
 
-      $sql2 = "DELETE FROM " . static::$table_name .
-        " WHERE " . static::$primary_key . " = ? LIMIT 1";
-      $stmt2 = $db->prepare($sql2);
+      $stmt2 = $db->prepare("
+        DELETE FROM " . static::$table_name . " 
+        WHERE " . static::$primary_key . " = ? LIMIT 1
+      ");
       $stmt2->execute([$id]);
 
-      $db->commit();
-
+      if ($own) $db->commit();
       return ($stmt2->rowCount() === 1);
-    } catch (Exception $e) {
-      $db->rollBack();
-
-      return false;
+    } catch (\Exception $e) {
+      if ($own && $db->inTransaction()) $db->rollBack();
+      throw $e;
     }
+  }
+
+  public static function fetchMarketsByRegion(int $region_id): array
+  {
+    $sql = "
+      SELECT
+        m.*,
+        s.state_name,
+        r.region_name
+      FROM market AS m
+      JOIN state  AS s ON m.state_id  = s.state_id
+      JOIN region AS r ON m.region_id = r.region_id
+      WHERE m.region_id = :region_id
+      ORDER BY m.market_name
+    ";
+    $stmt = self::$database->prepare($sql);
+    $stmt->bindValue(':region_id', $region_id, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
   }
 }

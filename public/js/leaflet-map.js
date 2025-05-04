@@ -35,13 +35,9 @@ document.addEventListener("DOMContentLoaded", async function () {
 
       // Click handler
       marker.on('click', () => {
-        if (r.market_id) {
-          window.location.href = `market-details.php?id=${r.market_id}`;
-        } else {
-          alert("No market found for this region.");
-        }
+        // Always go to multi-market mode for the clicked region
+        window.location.href = `market-details.php?region_id=${r.region_id}`;
       });
-
       return marker;
     });
 

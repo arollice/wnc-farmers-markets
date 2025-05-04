@@ -20,20 +20,41 @@ include_once('../private/config.php');
 
   $breadcrumbTrail = array_slice($breadcrumbs, -2);
 
-  if (!isset($_GET['id'])) {
-    die("Market ID not provided.");
+  if (!isset($_GET['region_id']) && !isset($_GET['id'])) {
+    die("Must provide either region_id or market id.");
   }
 
-  $_SESSION['prev_page'] = $_SERVER['REQUEST_URI'];
+  // Decide mode & load data
+  if (isset($_GET['region_id'])) {
+    $region_id = intval($_GET['region_id']);
+    $markets   = Market::fetchMarketsByRegion($region_id);
 
-  $market_id = intval($_GET['id']);
-  $market = Market::fetchMarketDetails($market_id);
+    $markets = Market::fetchMarketsByRegion($region_id);
+
+    if (count($markets) === 0) {
+      die("No markets found in this region.");
+    } elseif (count($markets) === 1) {
+      $market    = $markets[0];
+      $multiMode = false;
+    } else {
+      $multiMode = true;
+    }
+  } else {
+    $market_id = intval($_GET['id']);
+    $market    = Market::fetchMarketDetails($market_id)
+      ?: die("Market not found.");
+    $multiMode = false;
+  }
+
+  // Load policies & (in single mode) vendors
   $policies = Market::fetchMarketPolicies();
-  $vendors = Vendor::findVendorsByMarket($market_id, ['approved' => true]);
+  if (! $multiMode) {
+    $vendors = Vendor::findVendorsByMarket($market['market_id'], ['approved' => true]);
+  }
 
-
-  if (!$market) {
-    die("Market not found.");
+  $backLink = 'index.php';
+  if (count($breadcrumbTrail) >= 2) {
+    $backLink = $breadcrumbTrail[count($breadcrumbTrail) - 2];
   }
 
   include_once HEADER_FILE;
@@ -52,52 +73,53 @@ include_once('../private/config.php');
       </ul>
     </nav>
 
-    <h1><?= htmlspecialchars($market['market_name']) ?> - Details</h1>
-    <section id="single-market-card">
-      <?= Market::renderMarketCard($market) ?>
-    </section>
-
-    <section>
-      <h2>Attending Vendors</h2>
-      <?php if (!empty($vendors)) : ?>
-        <ul class="attending-vendors">
-          <?php foreach ($vendors as $vendor) : ?>
+    <?php if ($multiMode): ?>
+      <!-- Multi-Market List View -->
+      <h1>Markets in <?= htmlspecialchars($markets[0]['region_name']) ?></h1>
+      <section id="multi-market-list">
+        <ul>
+          <?php foreach ($markets as $m): ?>
             <li>
-              <a href="vendor-details.php?id=<?= htmlspecialchars($vendor['vendor_id']) ?>">
-                <?= htmlspecialchars($vendor['vendor_name']) ?>
+              <a href="market-details.php?id=<?= $m['market_id'] ?>">
+                <?= htmlspecialchars($m['market_name']) ?>
               </a>
-              <?php if (!empty($vendor['vendor_website'])) : ?>
-                - <a href="<?= htmlspecialchars($vendor['vendor_website']) ?>" target="_blank">Website</a>
-              <?php endif; ?>
+              &mdash; <?= htmlspecialchars($m['city']) ?>, <?= htmlspecialchars($m['state_name']) ?>
             </li>
           <?php endforeach; ?>
         </ul>
-      <?php else : ?>
-        <p>No vendors are currently listed for this market.</p>
-      <?php endif; ?>
-    </section>
+      </section>
 
-    <?php if (!empty($policies)) : ?>
-      <section class="market-policies">
-        <h2>Market Policies</h2>
-        <ul>
-          <?php foreach ($policies as $policy) : ?>
-            <li><?= htmlspecialchars($policy['policy_description']) ?></li>
-          <?php endforeach; ?>
-        </ul>
+    <?php else: ?>
+      <!-- Single-Market Detail View -->
+      <h1><?= htmlspecialchars($market['market_name']) ?> &mdash; Details</h1>
+      <section id="single-market-card">
+        <?= Market::renderMarketCard($market, $policies) ?>
+      </section>
+
+      <section>
+        <h2>Attending Vendors</h2>
+        <?php if (!empty($vendors)): ?>
+          <ul class="attending-vendors">
+            <?php foreach ($vendors as $v): ?>
+              <li>
+                <a href="vendor-details.php?id=<?= htmlspecialchars($v['vendor_id']) ?>">
+                  <?= htmlspecialchars($v['vendor_name']) ?>
+                </a>
+                <?php if (!empty($v['vendor_website'])): ?>
+                  — <a href="<?= htmlspecialchars($v['vendor_website']) ?>" target="_blank">Website</a>
+                <?php endif; ?>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        <?php else: ?>
+          <p>No vendors are currently listed for this market.</p>
+        <?php endif; ?>
       </section>
     <?php endif; ?>
 
-    <?php
-    $backLink = 'index.php';
-
-    if (isset($_SESSION['breadcrumbs']) && count($_SESSION['breadcrumbs']) >= 2) {
-      $backLink = $_SESSION['breadcrumbs'][count($_SESSION['breadcrumbs']) - 2];
-    }
-    ?>
-    <a href="<?= htmlspecialchars($backLink) ?>" id="back-link">&larr; Back</a>
+    <!-- Back link -->
+    <p><a href="<?= htmlspecialchars($backLink) ?>" id="back-link">&larr; Back</a></p>
   </main>
-
   <?php include_once FOOTER_FILE; ?>
 </body>
 
