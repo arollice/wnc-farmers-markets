@@ -417,7 +417,9 @@ Before using the app, you can verify your database setup with a simple script.
 ## Roadmap
 
 ### Upcoming Features
-- [ ] **User Profiles:** Enable vendors to customize their profiles and users to bookmark favorite markets.
+- [ ] **Generic:** Forgot Password feature for vendors and admins
+- [ ] **Generic:** Swap Leaflet for Google Maps
+- [ ] **User Profiles:** Enable vendors and users to bookmark favorite markets.
 - [ ] **Dark Mode:** Add a theme toggle for accessibility and battery savings on mobile.
 
 ### Enhancements
